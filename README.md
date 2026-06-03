@@ -39,8 +39,6 @@ levy-project/
 pip install numpy pandas scipy yfinance matplotlib pymc arviz
 ```
 
-R dependencies: `quantmod`, `MASS`, `ggplot2`, `gridExtra`
-
 ## Key references
 
 - Madan, Carr & Chang (1998) — Variance Gamma process
