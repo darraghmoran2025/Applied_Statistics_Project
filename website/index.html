@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:    #111111;
+      --mid:      #444444;
+      --light:    #888888;
+      --rule:     #dddddd;
+      --bg:       #ffffff;
+      --accent:   #1a1a1a;
+      --gaussian: #4682b4;
+      --student:  #dc143c;
+      --vg:       #e07b00;
+      --nig:      #2e8b57;
+      --dot-com:  #fff3cd;
+      --gfc:      #f8d7da;
+      --covid:    #d1ecf1;
+      --fed:      #d4edda;
+    }
+
+    body {
+      font-family: "Georgia", serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--black);
+      background: var(--bg);
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 2px solid var(--black);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    header .subtitle {
+      font-size: 0.9rem;
+      color: var(--light);
+      margin-top: 0.35rem;
+      font-style: italic;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.75rem;
+      font-size: 0.88rem;
+    }
+    nav a { color: var(--mid); text-decoration: none; }
+    nav a:hover { color: var(--black); text-decoration: underline; }
+
+    /* ── Sections ── */
+    section { margin-bottom: 3rem; }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; font-weight: bold; }
+    p  { margin-bottom: 0.9rem; color: var(--mid); }
+
+    /* ── Progress table ── */
+    .progress-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+    }
+    .progress-table th {
+      text-align: left;
+      padding: 0.4rem 0.75rem;
+      border-bottom: 2px solid var(--black);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .progress-table td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--mid);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 2px;
+      font-family: monospace;
+      letter-spacing: 0.03em;
+    }
+    .badge.done     { background: #d4edda; color: #155724; }
+    .badge.upcoming { background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; }
+
+    /* ── Model legend ── */
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .model-card {
+      border: 1px solid var(--rule);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+    .model-card .swatch {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    .model-card strong { display: block; margin-bottom: 0.2rem; }
+    .model-card p { font-size: 0.8rem; margin: 0; color: var(--light); }
+
+    /* ── Trace plot canvas ── */
+    .trace-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border: 1px solid var(--rule);
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+    canvas#trace { width: 100%; height: 100%; display: block; }
+
+    .shock-legend {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--mid);
+      margin-bottom: 1.5rem;
+    }
+    .shock-legend span {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .shock-swatch {
+      width: 14px; height: 10px;
+      border: 1px solid #ccc;
+      display: inline-block;
+    }
+
+    /* ── Results cards ── */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .result-card {
+      border: 1px solid var(--rule);
+      padding: 1rem;
+    }
+    .result-card .metric {
+      font-size: 1.6rem;
+      font-weight: bold;
+      line-height: 1.1;
+    }
+    .result-card .metric-label {
+      font-size: 0.78rem;
+      color: var(--light);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 0.25rem;
+    }
+    .result-card .metric-note {
+      font-size: 0.8rem;
+      color: var(--mid);
+      margin-top: 0.5rem;
+    }
+
+    /* ── Figure placeholder ── */
+    .figure-box {
+      border: 1px solid var(--rule);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .figure-box img { max-width: 100%; height: auto; }
+    .figure-box figcaption {
+      font-size: 0.8rem;
+      color: var(--light);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--light);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    footer a { color: var(--light); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Beyond Black-Scholes:<br>Fitting Lévy Processes to Stock Returns</h1>
+  <div class="subtitle">BSc Financial Mathematics and Economics &nbsp;·&nbsp; Applied Statistics Research Project &nbsp;·&nbsp; 2026</div>
+</header>
+
+<nav>
+  <a href="#overview">Overview</a>
+  <a href="#models">Models</a>
+  <a href="#data">Data &amp; Returns</a>
+  <a href="#week2">Week 2 Results</a>
+  <a href="#roadmap">Roadmap</a>
+  <a href="#references">References</a>
+  <a href="https://github.com/YOUR_USERNAME/levy-project" target="_blank">GitHub ↗</a>
+</nav>
+
+<!-- ── Overview ──────────────────────────────────────────────── -->
+<section id="overview">
+  <h2>Overview</h2>
+  <p>
+    The Black-Scholes framework — and much of classical financial econometrics — assumes that daily
+    stock returns are normally distributed. This project tests that assumption systematically against
+    a hierarchy of four models fitted to 25 years of S&P 500 daily log-returns (2000–2024),
+    spanning three major market crises.
+  </p>
+  <p>
+    The central question: by how much does the Gaussian model underestimate tail risk, and do
+    Lévy-based distributions (Variance-Gamma and Normal Inverse Gaussian) offer a statistically
+    meaningful improvement? Risk measures are evaluated both in-sample (MLE, AIC/BIC) and
+    out-of-sample (rolling VaR backtests, Bayesian PSIS-LOO).
+  </p>
+
+  <table class="progress-table">
+    <thead>
+      <tr><th>Week</th><th>Topic</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Literature Review</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>2</td><td>Gaussian &amp; Student-t MLE Benchmarks</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>3</td><td>Variance-Gamma &amp; NIG MLE</td><td><span class="badge upcoming">Upcoming</span></td></tr>
+      <tr><td>4</td><td>Sub-period &amp; shock analysis</td><td><span class="badge upcoming">Upcoming</span></td></tr>
+      <tr><td>5</td><td>Bayesian MCMC (PyMC / NUTS)</td><td><span class="badge upcoming">Upcoming</span></td></tr>
+      <tr><td>6</td><td>Rolling VaR backtest &amp; VIX regression</td><td><span class="badge upcoming">Upcoming</span></td></tr>
+      <tr><td>7</td><td>Final write-up</td><td><span class="badge upcoming">Upcoming</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── Models ────────────────────────────────────────────────── -->
+<section id="models">
+  <h2>Model Hierarchy</h2>
+  <div class="model-grid">
+    <div class="model-card">
+      <strong><span class="swatch" style="background:var(--gaussian)"></span>Gaussian</strong>
+      <p>2 parameters. Black-Scholes baseline. Symmetric, thin tails.</p>
+    </div>
+    <div class="model-card">
+      <strong><span class="swatch" style="background:var(--student)"></span>Student-t</strong>
+      <p>3 parameters. Symmetric fat tails via degrees-of-freedom ν.</p>
+    </div>
+    <div class="model-card">
+      <strong><span class="swatch" style="background:var(--vg)"></span>Variance-Gamma</strong>
+      <p>4 parameters. Pure jump Lévy process. Finite variation, no Brownian component.</p>
+    </div>
+    <div class="model-card">
+      <strong><span class="swatch" style="background:var(--nig)"></span>Normal Inv. Gaussian</strong>
+      <p>4 parameters. Lévy process via IG subordination. Semi-heavy tails.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Data ──────────────────────────────────────────────────── -->
+<section id="data">
+  <h2>Data &amp; Returns</h2>
+  <p>
+    6,287 daily log-returns on the S&P 500 index (^GSPC), computed as
+    r<sub>t</sub> = log(S<sub>t</sub> / S<sub>t−1</sub>), covering
+    2 January 2000 to 31 December 2024. Four market shock periods are tracked
+    throughout the analysis.
+  </p>
+
+  <div class="trace-container">
+    <canvas id="trace"></canvas>
+  </div>
+
+  <div class="shock-legend">
+    <span><span class="shock-swatch" style="background:var(--dot-com)"></span>Dot-com crash (2000–2002)</span>
+    <span><span class="shock-swatch" style="background:var(--gfc)"></span>GFC (2007–2009)</span>
+    <span><span class="shock-swatch" style="background:var(--covid)"></span>COVID-19 (2020)</span>
+    <span><span class="shock-swatch" style="background:var(--fed)"></span>Fed rate hikes (2022–2023)</span>
+  </div>
+
+  <p style="font-size:0.82rem; color:var(--light); font-style:italic;">
+    Interactive trace — hover over a shaded region for sub-period statistics.
+    Full interactivity added in Week 4.
+  </p>
+</section>
+
+<!-- ── Week 2 Results ─────────────────────────────────────────── -->
+<section id="week2">
+  <h2>Week 2 — Gaussian &amp; Student-t MLE</h2>
+
+  <h3>Key findings</h3>
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="metric">ν̂ = 2.65</div>
+      <div class="metric-label">Student-t degrees of freedom</div>
+      <div class="metric-note">Consistent with infinite kurtosis. 95% CI: 2.43–2.87.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">79.5%</div>
+      <div class="metric-label">99% ES gap (Student-t vs Gaussian)</div>
+      <div class="metric-note">−5.81% vs −3.24% daily loss at the 99th percentile.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">44%</div>
+      <div class="metric-label">Gaussian capital shortfall</div>
+      <div class="metric-note">A Gaussian-calibrated risk model holds 44% less capital than the tail structure requires.</div>
+    </div>
+  </div>
+
+  <div class="figure-box">
+    <img src="assets/img/week2_plots.png"
+         alt="S&P 500 density overlay and QQ plots — Gaussian vs Student-t MLE" />
+    <figcaption>
+      Figure 1. Top: histogram of 6,287 daily log-returns with fitted Gaussian (blue) and
+      Student-t (red, ν = 2.65) PDFs. Bottom left: Gaussian QQ plot — the S-shaped deviation
+      confirms fat tails. Bottom right: Student-t QQ — substantially improved alignment,
+      with residual departures confined to four or five structural-break events.
+      Note: the Student-t QQ y-axis spans ±25 standardised units because ν = 2.65
+      implies very heavy theoretical tails; this is expected, not an error.
+    </figcaption>
+  </div>
+</section>
+
+<!-- ── Roadmap ────────────────────────────────────────────────── -->
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <p>
+    Weeks 3–4 introduce the Lévy models (VG, NIG) and conduct a full sub-period
+    distributional analysis across the four shock periods. Week 5 extends estimation
+    to Bayesian MCMC via PyMC (NUTS sampler), yielding posterior distributions over
+    all parameters and formal predictive accuracy comparison via PSIS-LOO.
+    Week 6 runs rolling VaR backtests and fits a regression of VG/NIG parameters
+    on the VIX index as a predictor of distributional regime. Week 7 produces the
+    final write-up.
+  </p>
+</section>
+
+<!-- ── References ────────────────────────────────────────────── -->
+<section id="references">
+  <h2>References</h2>
+  <p style="font-size:0.85rem; line-height:2;">
+    Madan, D. B., Carr, P. P. and Chang, E. C. (1998). The Variance Gamma Process and Option Pricing. <em>European Finance Review</em>, 2(1), 79–105.<br>
+    Barndorff-Nielsen, O. E. (1997). Processes of Normal Inverse Gaussian Type. <em>Finance and Stochastics</em>, 2(1), 41–68.<br>
+    Cont, R. (2001). Empirical Properties of Asset Returns: Stylised Facts and Statistical Issues. <em>Quantitative Finance</em>, 1(2), 223–236.<br>
+    Christoffersen, P. F. (1998). Evaluating Interval Forecasts. <em>International Economic Review</em>, 39(4), 841–862.<br>
+    Vehtari, A., Gelman, A. and Gabry, J. (2017). Practical Bayesian Model Evaluation Using Leave-One-Out Cross-Validation and WAIC. <em>Statistics and Computing</em>, 27(5), 1413–1432.
+  </p>
+</section>
+
+<footer>
+  <span>Beyond Black-Scholes · BSc Financial Mathematics and Economics · 2026</span>
+  <span><a href="https://github.com/YOUR_USERNAME/levy-project" target="_blank">GitHub</a></span>
+</footer>
+
+<!-- ── Trace canvas sketch ── -->
+<script>
+  // Placeholder trace — replaced with real data in Week 4
+  // Draws a synthetic noisy signal to illustrate the layout
+  (function () {
+    const canvas = document.getElementById("trace");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      draw();
+    }
+
+    function draw() {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // Shock shading regions (approximate proportions of 2000-2024)
+      const shocks = [
+        { start: 0.01, end: 0.12, colour: "rgba(255,243,205,0.7)" },  // dot-com
+        { start: 0.32, end: 0.38, colour: "rgba(248,215,218,0.7)" },  // GFC
+        { start: 0.83, end: 0.85, colour: "rgba(209,236,241,0.7)" },  // COVID
+        { start: 0.88, end: 0.96, colour: "rgba(212,237,218,0.7)" },  // Fed
+      ];
+      shocks.forEach(s => {
+        ctx.fillStyle = s.colour;
+        ctx.fillRect(s.start * W, 0, (s.end - s.start) * W, H);
+      });
+
+      // Zero line
+      ctx.strokeStyle = "#cccccc";
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(0, H / 2);
+      ctx.lineTo(W, H / 2);
+      ctx.stroke();
+
+      // Synthetic return series
+      ctx.strokeStyle = "rgba(30,30,30,0.65)";
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      let y = H / 2;
+      const steps = 600;
+      for (let i = 0; i < steps; i++) {
+        const x = (i / steps) * W;
+        // Inject higher volatility in shock regions
+        let vol = 0.015;
+        const frac = i / steps;
+        if ((frac > 0.01 && frac < 0.12) ||
+            (frac > 0.32 && frac < 0.38) ||
+            (frac > 0.83 && frac < 0.85) ||
+            (frac > 0.88 && frac < 0.96)) vol = 0.045;
+        y += (Math.random() - 0.5) * vol * H;
+        y = Math.max(5, Math.min(H - 5, y));
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+  })();
+</script>
+
+</body>
+</html>
