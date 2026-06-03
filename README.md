@@ -44,7 +44,5 @@ R dependencies: `quantmod`, `MASS`, `ggplot2`, `gridExtra`
 ## Key references
 
 - Madan, Carr & Chang (1998) — Variance Gamma process
-- Barndorff-Nielsen (1997) — Normal Inverse Gaussian process
 - Cont (2001) — Stylised facts of financial returns
 - Christoffersen (1998) — VaR backtesting framework
-- Vehtari, Gelman & Gabry (2017) — Bayesian model comparison
