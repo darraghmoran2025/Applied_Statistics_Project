@@ -8,17 +8,26 @@ Estimation is carried out by both Maximum Likelihood (MLE) and Bayesian MCMC (Py
 Risk measures (VaR, ES) are evaluated via rolling backtests using the Kupiec and
 Christoffersen test framework.
 
-## Project structure
+## Repository structure
+
+Each week is self-contained: code, figures, and write-up all live under the
+corresponding week folder.
 
 ```
-levy-project/
-  data/           # Data fetching utilities (S&P 500, VIX)
-  models/         # One module per distribution
-  risk/           # VaR/ES computation and backtesting
-  utils/          # Shared helpers: Hessian, plotting, stats
-  scripts/        # Week-by-week runner scripts
-  docs/           # Write-ups and figures
-  website/        # GitHub Pages site
+week1/
+  references/   — key papers and bibliography
+  writeup/      — literature review and research proposal
+
+week2/
+  code/         — Python and R scripts (Gaussian & Student-t MLE)
+  figures/      — diagnostic plots (density, QQ, trace, annual marginals)
+  writeup/      — results write-up with parameter tables and risk analysis
+
+week3/          — Variance-Gamma (VG) model  [upcoming]
+week4/          — NIG model; AIC/BIC/KS comparison  [upcoming]
+week5/          — Bayesian VG in PyMC  [upcoming]
+week6/          — Posterior predictive checks; rolling backtest  [upcoming]
+week7/          — Final write-up  [upcoming]
 ```
 
 ## Weekly progress
@@ -33,10 +42,17 @@ levy-project/
 | 6 | Rolling VaR backtest + VIX regression | Upcoming |
 | 7 | Final write-up | Upcoming |
 
-## Setup
+## Running Week 2
 
 ```bash
-pip install numpy pandas scipy yfinance matplotlib pymc arviz
+pip install numpy pandas scipy yfinance matplotlib
+python week2/code/week2_gaussian_student_mle.py
+```
+
+For the R version:
+```r
+install.packages(c("quantmod", "MASS", "ggplot2", "gridExtra"))
+source("week2/code/week2_gaussian_student_mle.R")
 ```
 
 ## Key references
