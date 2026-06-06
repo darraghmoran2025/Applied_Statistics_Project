@@ -66,9 +66,6 @@ pip install numpy pandas scipy yfinance matplotlib
 python week2/code/week2_gaussian_student_mle.py
 ```
 
-The script downloads S&P 500 data automatically via yfinance and saves all
-figures to the same directory.
-
 ## Key references
 
 - Madan, Carr & Chang (1998) - Variance Gamma process
