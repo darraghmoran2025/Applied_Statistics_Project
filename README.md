@@ -5,8 +5,7 @@
 This project compares four distributional models for S&P 500 daily log-returns:
 Gaussian, Student-t, Variance-Gamma (VG), and Normal Inverse Gaussian (NIG).
 Estimation is carried out by Maximum Likelihood (MLE) and Bayesian MCMC (PyMC/NUTS).
-Risk measures (VaR, ES) are evaluated via rolling backtests using the Kupiec and
-Christoffersen test framework.
+Risk measures (VaR, ES) are evaluated via rolling backtests using the Christoffersen test framework.
 
 ## Repository structure
 
