@@ -1,22 +1,5 @@
 """
 Week 2 — Gaussian & Student-t MLE
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Objectives
-----------
-1. Download S&P 500 daily log-returns (Jan 2000 – Dec 2024) via yfinance
-2. Fit Normal(μ, σ²) and Student-t(ν, μ, σ) by Maximum Likelihood
-3. Extract standard errors from the observed Fisher Information matrix
-4. Compute AIC and BIC for model comparison
-5. Estimate VaR and ES at 95% and 99%
-6. KS goodness-of-fit test on standardised residuals
-7. Retrospective sub-period analysis across four market shock windows
-8. Diagnostic plots: density overlay, QQ plots, return trace with shock shading
-
-Install dependencies
---------------------
-    pip install numpy pandas scipy yfinance matplotlib
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 LEGEND
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -38,14 +21,12 @@ fit_student_t(r) → dict
 
 _neg_loglik_t(params, r)
     Internal helper: negative log-likelihood of the Student-t.
-    Prefixed with _ to signal it is not called directly — it is passed
-    as the objective function to scipy.optimize.minimize.
+    Prefixed with _ to signal it is not called directly.
 
 _numerical_hessian(f, x)
     Internal helper: approximates the matrix of second derivatives of f
     at point x using the 4-point central-difference formula. Used to
-    compute standard errors after optimisation. Prefixed with _ for the
-    same reason as above.
+    compute standard errors after optimisation.
 
 compute_risk_measures(g, t, alphas) → pd.DataFrame
     Computes VaR and ES at each confidence level in alphas for both the
@@ -65,109 +46,14 @@ print_subperiod_summary(df)
     format with annualised volatility for easier interpretation.
 
 plot_marginals_by_year(r_series, save_dir)
-    Produces a grid of annual kernel density plots — one panel per
-    calendar year. Crisis years (2008, 2020) show wider distributions;
-    calm years show narrow, peaked distributions. Saved as
-    week2_marginals_by_year.png.
+    Produces a grid of annual kernel density plots
 
 make_plots(r_series, g, t, save_dir)
     Produces six figures: the combined 4-panel overview (week2_plots.png)
-    plus five individual files — one per panel and one for the annual
-    marginals grid — for direct use in write-ups.
+    plus five individual files 
 
 _save_fig(fig, save_dir, filename)
-    Internal helper: saves a matplotlib figure to save_dir/filename at
-    150 dpi. Prefixed with _ as it is not called directly.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-VARIABLE NAMES
-──────────────
-r               Array of daily log-returns (numpy array).
-r_series        Same data as a dated pd.Series (has a DatetimeIndex),
-                used for time-series plots and sub-period slicing.
-g               Dict of Gaussian MLE results returned by fit_gaussian().
-t               Dict of Student-t MLE results returned by fit_student_t().
-n               Number of observations.
-k               Number of free parameters in the model (2 for Gaussian,
-                3 for Student-t).
-p               Left-tail probability = 1 − α (e.g. 0.05 at 95% level).
-q_g, q_t        Quantile at probability p under the Gaussian / Student-t.
-var_g, var_t    VaR under the Gaussian / Student-t model.
-es_g,  es_t     Expected Shortfall under the Gaussian / Student-t model.
-z_g,   z_t      Standardised residuals: (r − μ̂) / σ̂ for each model.
-                Should follow N(0,1) or t(ν) if the model fits well.
-H               Hessian matrix — the n×n matrix of second partial
-                derivatives of the negative log-likelihood at the MLE.
-                Its inverse is the asymptotic covariance matrix.
-h               Per-parameter finite-difference step sizes (vector).
-                Scaled as h_i = max(1e-6, 1e-4 × |θ_i|) so the step is
-                always proportional to the size of each parameter.
-se              Array of standard errors = sqrt(diag(H⁻¹)).
-n_obs           Number of observations within a sub-period window.
-loglik          Log-likelihood ℓ(θ̂) evaluated at the MLE.
-init            Starting parameter values passed to the optimiser.
-bounds          Box constraints on the parameters for L-BFGS-B:
-                ν > 2.01 (finite variance), σ > 0.
-result          The object returned by scipy.optimize.minimize containing
-                the optimised parameters (result.x), objective value
-                (result.fun), and convergence flag (result.success).
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-GREEK LETTERS AND STATISTICAL NOTATION
-───────────────────────────────────────
-μ  (mu)         Location parameter ≈ mean of the distribution.
-σ  (sigma)      Scale parameter ≈ standard deviation. Note: for the
-                Student-t, σ is NOT the true standard deviation; the
-                true std dev = σ√(ν/(ν−2)), which is larger than σ.
-ν  (nu)         Degrees of freedom of the Student-t. Controls tail
-                heaviness: smaller ν → fatter tails. ν → ∞ recovers
-                the Gaussian. Requires ν > 2 for finite variance.
-α  (alpha)      Confidence level for VaR/ES (e.g. 0.95 = 95%).
-φ(·)            PDF of the standard Normal distribution N(0,1).
-Φ⁻¹(·)         Quantile function (inverse CDF) of N(0,1).
-f_ν(·)          PDF of the standard Student-t with ν degrees of freedom.
-θ̂  (theta-hat)  Generic notation for a vector of MLE parameter estimates.
-ℓ(θ̂)           Log-likelihood evaluated at the MLE estimates.
-SE(θ̂_i)        Standard error of the i-th parameter = √(H⁻¹)_{ii}.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-ACRONYMS
-────────
-MLE         Maximum Likelihood Estimation — finds parameter values that
-            maximise the probability of observing the data.
-SE          Standard Error — uncertainty estimate for a fitted parameter.
-VaR         Value-at-Risk — the loss level exceeded with probability 1−α.
-ES          Expected Shortfall — the average loss conditional on exceeding
-            VaR. Also called CVaR (Conditional VaR). More informative
-            than VaR for extreme events; mandated by Basel III/IV (FRTB).
-AIC         Akaike Information Criterion = 2k − 2ℓ(θ̂). Penalises model
-            complexity; lower is better. Used to compare Gaussian vs
-            Student-t without over-rewarding extra parameters.
-BIC         Bayesian Information Criterion = k·ln(n) − 2ℓ(θ̂). Imposes
-            a stronger penalty for extra parameters than AIC. Also lower
-            is better.
-KS          Kolmogorov-Smirnov — a non-parametric goodness-of-fit test.
-            The test statistic D = max|F_n(x) − F(x)| measures the
-            largest gap between the empirical and theoretical CDF.
-QQ plot     Quantile-Quantile plot — compares the sorted sample values
-            against theoretical quantiles. A straight diagonal line
-            indicates a good fit; S-shaped deviation signals fat tails.
-GFC         Global Financial Crisis (approximately 2007–2009).
-FRTB        Fundamental Review of the Trading Book — Basel Committee
-            regulation (BCBS 2013) that replaced VaR with ES as the
-            primary capital metric.
-L-BFGS-B    Limited-memory Broyden–Fletcher–Goldfarb–Shanno with Bounds
-            — the quasi-Newton optimisation algorithm used for Student-t
-            MLE. Handles box constraints (ν > 2.01, σ > 0) natively.
-PDF         Probability Density Function.
-CDF         Cumulative Distribution Function.
-ddof        Delta degrees of freedom — the divisor used in std(). ddof=0
-            divides by n (MLE / biased estimator); ddof=1 divides by n−1
-            (sample / unbiased estimator). MLE uses ddof=0.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    Internal helper: saves a matplotlib figure
 """
 
 import os
