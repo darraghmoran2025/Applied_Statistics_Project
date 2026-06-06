@@ -10,7 +10,7 @@ This week I fitted two distributions to 6,287 daily log-returns on the S&P 500 (
 
 Figure 1 shows the full return series. I chose a 25-year window to cover four distinct market stress periods: the dot-com crash (2000–2002), the Global Financial Crisis (2007–2009), the COVID-19 shock (February–June 2020), and the Fed rate hike cycle (2022–2023). These are shaded in the figure.
 
-The volatility is strikingly uneven. The 2012–2019 period looks almost flat against the GFC and COVID spikes. The single worst day in the sample, roughly −12% on 16 March 2020, barely looks like it belongs to the same series as a typical day in 2017.
+The volatility is uneven. The 2012–2019 period looks almost flat against the GFC and COVID spikes. The single worst day in the sample, roughly −12% on 16 March 2020, barely looks like it belongs to the same series as a typical day in 2017.
 
 ![Figure 1. S&P 500 daily log-returns (2000–2024) with the four market shock periods shaded.](../figures/week2_trace.png)
 
@@ -67,7 +67,7 @@ Figure 3 shows the Gaussian QQ. The S-shape is the signature of fat tails: the a
 
 *Figure 3. QQ plot against N(0,1). The S-shape confirms fat tails in both directions.*
 
-Figure 4 shows the Student-t QQ. The fit is dramatically better across the central 99% of the data. The remaining departures are a handful of extreme observations at each end — 9/11, the Lehman collapse, the March 2020 crash. These look more like structural breaks than draws from a stable distribution, which is part of what motivates moving to more flexible models in Weeks 3–4.
+Figure 4 shows the Student-t QQ. The fit is dramatically better across the central 99% of the data. The remaining departures are a handful of extreme observations at each end: 9/11, the Lehman collapse, the March 2020 crash. These look more like structural breaks than draws from a stable distribution.
 
 ![Figure 4. QQ plot against t(ν = 2.648). Near-perfect fit across the central 99%; residual departures correspond to major crisis events.](../figures/week2_qq_student_t.png)
 
@@ -79,8 +79,6 @@ Figure 4 shows the Student-t QQ. The fit is dramatically better across the centr
 |-------|-----------------|----------|---|
 | Gaussian | 0.094 | <0.001 | 6,287 |
 | Student-t | 0.018 | 0.030 | 6,287 |
-
-*\*p-values are biased downward when the same data is used to estimate parameters and test fit (Lilliefors effect). D is the reliable comparison.*
 
 The KS statistic D backs up the QQ plots. The Student-t D of 0.018 is five times smaller than the Gaussian's 0.094. Both technically reject at n = 6,287, but the gap between them is what matters.
 
@@ -97,7 +95,7 @@ The AIC difference is 1,803 units. AIC already penalises the Student-t for its e
 
 ## 5. Risk measures
 
-VaR tells you the loss threshold exceeded on the worst α% of days. ES tells you the average loss on those days — not just the threshold, but what's inside the tail. ES is what matters for capital setting under FRTB.
+VaR tells you the loss threshold exceeded on the worst α% of days. ES tells you the average loss on those days.
 
 **Table 5. Daily VaR and ES. Negative values = losses.**
 
@@ -108,13 +106,13 @@ VaR tells you the loss threshold exceeded on the worst α% of days. ES tells you
 
 At 95%, the Gaussian VaR looks more conservative than the Student-t (−1.99% vs −1.69%). That's because the Student-t's fitted σ is much smaller (0.71% vs 1.22%), which at moderate quantile depths outweighs the heavier-tail effect. But even at 95%, ES tells the opposite story: Student-t ES of −3.00% is 20% worse than the Gaussian's −2.50%. Once inside the tail, the heavier distribution wins.
 
-At 99%, there is no crossover. Student-t ES is −5.81% against the Gaussian's −3.24% — a 79.5% gap. A portfolio using Gaussian ES to set capital under FRTB rules would hold roughly 44% too little (3.238 / 5.813 = 0.557). That's the number this whole week was building toward.
+At 99%, there is no crossover. Student-t ES is −5.81% against the Gaussian's −3.24%. A portfolio using Gaussian ES to set capital would hold roughly 44% too little (3.238 / 5.813 = 0.557). That's the number this whole week was building toward.
 
 ---
 
 ## 6. How crises change the distribution
 
-When you fit each model separately to the four shock windows, the variation in tail behaviour is striking.
+When you fit each model separately to the four shock windows, the variation in tail behaviour is interesting.
 
 **Table 6. Sub-period MLE results. ν̂ is fitted independently to each window.**
 
@@ -126,12 +124,12 @@ When you fit each model separately to the four shock windows, the variation in t
 | COVID-19 | 104 | 50.5% | 2.285 | 28.4% |
 | Fed rate hikes | 501 | 19.5% | 6.525 | 16.3% |
 
-The ν̂ values are where it gets interesting. The GFC and COVID periods return ν̂ around 2.3–2.6, extremely close to the boundary where variance becomes infinite. The dot-com crash and rate hike cycle return ν̂ around 6.5, close enough to the Gaussian that the difference barely matters. These crises aren't just different in magnitude; they're structurally different.
+The ν̂ values are where it gets interesting. The GFC and COVID periods return ν̂ around 2.3–2.6, extremely close to the boundary where variance becomes infinite. The dot-com crash and rate hike cycle return ν̂ around 6.5, close enough to the Gaussian that the difference barely matters. Evidence suggests crises are structurally different.
 
 Figure 5 shows the annual return distributions for 2000–2024, with crisis years highlighted and annualised volatility labelled in each panel. 2008 (σ = 41%) and 2020 (σ = 35%) stand out clearly. The 2013–2019 stretch looks narrow by comparison, with σ as low as 7% in 2017. The dot-com years are elevated but noticeably more moderate than the GFC, which matches the higher ν̂.
 
-![Figure 5. Annual return distributions (KDE), 2000–2024. Crisis years are highlighted; annualised volatility is shown in each panel.](../figures/week2_marginals_by_year.png)
+![Figure 5. Annual return distributions, 2000–2024. Crisis years are highlighted; annualised volatility is shown in each panel.](../figures/week2_marginals_by_year.png)
 
-*Figure 5. Annual return distributions (KDE), 2000–2024. Crisis years are highlighted; annualised volatility is shown in each panel.*
+*Figure 5. Annual return distributions, 2000–2024. Crisis years are highlighted; annualised volatility is shown in each panel.*
 
-The full-sample ν̂ of 2.648 is effectively an average across all these regimes. In calm years it overstates tail risk; in GFC conditions it may still understate it. That's the main reason for moving to the Variance-Gamma and NIG models in Weeks 3–4, which have separate parameters for skewness and tail weight and should handle this variation better.
+The full-sample ν̂ of 2.648 is effectively an average across all these regimes. In calm years it overstates tail risk; in GFC conditions it may still understate it.
