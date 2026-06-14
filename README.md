@@ -2,8 +2,8 @@
 
 **BSc Financial Mathematics and Economics - Applied Statistics Research Project**
 
-This project compares four distributional models for S&P 500 daily log-returns:
-Gaussian, Student-t, Variance-Gamma (VG), and Normal Inverse Gaussian (NIG).
+This project compares five distributional models for S&P 500 daily log-returns:
+Gaussian, Laplace, Student-t, Variance-Gamma (VG), and Normal Inverse Gaussian (NIG).
 Estimation is carried out by Maximum Likelihood (MLE) and Bayesian MCMC (PyMC/NUTS).
 Risk measures (VaR, ES) are evaluated via rolling backtests using the Christoffersen test framework.
 
@@ -22,10 +22,16 @@ week2/
   figures/  - trace plot, density overlay, QQ plots, annual marginals
   writeup/  - Week2_Results.md
 
-week3/      - Variance-Gamma model  [upcoming]
-week4/      - NIG model; AIC/BIC/KS comparison  [upcoming]
-week5/      - Bayesian VG in PyMC  [upcoming]
-week6/      - Posterior predictive checks; rolling backtest  [upcoming]
+week3/
+  code/     - levy_models.py, week3_all_models_mle.py, week3_subperiod.py,
+              week3_leadup_regression.py, week3_vix_regression.py, week3_main.py,
+              and the writeup generators
+  figures/  - five-model density/QQ/risk, sub-period bars, lead-up regression plots
+  writeup/  - Week3_Results.md, Week3_Regression.md
+
+week4/      - Bayesian VG/NIG in PyMC  [upcoming]
+week5/      - Posterior predictive checks; convergence diagnostics  [upcoming]
+week6/      - Rolling VaR backtest (Christoffersen)  [upcoming]
 week7/      - Final write-up  [upcoming]
 ```
 
@@ -35,10 +41,10 @@ week7/      - Final write-up  [upcoming]
 |------|-------|--------|
 | 1 | Literature review and research proposal | Complete |
 | 2 | Gaussian and Student-t MLE | Complete |
-| 3 | Variance-Gamma model | Upcoming |
-| 4 | NIG model; model comparison | Upcoming |
-| 5 | Bayesian MCMC | Upcoming |
-| 6 | Rolling VaR backtest + VIX regression | Upcoming |
+| 3 | Five-model MLE (incl. Laplace, VG, NIG); sub-period analysis; lead-up regression | Complete |
+| 4 | Bayesian MCMC (PyMC/NUTS) | Upcoming |
+| 5 | Posterior predictive checks; diagnostics | Upcoming |
+| 6 | Rolling VaR backtest (Christoffersen) | Upcoming |
 | 7 | Final write-up | Upcoming |
 
 ## Week 1
@@ -63,6 +69,35 @@ Fits a Gaussian and location-scale Student-t to 6,287 daily S&P 500 log-returns
 ```bash
 pip install numpy pandas scipy yfinance matplotlib
 python week2/code/week2_gaussian_student_mle.py
+```
+
+## Week 3
+
+Extends the comparison to five distributional models on the same 6,287 daily
+returns, adds a sub-period analysis across the four shock windows, and adds a
+lead-up regression on forward risk. Write-ups: `Week3_Results.md` (the model
+comparison) and `Week3_Regression.md` (the lead-up regression). Key findings:
+
+- The Laplace (double-exponential), the symmetric VG special case (θ = 0, ν = 1),
+  reaches ΔAIC −1,771 with only two parameters — 96% of the four-parameter NIG's
+  gain over the Gaussian. Most of the improvement over the Gaussian comes from
+  exponential rather than thin tails.
+- NIG is the best fit overall (ΔAIC −1,851) and the only model not rejected by KS.
+- 99% Expected Shortfall: −3.24% (Gaussian), −3.91% (Laplace), −4.27% (VG),
+  −5.19% (NIG), −5.81% (Student-t).
+- Sub-period fits show the GFC and COVID differ in kind from the dot-com and
+  rate-hike episodes: ν near 2.3–2.6 versus 6.5, NIG α near 18–26 versus 99–112.
+- Lead-up regression on forward 21-day realised volatility: tail/VIX/drawdown
+  factors add 11 points of R² (0.44 to 0.55) over a volatility-only baseline,
+  with Newey-West HAC standard errors. Framed as retrospective risk attribution,
+  not return forecasting.
+
+### Running Week 3
+
+```bash
+pip install numpy pandas scipy yfinance matplotlib
+python week3/code/week3_main.py            # mle + sub-period + lead-up regression
+python week3/code/week3_main.py --mode mle # five-model comparison only
 ```
 
 ## Key references
