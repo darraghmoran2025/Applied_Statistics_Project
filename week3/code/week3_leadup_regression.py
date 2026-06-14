@@ -323,19 +323,33 @@ def make_leadup_plots(panel_df, std_full, horizon, save_dir=None):
     z, _, _ = _standardise(panel_df[_FACTOR_KEYS])
     show = ["rv21", "kurt21", "dvix5", "ddown"]
     show_lbl = {k: dict(_FACTORS)[k] for k in show}
-    fig1, axes = plt.subplots(len(show), 1, figsize=(11, 9), sharex=True)
+    # Saturated shading: the shared SHOCK_COLOURS pastels wash out once the
+    # PNG is flattened to RGB-on-white, so the four windows are given stronger,
+    # clearly distinct colours here.
+    shade = {
+        "Dot-com crash":  "#f4b400",   # amber
+        "GFC":            "#e2504e",   # red
+        "COVID-19":       "#1f9ec4",   # cyan
+        "Fed rate hikes": "#3fa34d",   # green
+    }
+    fig1, axes = plt.subplots(len(show), 1, figsize=(13, 11), sharex=True)
     for ax, kkey in zip(axes, show):
-        _shade_shocks(ax, periods)
-        ax.plot(z.index, z[kkey].values, color="black", lw=0.6)
-        ax.axhline(0, color="gray", lw=0.6, ls=":")
-        ax.set_ylabel(show_lbl[kkey], fontsize=9)
-        ax.set_ylim(-4, 6)
-    axes[0].set_title(
-        "Standardised risk factors over time (shaded = shock windows)\n"
-        "Descriptive diagnostic — not a forecast", fontsize=11)
-    handles = [mpatches.Patch(color=SHOCK_COLOURS[n], label=n) for n in periods]
-    axes[0].legend(handles=handles, fontsize=7, ncol=4, loc="upper left")
-    fig1.tight_layout()
+        for name, (start, end) in periods.items():
+            ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
+                       color=shade[name], alpha=0.33, lw=0, zorder=0)
+        ax.plot(z.index, z[kkey].values, color="#111111", lw=1.0, zorder=3)
+        ax.axhline(0, color="gray", lw=0.7, ls=":", zorder=2)
+        ax.grid(axis="y", color="0.9", lw=0.6, zorder=1)
+        ax.set_ylabel(show_lbl[kkey], fontsize=12)
+        ax.set_ylim(-3.5, 6)
+        ax.margins(x=0.01)
+    handles = [mpatches.Patch(facecolor=shade[n], alpha=0.55, label=n)
+               for n in periods]
+    fig1.suptitle("Standardised risk factors over time (shaded = shock windows)",
+                  fontsize=13, y=0.995)
+    fig1.legend(handles=handles, fontsize=11, ncol=4, loc="upper center",
+                bbox_to_anchor=(0.5, 0.945), frameon=False)
+    fig1.tight_layout(rect=[0, 0, 1, 0.91])
     _save_fig(fig1, save_dir, "week3_leadup_factors.png")
     plt.close(fig1)
 
