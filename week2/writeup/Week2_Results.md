@@ -126,6 +126,8 @@ When you fit each model separately to the four shock windows, the variation in t
 
 The ν̂ values are where it gets interesting. The GFC and COVID periods return ν̂ around 2.3–2.6, extremely close to the boundary where variance becomes infinite. The dot-com crash and rate hike cycle return ν̂ around 6.5, close enough to the Gaussian that the difference barely matters. Evidence suggests crises are structurally different.
 
+A counterintuitive feature of the crisis windows is that excess kurtosis falls even as variance rises sharply. In a sustained crisis, extreme daily moves are no longer outliers relative to the elevated variance — nearly every day is volatile — so the distribution spreads broadly rather than concentrating mass near the centre with a thin spike. The excess kurtosis that drives ν̂ down in the full sample comes largely from the contrast between tranquil and turbulent regimes; within a crisis window that contrast disappears, and the within-period distribution is wide but not especially peaked.
+
 Figure 5 shows the annual return distributions for 2000–2024, with crisis years highlighted and annualised volatility labelled in each panel. 2008 (σ = 41%) and 2020 (σ = 35%) stand out clearly. The 2013–2019 stretch looks narrow by comparison, with σ as low as 7% in 2017. The dot-com years are elevated but noticeably more moderate than the GFC, which matches the higher ν̂.
 
 ![Figure 5. Annual return distributions, 2000–2024. Crisis years are highlighted; annualised volatility is shown in each panel.](../figures/week2_marginals_by_year.png)
