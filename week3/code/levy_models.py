@@ -1,11 +1,4 @@
 """
-levy_models.py — Variance-Gamma and Normal Inverse Gaussian MLE
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Provides the two Lévy process models for Week 3 onward.  All downstream
-scripts import from this module rather than re-implementing the mathematics.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FUNCTIONS
 ─────────
 fit_vg(r, n_starts)  → dict
@@ -56,46 +49,6 @@ NIG  (μ, α, β, δ)
   Variance = δα²/γ³
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MATHEMATICAL NOTES
-──────────────────
-VG PDF (Madan, Carr, Chang 1998, eq. 2):
-
-  f(x) = 2·exp(θy/σ²) · (|y|/ω)^(1/ν−½) · K_{1/ν−½}(ω|y|/σ²)
-         ─────────────────────────────────────────────────────────
-         σ√(2π) · ν^(1/ν) · Γ(1/ν)
-
-  where y = x − μ,  ω = √(2σ²/ν + θ²)
-
-  Derivation: integrate out the Gamma time-change G ~ Gamma(1/ν, ν)
-  from the conditional normal N(μ + θG, σ²G) using the integral
-  ∫₀^∞ g^(p−1) exp(−qg − r/g) dg = 2(r/q)^(p/2) K_p(2√(qr)).
-
-NIG PDF (Barndorff-Nielsen 1997):
-
-  f(x) = αδ · exp(δγ + β(x−μ)) · K₁(αq) / (π · q)
-
-  where γ = √(α²−β²),  q = √(δ²+(x−μ)²)
-
-Bessel numerics: K_ν(z) = kve(ν,z)·exp(−z), so
-  log K_ν(z) = log kve(ν,z) − z.
-Using kve avoids underflow for large z (deep tail observations).
-kve handles negative orders via the reflection K_{−ν} = K_ν.
-
-NIG simulation uses the variance-mean mixture:
-  X | V ~ N(μ + βV, V),   V ~ IG(δ/γ, δ²)
-  where scipy invgauss(mu_s, scale=s) has mean = mu_s·s, var = mu_s³·s².
-  Setting mu_s = 1/(δγ), s = δ² gives E[V]=δ/γ, Var[V]=δ/γ³ as required.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Install dependencies
-────────────────────
-    pip install numpy pandas scipy yfinance matplotlib
-
-REFERENCES
-──────────
-Madan, D. B., Carr, P. P. and Chang, E. C. (1998). The Variance Gamma
-Process and Option Pricing. European Finance Review, 2(1), 79–105.
 """
 
 import getpass
