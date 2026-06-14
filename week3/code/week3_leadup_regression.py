@@ -2,29 +2,6 @@
 week3_leadup_regression.py — Lead-Up Regression on Forward Risk
 Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
 
-SCOPE AND GUARDRAILS (read first)
-─────────────────────────────────
-This module does NOT attempt to predict the direction or level of stock
-returns.  That is outside the project and is not reliably possible.  The
-dependent variable here is always a RISK / DISPERSION quantity — forward
-realised volatility — never a return sign or level.  Forecasting the
-dispersion of returns is legitimate because volatility clusters (Cont,
-2001): large moves follow large moves.  This is the same empirical fact
-the whole Basel VaR/ES apparatus rests on.
-
-The analysis is framed as RETROSPECTIVE, IN-SAMPLE ATTRIBUTION, not
-out-of-sample forecasting.  The question answered is:
-
-    "Which observable, daily factors were systematically elevated in the
-     run-up to historical episodes of extreme returns, and do tail-shape
-     factors carry information about future risk beyond plain volatility?"
-
-No out-of-sample skill is claimed, no trading PnL is computed, and no
-held-out validation is presented as a forecasting scorecard.  The factor
-trajectories overlaid on the four shock windows are a descriptive
-diagnostic ("these quantities were already rising"), not an early-warning
-system.
-
 Objectives
 ----------
 1. Build a daily feature panel from S&P 500 returns + VIX, with every
