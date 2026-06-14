@@ -15,10 +15,10 @@ Tables 1 and 3 carry the Week 2 Gaussian and Student-t results forward. Tables 2
 | Parameter | Estimate | Standard Error | t-statistic |
 |-----------|----------|----------------|-------------|
 | μ (daily drift) | +0.000223 | 0.000154 | 1.45 |
-| σ (scale) | 0.012234 | 0.000109 | — |
-| Log-likelihood | 18,764.3 | — | — |
-| AIC | −37,524.5 | — | — |
-| BIC | −37,511.0 | — | — |
+| σ (scale) | 0.012234 | 0.000109 | n/a |
+| Log-likelihood | 18,764.3 | n/a | n/a |
+| AIC | −37,524.5 | n/a | n/a |
+| BIC | −37,511.0 | n/a | n/a |
 
 **Table 2. Laplace MLE (symmetric VG special case: θ = 0, ν = 1).**
 
@@ -26,9 +26,9 @@ Tables 1 and 3 carry the Week 2 Gaussian and Student-t results forward. Tables 2
 |-----------|----------|----------------|
 | μ (location) | +0.000602 | 0.000102 |
 | b (scale) | 0.008078 | 0.000102 |
-| Log-likelihood | 19,649.9 | — |
-| AIC | −39,295.7 | — |
-| BIC | −39,282.2 | — |
+| Log-likelihood | 19,649.9 | n/a |
+| AIC | −39,295.7 | n/a |
+| BIC | −39,282.2 | n/a |
 
 The Laplace closed-form MLE sets μ to the sample median and b to the mean absolute deviation about it. Its log-likelihood of 19,649.9 beats the Gaussian by 885.6 and falls only 15.6 short of the full VG, which frees the two parameters (θ and ν) that the Laplace holds fixed. A likelihood-ratio test of that restriction gives 31.2 on 2 degrees of freedom (p < 0.001), so the asymmetry and variance-rate freedom are real, but small next to the 885-unit gain the exponential tails alone give.
 
@@ -37,11 +37,11 @@ The Laplace closed-form MLE sets μ to the sample median and b to the mean absol
 | Parameter | Estimate | Standard Error | 95% CI |
 |-----------|----------|----------------|--------|
 | ν (degrees of freedom) | 2.648 | 0.110 | (2.43, 2.87) |
-| μ (location) | +0.000656 | 0.000110 | — |
-| σ (scale) | 0.007077 | 0.000128 | — |
-| Log-likelihood | 19,666.7 | — | — |
-| AIC | −39,327.5 | — | — |
-| BIC | −39,307.2 | — | — |
+| μ (location) | +0.000656 | 0.000110 | n/a |
+| σ (scale) | 0.007077 | 0.000128 | n/a |
+| Log-likelihood | 19,666.7 | n/a | n/a |
+| AIC | −39,327.5 | n/a | n/a |
+| BIC | −39,307.2 | n/a | n/a |
 
 **Table 4. Variance-Gamma MLE.**
 
@@ -51,9 +51,9 @@ The Laplace closed-form MLE sets μ to the sample median and b to the mean absol
 | θ (asymmetry) | −0.000684 | 0.000149 |
 | ν (variance rate) | 1.17306 | 0.043087 |
 | μ (location) | +0.000907 | 0.000028 |
-| Log-likelihood | 19,665.5 | — |
-| AIC | −39,322.9 | — |
-| BIC | −39,296.0 | — |
+| Log-likelihood | 19,665.5 | n/a |
+| AIC | −39,322.9 | n/a |
+| BIC | −39,296.0 | n/a |
 
 The VG log-likelihood of 19,665.5 is almost identical to the Student-t's 19,666.7 despite two extra parameters, so its AIC is slightly worse. The negative θ confirms left skew, and the variance rate ν = 1.173 is well above zero, so the Gamma time-change is doing real work rather than collapsing toward the Gaussian limit.
 
@@ -65,9 +65,9 @@ The VG log-likelihood of 19,665.5 is almost identical to the Student-t's 19,666.
 | β (asymmetry) | −6.095 | 1.498 |
 | δ (scale) | 0.007574 | 0.000217 |
 | μ (location) | +0.001111 | 0.000150 |
-| Log-likelihood | 19,691.7 | — |
-| AIC | −39,375.3 | — |
-| BIC | −39,348.4 | — |
+| Log-likelihood | 19,691.7 | n/a |
+| AIC | −39,375.3 | n/a |
+| BIC | −39,348.4 | n/a |
 
 NIG achieves the highest log-likelihood of the five models. Its AIC improvement over the Gaussian is 1,851 units, 48 better than the Student-t. Negative β confirms left skew, and α = 52.3 indicates heavy tails; the values of 17–26 it falls to during the GFC and COVID (Section 5) show how much deeper the tails run in acute crises.
 
@@ -101,7 +101,7 @@ Gaussian, Laplace and Student-t use the one-sample test (analytical CDF); VG and
 
 | Model | Parameters | Log-lik | AIC | BIC | ΔAIC vs Gaussian |
 |-------|------------|---------|-----|-----|------------------|
-| Gaussian | 2 | 18,764.3 | −37,524.5 | −37,511.0 | — |
+| Gaussian | 2 | 18,764.3 | −37,524.5 | −37,511.0 | n/a |
 | Laplace | 2 | 19,649.9 | −39,295.7 | −39,282.2 | −1,771.2 |
 | Student-t | 3 | 19,666.7 | −39,327.5 | −39,307.2 | −1,802.9 |
 | VG | 4 | 19,665.5 | −39,322.9 | −39,296.0 | −1,798.4 |

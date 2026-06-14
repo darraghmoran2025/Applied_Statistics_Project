@@ -1,4 +1,53 @@
 """
+week3_leadup_regression.py — Lead-Up Regression on Forward Risk
+Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
+
+SCOPE AND GUARDRAILS (read first)
+─────────────────────────────────
+This module does NOT attempt to predict the direction or level of stock
+returns.  That is outside the project and is not reliably possible.  The
+dependent variable here is always a RISK / DISPERSION quantity — forward
+realised volatility — never a return sign or level.  Forecasting the
+dispersion of returns is legitimate because volatility clusters (Cont,
+2001): large moves follow large moves.  This is the same empirical fact
+the whole Basel VaR/ES apparatus rests on.
+
+The analysis is framed as RETROSPECTIVE, IN-SAMPLE ATTRIBUTION, not
+out-of-sample forecasting.  The question answered is:
+
+    "Which observable, daily factors were systematically elevated in the
+     run-up to historical episodes of extreme returns, and do tail-shape
+     factors carry information about future risk beyond plain volatility?"
+
+No out-of-sample skill is claimed, no trading PnL is computed, and no
+held-out validation is presented as a forecasting scorecard.  The factor
+trajectories overlaid on the four shock windows are a descriptive
+diagnostic ("these quantities were already rising"), not an early-warning
+system.
+
+Objectives
+----------
+1. Build a daily feature panel from S&P 500 returns + VIX, with every
+   predictor measured strictly at time t (knowable before the outcome).
+2. Define the outcome as forward realised volatility over the next h days,
+   RV_{t+1..t+h} — a forward RISK measure.
+3. Fit a single OLS model on the full daily sample (n ≈ 6,000), with
+   Newey–West HAC standard errors to correct for the serial correlation
+   induced by overlapping forward windows.
+4. Quantify whether tail-shape factors (rolling excess kurtosis, rolling
+   skewness, drawdown) add explanatory power BEYOND a volatility-only
+   baseline — the incremental-R² result is the bridge back to the Lévy
+   tail story.
+5. Produce a retrospective lead-up table: the average standardised level
+   of each factor in the 21 trading days before each shock window.
+
+Bridge to the Lévy framing
+--------------------------
+Two predictors — rolling excess kurtosis (kurt21) and rolling skewness
+(skew21) — are short-window empirical analogues of the VG/NIG tail and
+asymmetry parameters.  Including them lets the model speak the project's
+own vocabulary: it is the dynamics of the *risk environment*, expressed in
+tail terms, that the static-Gaussian risk numbers fail to capture.
 
 Run standalone:
     python week3_leadup_regression.py
@@ -309,10 +358,21 @@ def _save_fig(fig, save_dir, filename):
         print(f"  Saved → {path}")
 
 
-def _shade_shocks(ax, periods):
+# Saturated shock-window shading. The shared SHOCK_COLOURS pastels wash out once
+# a PNG is flattened to RGB-on-white, so the lead-up figures use stronger, clearly
+# distinct colours.
+SHADE_COLOURS = {
+    "Dot-com crash":  "#f4b400",   # amber
+    "GFC":            "#e2504e",   # red
+    "COVID-19":       "#1f9ec4",   # cyan
+    "Fed rate hikes": "#3fa34d",   # green
+}
+
+
+def _shade_shocks(ax, periods, alpha=0.33):
     for name, (start, end) in periods.items():
         ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
-                   color=SHOCK_COLOURS[name], alpha=0.55, zorder=0)
+                   color=SHADE_COLOURS[name], alpha=alpha, lw=0, zorder=0)
 
 
 def make_leadup_plots(panel_df, std_full, horizon, save_dir=None):
@@ -323,27 +383,16 @@ def make_leadup_plots(panel_df, std_full, horizon, save_dir=None):
     z, _, _ = _standardise(panel_df[_FACTOR_KEYS])
     show = ["rv21", "kurt21", "dvix5", "ddown"]
     show_lbl = {k: dict(_FACTORS)[k] for k in show}
-    # Saturated shading: the shared SHOCK_COLOURS pastels wash out once the
-    # PNG is flattened to RGB-on-white, so the four windows are given stronger,
-    # clearly distinct colours here.
-    shade = {
-        "Dot-com crash":  "#f4b400",   # amber
-        "GFC":            "#e2504e",   # red
-        "COVID-19":       "#1f9ec4",   # cyan
-        "Fed rate hikes": "#3fa34d",   # green
-    }
     fig1, axes = plt.subplots(len(show), 1, figsize=(13, 11), sharex=True)
     for ax, kkey in zip(axes, show):
-        for name, (start, end) in periods.items():
-            ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
-                       color=shade[name], alpha=0.33, lw=0, zorder=0)
+        _shade_shocks(ax, periods)
         ax.plot(z.index, z[kkey].values, color="#111111", lw=1.0, zorder=3)
         ax.axhline(0, color="gray", lw=0.7, ls=":", zorder=2)
         ax.grid(axis="y", color="0.9", lw=0.6, zorder=1)
         ax.set_ylabel(show_lbl[kkey], fontsize=12)
         ax.set_ylim(-3.5, 6)
         ax.margins(x=0.01)
-    handles = [mpatches.Patch(facecolor=shade[n], alpha=0.55, label=n)
+    handles = [mpatches.Patch(facecolor=SHADE_COLOURS[n], alpha=0.55, label=n)
                for n in periods]
     fig1.suptitle("Standardised risk factors over time (shaded = shock windows)",
                   fontsize=13, y=0.995)
@@ -360,17 +409,22 @@ def make_leadup_plots(panel_df, std_full, horizon, save_dir=None):
     # refit raw full model to get fitted values
     full_raw = ols_hac(Xf, panel_df["fwd_rv"].values, horizon)
     fitted = Xc @ full_raw["beta"]
-    fig2, ax = plt.subplots(figsize=(11, 4.5))
+    fig2, ax = plt.subplots(figsize=(13, 5.5))
     _shade_shocks(ax, periods)
     ax.plot(panel_df.index, panel_df["fwd_rv"].values * 100,
-            color="black", lw=0.7, label="Actual forward 21d vol (ann., %)")
+            color="black", lw=0.8, label="Actual forward 21d vol (ann., %)")
     ax.plot(panel_df.index, fitted * 100,
-            color="crimson", lw=0.8, alpha=0.8, label="In-sample fitted")
-    ax.set_ylabel("Annualised vol (%)", fontsize=9)
+            color="crimson", lw=0.9, alpha=0.85, label="In-sample fitted")
+    ax.set_ylabel("Annualised vol (%)", fontsize=11)
+    ax.margins(x=0.01)
     ax.set_title(
         f"Forward {horizon}-day realised volatility: actual vs in-sample fit "
-        f"(R² = {full_raw['r2']:.2f})", fontsize=11)
-    ax.legend(fontsize=8, loc="upper left")
+        f"(R² = {full_raw['r2']:.2f})", fontsize=12)
+    line_handles, _ = ax.get_legend_handles_labels()
+    shock_handles = [mpatches.Patch(facecolor=SHADE_COLOURS[n], alpha=0.55, label=n)
+                     for n in periods]
+    ax.legend(handles=line_handles + shock_handles, fontsize=9,
+              loc="upper center", ncol=3, framealpha=0.9)
     fig2.tight_layout()
     _save_fig(fig2, save_dir, "week3_leadup_fit.png")
     plt.close(fig2)

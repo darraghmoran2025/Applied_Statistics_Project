@@ -6,9 +6,9 @@ This regression studies how the risk environment evolves. It models forward 21-d
 
 ## 1. The model
 
-**Outcome.** The dependent variable is forward realised volatility over the next h = 21 trading days (about one calendar month): for each day t, the square root of the summed squared daily log-returns over days t+1 to t+h, scaled by 252/h and annualised. Squared returns measure the magnitude of moves regardless of sign.
+The dependent variable is forward realised volatility over the next h = 21 trading days, about one calendar month. For each day t it is the square root of the summed squared daily log-returns over days t+1 to t+h, scaled by 252/h and annualised. Squared returns measure the magnitude of moves regardless of sign.
 
-**Predictors.** Every predictor is built only from information available up to and including day t. Two of them — rolling skewness and rolling excess kurtosis — are short-window empirical analogues of the VG and NIG asymmetry and tail-heaviness parameters estimated elsewhere in Week 3, so the model can ask whether the recent tail shape, not just the recent volatility, carries information about the risk to come.
+Every predictor is built only from information available up to and including day t. Two of them, rolling skewness and rolling excess kurtosis, are short-window empirical analogues of the VG and NIG asymmetry and tail-heaviness parameters estimated elsewhere in Week 3, so the model can ask whether the recent tail shape, not just the recent volatility, carries information about the risk to come.
 
 **Table 1. The seven lead-up predictors. All are trailing quantities measured at day t.**
 
@@ -22,13 +22,13 @@ This regression studies how the risk environment evolves. It models forward 21-d
 | Rolling kurtosis (21d) | Excess kurtosis of returns over the last 21 days (tail proxy) |
 | Drawdown (252d) | Current price relative to its trailing 252-day peak (≤ 0) |
 
-**Estimation.** A single OLS regression on the full daily sample. Consecutive forward windows overlap (day t and day t+1 share 20 of their 21 days), so the residuals are strongly autocorrelated; all standard errors are Newey-West HAC (Bartlett kernel, bandwidth 21, the overlap length). Coefficients are reported in standardised (z-score) form, so a coefficient of 0.40 means a one-standard-deviation rise in the factor goes with a 0.40-standard-deviation rise in forward volatility, holding the others fixed.
+The model is a single OLS regression on the full daily sample. Consecutive forward windows overlap, since day t and day t+1 share 20 of their 21 days, so the residuals are strongly autocorrelated; all standard errors are Newey-West HAC (Bartlett kernel, bandwidth 21, the overlap length). Coefficients are reported in standardised (z-score) form, so a coefficient of 0.40 means a one-standard-deviation rise in the factor goes with a 0.40-standard-deviation rise in forward volatility, holding the others fixed.
 
 ---
 
 ## 2. Results
 
-A baseline using only trailing 21-day volatility explains forward volatility with R² = 0.441, as expected from volatility clustering. Adding the other six factors raises R² to 0.553. The extra 0.112 — about eleven percentage points — comes from the implied-volatility, shock, tail and drawdown factors over and above plain volatility persistence. The risk environment is better described with tail-aware factors than with volatility alone, the same message the Lévy models give for the static distribution, now in a dynamic form.
+A baseline using only trailing 21-day volatility explains forward volatility with R² = 0.441, as expected from volatility clustering. Adding the other six factors raises R² to 0.553. The extra 0.112, about eleven percentage points, comes from the implied-volatility, shock, tail and drawdown factors over and above plain volatility persistence. The risk environment is better described with tail-aware factors than with volatility alone, the same message the Lévy models give for the static distribution, now in a dynamic form.
 
 **Table 2. Variance in forward 21-day realised volatility explained. n = 6,207.**
 
@@ -36,9 +36,9 @@ A baseline using only trailing 21-day volatility explains forward volatility wit
 |-------|-----------|----|-------------|
 | Baseline | Trailing 21d vol only | 0.441 | 0.441 |
 | Full | All seven lead-up factors | 0.553 | 0.552 |
-| Increment | Tail / VIX / drawdown factors | +0.112 | — |
+| Increment | Tail / VIX / drawdown factors | +0.112 | n/a |
 
-The VIX level is the strongest factor (+0.40, t = 4.2): options-implied volatility is the market's own forward-looking estimate of dispersion. The 5-day VIX change is also positive and significant (+0.12, t = 2.4), as is the latest absolute return (+0.05, t = 2.2). Two coefficients are worth a note. Drawdown loads negatively (−0.11, t = −1.8): the nearer the market sits to its trailing peak, the higher the volatility that tends to follow. Rolling excess kurtosis also loads negatively (−0.04, t = −2.1) — once volatility and the VIX are in the model, a kurtosis spike tends to mark a jump that has already happened rather than risk still building. Rolling skewness is indistinguishable from zero.
+The VIX level is the strongest factor (+0.40, t = 4.2): options-implied volatility is the market's own forward-looking estimate of dispersion. The 5-day VIX change is also positive and significant (+0.12, t = 2.4), as is the latest absolute return (+0.05, t = 2.2). The drawdown and rolling-kurtosis loadings are the interesting ones. Drawdown is negative (−0.11, t = −1.8): the nearer the market sits to its trailing peak, the higher the volatility that tends to follow. Rolling excess kurtosis is also negative (−0.04, t = −2.1); once volatility and the VIX are in the model, a kurtosis spike tends to mark a jump that has already happened rather than risk still building. Rolling skewness is indistinguishable from zero.
 
 **Table 3. Standardised coefficients of the full model, Newey-West HAC standard errors (bandwidth 21). The intercept is zero by construction and is omitted.**
 
@@ -66,7 +66,7 @@ The VIX level is the strongest factor (+0.40, t = 4.2): options-implied volatili
 
 For each shock window, Table 4 reports the average standardised level of each factor over the 21 trading days immediately before the window began. Because the factors are z-scored over the full sample, +0.7 means the factor stood 0.7 sample standard deviations above its typical level going into the episode, and a negative value means it was below.
 
-The clearest pattern is drawdown, positive before all three episodes (+0.34, +0.68, +0.64): each shock began from a market sitting near its trailing peak rather than from an already depressed level. Beyond that the picture is mixed. The Global Financial Crisis was preceded by mildly elevated volatility and VIX (+0.39 and +0.30), consistent with a slow build-up, whereas COVID-19 was the opposite — volatility, the VIX and skewness were all well below average in the weeks before the crash (−0.80, −0.70, −0.57) — because that shock erupted from an unusually calm market.
+The clearest pattern is drawdown, positive before all three episodes (+0.34, +0.68, +0.64): each shock began from a market sitting near its trailing peak rather than from an already depressed level. Beyond that the picture is mixed. The Global Financial Crisis was preceded by mildly elevated volatility and VIX (+0.39 and +0.30), consistent with a slow build-up. COVID-19 was the opposite: volatility, the VIX and skewness were all well below average in the weeks before the crash (−0.80, −0.70, −0.57), because that shock erupted from an unusually calm market.
 
 **Table 4. Mean standardised factor level in the 21 trading days before each shock window (z-scores).**
 
@@ -86,4 +86,4 @@ The dot-com crash is omitted because its start date (March 2000) falls inside th
 
 ## 4. Limitations
 
-The estimates are in-sample. The predictors are correlated — most obviously trailing volatility and the VIX level — so the coefficients are partial associations rather than independent effects. The overlapping forward windows are the reason for the Newey-West standard errors, and they make the effective sample smaller than the nominal 6,207 observations. The 21-day horizon is a modelling choice; a shorter or longer one shifts the relative weight of the fast factors (the VIX change, the latest absolute return) and the slow ones (drawdown).
+The estimates are in-sample. The predictors are correlated (most obviously trailing volatility and the VIX level), so the coefficients are partial associations rather than independent effects. The overlapping forward windows are the reason for the Newey-West standard errors, and they make the effective sample smaller than the nominal 6,207 observations. The 21-day horizon is a modelling choice; a shorter or longer one shifts the relative weight of the fast factors (the VIX change, the latest absolute return) and the slow ones (drawdown).

@@ -78,7 +78,7 @@ lead-up regression on forward risk. Write-ups: `Week3_Results.md` (the model
 comparison) and `Week3_Regression.md` (the lead-up regression). Key findings:
 
 - The Laplace (double-exponential), the symmetric VG special case (θ = 0, ν = 1),
-  reaches ΔAIC −1,771 with only two parameters — 96% of the four-parameter NIG's
+  reaches ΔAIC −1,771 with only two parameters, 96% of the four-parameter NIG's
   gain over the Gaussian. Most of the improvement over the Gaussian comes from
   exponential rather than thin tails.
 - NIG is the best fit overall (ΔAIC −1,851) and the only model not rejected by KS.
