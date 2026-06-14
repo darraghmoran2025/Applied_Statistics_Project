@@ -1,30 +1,4 @@
 """
-week3_leadup_regression.py — Lead-Up Regression on Forward Risk
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Objectives
-----------
-1. Build a daily feature panel from S&P 500 returns + VIX, with every
-   predictor measured strictly at time t (knowable before the outcome).
-2. Define the outcome as forward realised volatility over the next h days,
-   RV_{t+1..t+h} — a forward RISK measure.
-3. Fit a single OLS model on the full daily sample (n ≈ 6,000), with
-   Newey–West HAC standard errors to correct for the serial correlation
-   induced by overlapping forward windows.
-4. Quantify whether tail-shape factors (rolling excess kurtosis, rolling
-   skewness, drawdown) add explanatory power BEYOND a volatility-only
-   baseline — the incremental-R² result is the bridge back to the Lévy
-   tail story.
-5. Produce a retrospective lead-up table: the average standardised level
-   of each factor in the 21 trading days before each shock window.
-
-Bridge to the Lévy framing
---------------------------
-Two predictors — rolling excess kurtosis (kurt21) and rolling skewness
-(skew21) — are short-window empirical analogues of the VG/NIG tail and
-asymmetry parameters.  Including them lets the model speak the project's
-own vocabulary: it is the dynamics of the *risk environment*, expressed in
-tail terms, that the static-Gaussian risk numbers fail to capture.
 
 Run standalone:
     python week3_leadup_regression.py
