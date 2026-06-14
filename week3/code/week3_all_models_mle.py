@@ -1,19 +1,4 @@
 """
-week3_all_models_mle.py — Four-Model MLE Comparison
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Objectives
-----------
-1. Fit all five models (Gaussian, Laplace, Student-t, VG, NIG) by MLE on the
-   full S&P 500 daily log-return sample (Jan 2000 – Dec 2024).  The Laplace
-   is the symmetric Variance-Gamma special case (θ=0, ν=1): a two-parameter
-   exponential-tailed benchmark added on Neil's suggestion.
-2. Produce a unified AIC/BIC comparison table
-3. Compute VaR and ES at 95% and 99% for all five models
-4. KS goodness-of-fit tests (analytical for Gaussian/Laplace/Student-t;
-   two-sample simulation-based for VG/NIG)
-5. Density overlay and QQ plots for all five models
-
 Run standalone:
     python week3_all_models_mle.py
     python week3_all_models_mle.py --save_dir ../figures --n_sim 500000
