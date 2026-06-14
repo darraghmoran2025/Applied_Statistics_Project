@@ -133,3 +133,29 @@ Figure 5 shows the annual return distributions for 2000–2024, with crisis year
 *Figure 5. Annual return distributions, 2000–2024. Crisis years are highlighted; annualised volatility is shown in each panel.*
 
 The full-sample ν̂ of 2.648 is effectively an average across all these regimes. In calm years it overstates tail risk; in GFC conditions it may still understate it.
+
+---
+
+## 7. Five-year block marginals
+
+Figures 6–10 break the 25-year sample into five 5-year blocks, each showing five annual panels side by side. The legend adds two entries relative to Figure 5: an x = 0 reference line (grey dashed) marking zero return, and the year mean (black dotted). Shock-window background shading follows the same colour scheme as Figure 1. The inset annotation in each panel gives annualised σ and ν.
+
+![Figure 6. Annual return distributions, 2000–2004. Dot-com crash years (2000–2002) are shaded.](../figures/week2_marginals_2000_2004.png)
+
+*Figure 6. Annual return distributions, 2000–2004. Dot-com crash years (2000–2002) are shaded.*
+
+![Figure 7. Annual return distributions, 2005–2009. GFC (2007–2009) panels are shaded; ν drops to 2.6 in 2008.](../figures/week2_marginals_2005_2009.png)
+
+*Figure 7. Annual return distributions, 2005–2009. GFC (2007–2009) panels are shaded; ν drops to 2.6 in 2008.*
+
+![Figure 8. Annual return distributions, 2010–2014. Post-crisis recovery; annualised volatility declines across the block.](../figures/week2_marginals_2010_2014.png)
+
+*Figure 8. Annual return distributions, 2010–2014. Post-crisis recovery; annualised volatility declines across the block.*
+
+![Figure 9. Annual return distributions, 2015–2019. 2017 shows the narrowest spread in the full sample (σ = 7%).](../figures/week2_marginals_2015_2019.png)
+
+*Figure 9. Annual return distributions, 2015–2019. 2017 shows the narrowest spread in the full sample (σ = 7%).*
+
+![Figure 10. Annual return distributions, 2020–2024. The 2020 COVID panel produces σ = 35% and ν near 2.3.](../figures/week2_marginals_2020_2024.png)
+
+*Figure 10. Annual return distributions, 2020–2024. The 2020 COVID panel produces σ = 35% and ν near 2.3.*
