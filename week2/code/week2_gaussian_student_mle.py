@@ -86,10 +86,10 @@ SHOCK_PERIODS = {
 }
 
 SHOCK_COLOURS = {
-    "Dot-com crash":  "#fff3cd",
-    "GFC":            "#f8d7da",
-    "COVID-19":       "#d1ecf1",
-    "Fed rate hikes": "#d4edda",
+    "Dot-com crash":  "#ffd966",   # amber
+    "GFC":            "#f4a3a8",   # rose/red
+    "COVID-19":       "#9ed3e6",   # cyan
+    "Fed rate hikes": "#a8d8b0",   # green
 }
 
 
@@ -503,7 +503,7 @@ def make_plots(r_series, g, t, save_dir=None):
     fig1, ax = plt.subplots(figsize=(14, 4))
     for label, (start, end) in SHOCK_PERIODS.items():
         ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
-                   alpha=0.35, color=SHOCK_COLOURS[label], zorder=0)
+                   alpha=0.55, color=SHOCK_COLOURS[label], zorder=0)
     ax.plot(r_series.index, r, lw=0.5, color="black", alpha=0.7, zorder=1)
     ax.axhline(0, color="gray", lw=0.5, linestyle="--")
     ax.set_xlabel("Date")
@@ -563,7 +563,7 @@ def make_plots(r_series, g, t, save_dir=None):
     ax1 = fig.add_subplot(gs[0, :])
     for label, (start, end) in SHOCK_PERIODS.items():
         ax1.axvspan(pd.Timestamp(start), pd.Timestamp(end),
-                    alpha=0.35, color=SHOCK_COLOURS[label], zorder=0)
+                    alpha=0.55, color=SHOCK_COLOURS[label], zorder=0)
     ax1.plot(r_series.index, r, lw=0.5, color="black", alpha=0.7, zorder=1)
     ax1.axhline(0, color="gray", lw=0.5, linestyle="--")
     ax1.set_xlabel("Date"); ax1.set_ylabel("Daily log-return")
