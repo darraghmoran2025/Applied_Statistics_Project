@@ -1,12 +1,4 @@
 """
-week3_main.py — Week 3 Orchestrator
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Runs any combination of the three Week 3 analyses via the --mode flag.
-Each mode maps directly to its dedicated module, which can also be run
-independently.  This orchestrator exists so a single command can reproduce
-the complete Week 3 deliverable.
-
 Usage
 ─────
     # Run everything (default)
