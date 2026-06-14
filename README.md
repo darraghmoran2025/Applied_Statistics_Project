@@ -75,7 +75,8 @@ python week2/code/week2_gaussian_student_mle.py
 Extends the comparison to five distributional models on the same 6,287 daily
 returns, adds a sub-period analysis across the four shock windows, and adds a
 lead-up regression on forward risk. Write-ups: `Week3_Results.md` (the model
-comparison) and `Week3_Regression.md` (the lead-up regression). Key findings:
+comparison) and `Week3_Regression.md` (the lead-up regression and the fitted
+parameters versus VIX). Key findings:
 
 - The Laplace (double-exponential), the symmetric VG special case (θ = 0, ν = 1),
   reaches ΔAIC −1,771 with only two parameters, 96% of the four-parameter NIG's

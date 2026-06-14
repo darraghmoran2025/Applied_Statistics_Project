@@ -1,6 +1,6 @@
-# Week 3: Lead-up regression on forward volatility
+# Week 3: Regression analyses
 
-This regression studies how the risk environment evolves. It models forward 21-day realised volatility on a set of factors observable at the time, using daily S&P 500 data from 2000 to 2024 (n = 6,207), and then examines which of those factors were elevated in the run-up to the four shock windows. The target is the dispersion of returns over the coming month, not their direction.
+This write-up reports two regressions from Week 3. The first, in Sections 1 to 3, is a lead-up regression that models forward 21-day realised volatility on a set of factors observable at the time, using daily S&P 500 data from 2000 to 2024 (n = 6,207), and then examines which of those factors were elevated in the run-up to the four shock windows. The target is the dispersion of returns over the coming month, not their direction. The second, in Section 4, is a cross-sectional regression of the fitted VG and NIG parameters on the VIX, which asks how the shape of the return distribution moves with the market's expected volatility.
 
 ---
 
@@ -84,6 +84,29 @@ The dot-com crash is omitted because its start date (March 2000) falls inside th
 
 ---
 
-## 4. Limitations
+## 4. Fitted Lévy parameters versus the VIX
+
+A second, complementary regression looks at how the fitted distribution shape moves with the market's own volatility gauge. Each calendar year from 2000 to 2024 is fitted separately, giving 25 annual estimates of each VG and NIG parameter, and each parameter is then regressed on that year's average VIX (n = 25). Table 5 is a key to the six parameters and to what the regression finds for each.
+
+**Table 5. The fitted parameters and how each relates to the VIX.**
+
+| Parameter | What it controls | Relationship with the VIX |
+|-----------|------------------|---------------------------|
+| VG σ (scale) | Width of the diffusion component; the everyday spread of returns | Strong and positive (R² = 0.91, p < 0.001): scale rises almost one-for-one with the VIX |
+| VG θ (asymmetry) | Skew of the time-changed Brownian motion; negative means a heavier left tail | None detectable (R² = 0.01, p = 0.57) |
+| VG ν (variance rate) | Tail heaviness from the random time-change; larger means fatter tails | None detectable (R² = 0.06, p = 0.24) |
+| NIG α (tail heaviness) | Larger means lighter tails, smaller means heavier | Weak and negative (R² = 0.14, p = 0.07): tails tend to get heavier as the VIX rises, though the signal is marginal |
+| NIG β (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.10, p = 0.12) |
+| NIG δ (scale) | Overall spread of the distribution | None detectable (R² = 0.00, p = 0.93) |
+
+The pattern is clear and one-sided. The VIX tracks the scale of the distribution very closely (VG σ, R² = 0.91), which is unsurprising because the VIX is itself an estimate of near-term volatility. It carries almost no information about the shape of the tails or their asymmetry: every tail and skew parameter (VG θ, VG ν, NIG β, NIG δ) is statistically indistinguishable from a flat line against the VIX, and only NIG α shows even a marginal link. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are. That distinction matters for capital, because Expected Shortfall is driven by the tails rather than by the scale. With only 25 annual observations these are broad associations rather than precise estimates, but the contrast between the scale parameter and the shape parameters is stark.
+
+![Figure 4. Annual VG and NIG parameter estimates against average annual VIX, with OLS regression lines.](../figures/week3_vix_regression.png)
+
+*Figure 4. Annual VG and NIG parameter estimates (2000 to 2024) against that year's average VIX, with OLS regression lines; each panel shows its R² and p-value. Only VG σ (top left) has a strong relationship with the VIX; the tail and asymmetry parameters are essentially flat.*
+
+---
+
+## 5. Limitations
 
 The estimates are in-sample. The predictors are correlated (most obviously trailing volatility and the VIX level), so the coefficients are partial associations rather than independent effects. The overlapping forward windows are the reason for the Newey-West standard errors, and they make the effective sample smaller than the nominal 6,207 observations. The 21-day horizon is a modelling choice; a shorter or longer one shifts the relative weight of the fast factors (the VIX change, the latest absolute return) and the slow ones (drawdown).
