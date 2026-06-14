@@ -1,27 +1,5 @@
 """
-week3_vix_regression.py — VIX Regression on VG and NIG Parameters
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
 
-Objectives
-----------
-1. Fit VG and NIG to each calendar year's returns (2000–2024),
-   yielding 25 annual parameter estimates per model.
-2. Download annual average VIX levels from Yahoo Finance (^VIX).
-3. Regress each parameter on average annual VIX via OLS.
-4. Report regression coefficients, R², p-values, and 95% CIs.
-5. Produce scatter + regression line plots.
-
-The VIX is selected as the predictive variable because it is a
-forward-looking implied-volatility measure derived from S&P 500 options,
-providing a coherent economic link to the fat-tail parameter ν (VG),
-the tail-heaviness parameter α (NIG), and the asymmetry parameters
-θ (VG) and β (NIG).  The regression formalises the qualitative pattern
-observed in the sub-period analysis: parameters shift systematically
-across market regimes, and VIX captures that regime state quantitatively.
-
-Run standalone:
-    python week3_vix_regression.py
-    python week3_vix_regression.py --save_dir ../figures
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FUNCTIONS
