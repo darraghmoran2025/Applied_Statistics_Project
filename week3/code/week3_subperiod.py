@@ -1,31 +1,4 @@
 """
-week3_subperiod.py — Sub-Period Analysis: All Four Models
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Objectives
-----------
-1. Fit all four models (Gaussian, Student-t, VG, NIG) independently to
-   each of the four market shock windows:
-     Dot-com crash  (2000-03-01 – 2002-10-31)
-     GFC            (2007-10-01 – 2009-03-31)
-     COVID-19       (2020-02-01 – 2020-06-30)
-     Fed rate hikes (2022-01-01 – 2023-12-31)
-   plus the full sample for comparison.
-
-2. Surface how parameters (σ, ν, θ, α, β, δ) shift across regimes:
-   the "distributional fingerprint" of each crisis.
-
-3. Retrospective shock analysis:
-   - Are extreme returns during crisis windows systematically
-     different from calm periods?
-   - Compute empirical tail statistics (skewness, kurtosis, max drawdown,
-     proportion of |r| > 2σ) for each window.
-   - Compare AIC improvement of Lévy models over Gaussian across windows:
-     does fat-tail benefit increase during crises?
-
-Run standalone:
-    python week3_subperiod.py
-    python week3_subperiod.py --save_dir ../figures
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FUNCTIONS
