@@ -24,8 +24,7 @@ week2/
 
 week3/
   code/     - levy_models.py, week3_all_models_mle.py, week3_subperiod.py,
-              week3_leadup_regression.py, week3_vix_regression.py, week3_main.py,
-              and the writeup generators
+              week3_leadup_regression.py, week3_vix_regression.py, week3_main.py
   figures/  - five-model density/QQ/risk, sub-period bars, lead-up regression plots
   writeup/  - Week3_Results.md, Week3_Regression.md
 
