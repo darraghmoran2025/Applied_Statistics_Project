@@ -6,7 +6,7 @@ This write-up reports two regressions from Week 3. The first (Sections 1–3) mo
 
 ## 1. The model
 
-The dependent variable is forward realised volatility over the next 21 trading days, annualised. Every predictor is built from information available only up to day t. Rolling skewness and rolling excess kurtosis serve as short-window empirical analogues of the VG and NIG shape parameters, asking whether recent tail shape carries information about forward risk beyond recent volatility.
+The dependent variable is forward realised volatility over the next 21 trading days, annualised. Every predictor is built from information available only up to day t. Rolling skewness and rolling excess kurtosis are short-window empirical analogues of the VG and NIG shape parameters, asking whether recent tail shape carries information about forward risk beyond recent volatility.
 
 **Table 1. The seven lead-up predictors. All are trailing quantities measured at day t.**
 
@@ -34,7 +34,7 @@ A volatility-only baseline explains forward volatility with R² = 0.441, as expe
 |-------|-----------|----|-------------|
 | Baseline | Trailing 21d vol only | 0.441 | 0.441 |
 | Full | All seven lead-up factors | 0.553 | 0.552 |
-| Increment | Tail / VIX / drawdown factors | +0.112 | n/a |
+| Increment | Tail / VIX / drawdown factors | +0.112 |  |
 
 VIX level is the strongest factor (+0.40, t = 4.2): options-implied volatility is the market's own forward-looking dispersion estimate. ΔVIX (+0.12, t = 2.4) and absolute return (+0.05, t = 2.2) are also positive and significant. Drawdown is negative (−0.11, t = −1.8): the nearer the market is to its trailing peak, the higher the forward volatility tends to be. Rolling excess kurtosis is also negative (−0.04, t = −2.1); once volatility and VIX are controlled for, a kurtosis spike marks a jump that has already happened rather than risk still building. Rolling skewness is indistinguishable from zero.
 
@@ -97,7 +97,7 @@ Each calendar year from 2000 to 2024 is fitted separately, giving 25 annual esti
 | NIG β (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.10, p = 0.12) |
 | NIG δ (scale) | Overall spread | None detectable (R² = 0.00, p = 0.93) |
 
-The VIX tracks distribution scale very closely (VG σ, R² = 0.91) but carries almost no information about tail shape or asymmetry. Every tail and skew parameter is statistically flat against the VIX; only NIG α shows a marginal signal. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are — a distinction that matters for ES-based capital, since ES is driven by tail shape rather than scale.
+The VIX tracks distribution scale very closely (VG σ, R² = 0.91) but carries almost no information about tail shape or asymmetry. Every tail and skew parameter is statistically flat against the VIX; only NIG α shows a marginal signal. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are. That distinction matters for ES-based capital, since ES is driven by tail shape rather than scale.
 
 ![Figure 4. Annual VG and NIG parameter estimates against average annual VIX, with OLS regression lines.](../figures/week3_vix_regression.png)
 
@@ -107,4 +107,4 @@ The VIX tracks distribution scale very closely (VG σ, R² = 0.91) but carries a
 
 ## 5. Limitations
 
-These results are in-sample. The predictors in the lead-up regression are correlated — most obviously trailing volatility and VIX — so coefficients are partial associations rather than independent effects. Overlapping forward windows make the effective sample smaller than n = 6,207; Newey-West SEs correct for this but not for the correlation between predictors. The 21-day horizon is a modelling choice: a shorter or longer window shifts the relative weight of fast factors (VIX change, absolute return) and slow ones (drawdown).
+These results are in-sample. The predictors in the lead-up regression are correlated (most obviously trailing volatility and VIX), so coefficients are partial associations rather than independent effects. Overlapping forward windows make the effective sample smaller than n = 6,207; Newey-West SEs correct for this but not for the correlation between predictors. The 21-day horizon is a modelling choice: a shorter or longer window shifts the relative weight of fast factors (VIX change, absolute return) and slow ones (drawdown).

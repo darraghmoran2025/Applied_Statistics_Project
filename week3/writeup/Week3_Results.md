@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This week I extended the comparison to five distributional models on the same 6,287 daily S&P 500 log-returns used in Week 2: Laplace (double-exponential), Variance-Gamma (VG), and Normal Inverse Gaussian (NIG) alongside the Gaussian and Student-t. The Laplace is a two-parameter benchmark — the symmetric VG special case (θ = 0, ν = 1) — and with the same parameter count as the Gaussian it captures 96% of the AIC gain the four-parameter NIG achieves. Most of the improvement over the Gaussian comes from exponential rather than thin tails. NIG is the best-fitting model and the only one not rejected by KS; its 99% ES of −5.19% sits between the Gaussian (−3.24%) and the Student-t (−5.81%). The sub-period analysis shows the GFC and COVID were structurally different crises from the dot-com crash and the rate-hike cycle.
+This week I extended the comparison to five distributional models on the same 6,287 daily S&P 500 log-returns used in Week 2: Laplace (double-exponential), Variance-Gamma (VG), and Normal Inverse Gaussian (NIG) alongside the Gaussian and Student-t. The Laplace is a two-parameter benchmark (the symmetric VG special case, θ = 0, ν = 1) and with the same parameter count as the Gaussian it captures 96% of the AIC gain the four-parameter NIG achieves. Most of the improvement over the Gaussian comes from exponential rather than thin tails. NIG is the best-fitting model and the only one not rejected by KS; its 99% ES of −5.19% sits between the Gaussian (−3.24%) and the Student-t (−5.81%). The sub-period analysis shows the GFC and COVID were structurally different crises from the dot-com crash and the rate-hike cycle.
 
 ---
 
@@ -13,10 +13,10 @@ This week I extended the comparison to five distributional models on the same 6,
 | Parameter | Estimate | Standard Error | t-statistic |
 |-----------|----------|----------------|-------------|
 | μ (daily drift) | +0.000223 | 0.000154 | 1.45 |
-| σ (scale) | 0.012234 | 0.000109 | n/a |
-| Log-likelihood | 18,764.3 | n/a | n/a |
-| AIC | −37,524.5 | n/a | n/a |
-| BIC | −37,511.0 | n/a | n/a |
+| σ (scale) | 0.012234 | 0.000109 |  |
+| Log-likelihood | 18,764.3 |  |  |
+| AIC | −37,524.5 |  |  |
+| BIC | −37,511.0 |  |  |
 
 **Table 2. Laplace MLE (symmetric VG special case: θ = 0, ν = 1).**
 
@@ -24,9 +24,9 @@ This week I extended the comparison to five distributional models on the same 6,
 |-----------|----------|----------------|
 | μ (location) | +0.000602 | 0.000102 |
 | b (scale) | 0.008078 | 0.000102 |
-| Log-likelihood | 19,649.9 | n/a |
-| AIC | −39,295.7 | n/a |
-| BIC | −39,282.2 | n/a |
+| Log-likelihood | 19,649.9 |  |
+| AIC | −39,295.7 |  |
+| BIC | −39,282.2 |  |
 
 Its log-likelihood beats the Gaussian by 885.6 and falls only 15.6 short of the full VG despite fixing θ = 0 and ν = 1; the exponential-tail gain alone dwarfs the benefit of freeing those two parameters.
 
@@ -35,11 +35,11 @@ Its log-likelihood beats the Gaussian by 885.6 and falls only 15.6 short of the 
 | Parameter | Estimate | Standard Error | 95% CI |
 |-----------|----------|----------------|--------|
 | ν (degrees of freedom) | 2.648 | 0.110 | (2.43, 2.87) |
-| μ (location) | +0.000656 | 0.000110 | n/a |
-| σ (scale) | 0.007077 | 0.000128 | n/a |
-| Log-likelihood | 19,666.7 | n/a | n/a |
-| AIC | −39,327.5 | n/a | n/a |
-| BIC | −39,307.2 | n/a | n/a |
+| μ (location) | +0.000656 | 0.000110 |  |
+| σ (scale) | 0.007077 | 0.000128 |  |
+| Log-likelihood | 19,666.7 |  |  |
+| AIC | −39,327.5 |  |  |
+| BIC | −39,307.2 |  |  |
 
 **Table 4. Variance-Gamma MLE.**
 
@@ -49,9 +49,9 @@ Its log-likelihood beats the Gaussian by 885.6 and falls only 15.6 short of the 
 | θ (asymmetry) | −0.000684 | 0.000149 |
 | ν (variance rate) | 1.17306 | 0.043087 |
 | μ (location) | +0.000907 | 0.000028 |
-| Log-likelihood | 19,665.5 | n/a |
-| AIC | −39,322.9 | n/a |
-| BIC | −39,296.0 | n/a |
+| Log-likelihood | 19,665.5 |  |
+| AIC | −39,322.9 |  |
+| BIC | −39,296.0 |  |
 
 VG's log-likelihood nearly matches the Student-t's despite two extra parameters, giving slightly worse AIC. Negative θ confirms left skew; ν = 1.173 confirms the Gamma time-change is active.
 
@@ -63,11 +63,11 @@ VG's log-likelihood nearly matches the Student-t's despite two extra parameters,
 | β (asymmetry) | −6.095 | 1.498 |
 | δ (scale) | 0.007574 | 0.000217 |
 | μ (location) | +0.001111 | 0.000150 |
-| Log-likelihood | 19,691.7 | n/a |
-| AIC | −39,375.3 | n/a |
-| BIC | −39,348.4 | n/a |
+| Log-likelihood | 19,691.7 |  |
+| AIC | −39,375.3 |  |
+| BIC | −39,348.4 |  |
 
-NIG achieves the highest log-likelihood and an AIC improvement of 1,851 units over the Gaussian. Negative β confirms left skew; α falls to 17–26 in the GFC and COVID (Section 5), marking far heavier crisis tails.
+NIG achieves the highest log-likelihood and an AIC improvement of 1,851 units over the Gaussian. Negative β confirms left skew; α falls to 17–26 in the GFC and COVID (Section 5): far heavier tails than the full-sample 52.
 
 ---
 
@@ -99,13 +99,13 @@ NIG is the only model not rejected by KS; VG passes too. Laplace and Student-t t
 
 | Model | Parameters | Log-lik | AIC | BIC | ΔAIC vs Gaussian |
 |-------|------------|---------|-----|-----|------------------|
-| Gaussian | 2 | 18,764.3 | −37,524.5 | −37,511.0 | n/a |
+| Gaussian | 2 | 18,764.3 | −37,524.5 | −37,511.0 |  |
 | Laplace | 2 | 19,649.9 | −39,295.7 | −39,282.2 | −1,771.2 |
 | Student-t | 3 | 19,666.7 | −39,327.5 | −39,307.2 | −1,802.9 |
 | VG | 4 | 19,665.5 | −39,322.9 | −39,296.0 | −1,798.4 |
 | NIG | 4 | 19,691.7 | −39,375.3 | −39,348.4 | −1,850.8 |
 
-The Laplace reaches ΔAIC −1,771 with two parameters — 96% of NIG's gain — confirming exponential tails account for most of the improvement over the Gaussian. VG is slightly worse than the three-parameter Student-t on both AIC and BIC; NIG gains 26 log-likelihood units over VG, meaning the Inverse Gaussian mixing distribution captures something the Gamma cannot.
+The Laplace reaches ΔAIC −1,771 with two parameters (96% of NIG's gain), confirming exponential tails account for most of the improvement over the Gaussian. VG is slightly worse than the three-parameter Student-t on both AIC and BIC; NIG gains 26 log-likelihood units over VG, meaning the Inverse Gaussian mixing distribution captures something the Gamma cannot.
 
 ---
 
@@ -118,7 +118,7 @@ The Laplace reaches ΔAIC −1,771 with two parameters — 96% of NIG's gain —
 | 95% | −1.990% | −2.501% | −1.800% | −2.608% | −1.694% | −3.000% | −1.915% | −2.818% | −1.880% | −3.075% |
 | 99% | −2.824% | −3.238% | −3.100% | −3.908% | −3.515% | −5.813% | −3.360% | −4.269% | −3.769% | −5.187% |
 
-At 99% ES the five models span from −3.24% (Gaussian) to −5.81% (Student-t). The Laplace at −3.91% already exceeds the Gaussian by 21% from exponential tails alone. The Student-t's outlier reading reflects its symmetric constraint at ν = 2.648, which inflates the right tail to match the left. VG and NIG, with asymmetry parameters, sit at −4.27% and −5.19%. Using the Gaussian ES to set capital leaves a 37% shortfall against NIG — material under FRTB (BCBS 2013).
+At 99% ES the five models span from −3.24% (Gaussian) to −5.81% (Student-t). The Laplace at −3.91% already exceeds the Gaussian by 21% from exponential tails alone. The Student-t's outlier reading reflects its symmetric constraint at ν = 2.648, which inflates the right tail to match the left. VG and NIG, with asymmetry parameters, sit at −4.27% and −5.19%. Using the Gaussian ES to set capital leaves a 37% shortfall against NIG. Under FRTB (BCBS 2013), that shortfall is material.
 
 ![Figure 3. VaR and ES at 95% and 99% for all five models. Hatched bars are ES.](../figures/week3_risk_comparison.png)
 
@@ -138,7 +138,7 @@ At 99% ES the five models span from −3.24% (Gaussian) to −5.81% (Student-t).
 | COVID-19 | 104 | 50.5% | 2.285 | 1.439 | −0.00455 | 17.8 | −4.17 |
 | Fed rate hikes | 501 | 19.5% | 6.525 | 0.493 | −0.00002 | 111.9 | −3.85 |
 
-The GFC and COVID return Student-t ν around 2.3–2.6, near the variance singularity at ν = 2, and NIG α falls to 17–26. The dot-com crash and rate-hike cycle show ν around 6.5 and NIG α near 99–112 — near-Gaussian. The two crisis types differ in kind: the dot-com was a slow drawdown; the GFC and COVID were clusters of extreme single-day moves, invisible in volatility alone but clear in the tail parameters.
+The GFC and COVID return Student-t ν around 2.3–2.6, near the variance singularity at ν = 2, and NIG α falls to 17–26. The dot-com crash and rate-hike cycle show ν around 6.5 and NIG α near 99–112, near-Gaussian. The two crisis types differ in kind: the dot-com was a slow drawdown; the GFC and COVID were clusters of extreme single-day moves, invisible in volatility alone but clear in the tail parameters.
 
 **Table 10. AIC improvement over Gaussian by period. Positive = Lévy model preferred.**
 
