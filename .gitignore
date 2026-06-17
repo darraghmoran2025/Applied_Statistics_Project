@@ -7,3 +7,7 @@ venv/
 *.egg-info/
 .DS_Store
 *.log
+
+# Generated data: cached returns and saved posterior draws
+# (regenerate deterministically from the week scripts)
+week*/data/
