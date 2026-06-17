@@ -1,23 +1,4 @@
 """
-week4_bayesian.py — Bayesian estimation via NUTS (PyMC)
-Project: Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
-
-Week 4 takes the marginals from Week 2/3 into a full Bayesian setting:
-weakly-informative priors anchored on the Week 3 MLE point estimates, a prior
-predictive check to confirm the priors imply plausible daily returns, then
-NUTS sampling and convergence diagnostics.
-
-Four models: Gaussian, Laplace, Student-t, NIG.  The Laplace stands in for the
-Variance-Gamma family — it is the symmetric VG special case (θ = 0, ν = 1) and
-has a closed-form density, so it needs no Bessel function.  NIG keeps its full
-four-parameter density, implemented as a custom PyTensor log-density using the
-modified Bessel function K₁ (pt.kve), with NUTS gradients flowing through it.
-
-The prior predictive check is the decision step.  Rather than justifying the
-priors by argument alone, we simulate returns from the prior and confirm they
-look like real financial returns (mostly within a few percent, occasional
-larger moves) instead of physically absurd ones (±50% routinely).
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PRIORS  (anchored on the Week 3 full-sample MLE)
 ────────
