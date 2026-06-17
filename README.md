@@ -28,7 +28,11 @@ week3/
   figures/  - five-model density/QQ/risk, sub-period bars, lead-up regression plots
   writeup/  - Week3_Results.md, Week3_Regression.md
 
-week4/      - Bayesian VG/NIG in PyMC  [upcoming]
+week4/
+  code/     - week4_bayesian.py (Gaussian, Laplace, Student-t, NIG via NUTS)
+  figures/  - prior predictive checks and NUTS traces for each model
+  writeup/  - Week4_Bayesian.md
+
 week5/      - Posterior predictive checks; convergence diagnostics  [upcoming]
 week6/      - Rolling VaR backtest (Christoffersen)  [upcoming]
 week7/      - Final write-up  [upcoming]
@@ -41,7 +45,7 @@ week7/      - Final write-up  [upcoming]
 | 1 | Literature review and research proposal | Complete |
 | 2 | Gaussian and Student-t MLE | Complete |
 | 3 | Five-model MLE (incl. Laplace, VG, NIG); sub-period analysis; lead-up regression | Complete |
-| 4 | Bayesian MCMC (PyMC/NUTS) | Upcoming |
+| 4 | Bayesian estimation (PyMC/NUTS) | Complete |
 | 5 | Posterior predictive checks; diagnostics | Upcoming |
 | 6 | Rolling VaR backtest (Christoffersen) | Upcoming |
 | 7 | Final write-up | Upcoming |
@@ -98,6 +102,36 @@ parameters versus VIX). Key findings:
 pip install numpy pandas scipy yfinance matplotlib
 python week3/code/week3_main.py            # mle + sub-period + lead-up regression
 python week3/code/week3_main.py --mode mle # five-model comparison only
+```
+
+## Week 4
+
+Refits four of the marginals (Gaussian, Laplace, Student-t, NIG) in a Bayesian
+setting and samples their full posteriors with the No-U-Turn Sampler (NUTS) in
+PyMC. The Laplace stands in for the Variance-Gamma family as its symmetric
+special case (θ = 0, ν = 1). Write-up: `Week4_Bayesian.md`. Key points:
+
+- Priors are weakly informative and anchored on the Week 3 MLE. Each one was
+  accepted on the basis of a prior predictive check: returns simulated from the
+  prior alone stay inside plausible bounds, with a negligible fraction of moves
+  beyond the worst day in the sample.
+- The NIG keeps its full four-parameter density, written as a custom PyTensor
+  log-density using the modified Bessel function K1, so NUTS gradients flow
+  through it without a latent mixing variable. The density matches scipy to
+  machine precision.
+- Every model converged cleanly: R-hat 1.00 across the board and effective
+  sample size above 2,000, and the posteriors reproduce the MLEs.
+- Student-t degrees of freedom: posterior mean 2.66, 94% HDI (2.46, 2.87). The
+  whole interval sits above 2, so the heavy tails come with a finite variance.
+- NIG asymmetry: posterior for β is negative across its 94% HDI (-8.75, -3.25),
+  confirming the left skew as a stable feature rather than a point estimate.
+
+### Running Week 4
+
+```bash
+pip install numpy pandas scipy yfinance matplotlib pymc arviz
+python week4/code/week4_bayesian.py               # all four models, full sampling
+python week4/code/week4_bayesian.py --prior_only  # prior predictive checks only
 ```
 
 ## Key references
