@@ -1,10 +1,10 @@
 # Week 4: Bayesian estimation with NUTS
 
-## 1. Bayesian Refining
+## 1. Why refit everything the Bayesian way
 
-Weeks 2 and 3 fitted every model by maximum likelihood. That gives one best value for each parameter and a standard error read off the curvature of the likelihood. The standard error leans on an assumption: that the sampling distribution of the estimate is roughly normal. For most of these parameters that is harmless. For the Student-t degrees of freedom it is worth a second look, because the MLE lands at ν ≈ 2.65, not far above ν = 2, the point where the variance of the distribution blows up to infinity. Close to that boundary the likelihood stops being symmetric, and a normal error bar can quietly mislead.
+Weeks 2 and 3 fitted every model by maximum likelihood. That gives one best value for each parameter and a standard error read off the curvature of the likelihood. The standard error leans on an assumption: that the sampling distribution of the estimate is roughly normal. For the Student-t degrees of freedom it is worth a second look, because the MLE lands at ν ≈ 2.65, not far above ν = 2, the point where the variance of the distribution blows up to infinity. Close to that boundary the likelihood stops being symmetric.
 
-So this week I refitted four models in a Bayesian setting and drew their full posteriors with the No-U-Turn Sampler (NUTS) in PyMC. I want the whole shape of the uncertainty rather than a centre and a width, and above all I want to know whether the posterior for ν stays on the finite-variance side of 2 or whether it leaks below.
+For this week I refitted four models in a Bayesian setting and drew their full posteriors with the No-U-Turn Sampler (NUTS) in PyMC. My goal here is to know whether the posterior for ν stays on the finite-variance side of 2 or whether it leaks below.
 
 The four models are the Gaussian, the Laplace, the Student-t and the NIG. The Laplace stands in for the Variance-Gamma family here. It is the symmetric VG with θ = 0 and ν = 1, and unlike the full VG it has a closed-form density, so it carries the heavy-tail idea without dragging in any special functions. The NIG keeps its full four-parameter density.
 
@@ -12,7 +12,7 @@ The four models are the Gaussian, the Laplace, the Student-t and the NIG. The La
 
 ## 2. Choosing the priors
 
-A Bayesian fit needs a prior on each parameter, and the prior is a modelling choice I have to defend. I wanted priors that are weakly informative. Loose enough that 6,287 daily returns do the talking, but tight enough to rule out values that make no financial sense. A model that thinks a fifty percent daily move is ordinary is not a model worth sampling. I started each prior from the Week 3 MLE and then widened it well beyond the plausible range.
+A Bayesian fit needs a prior on each parameter, I made my selections based on their level of informativeness. That is, weakly informative priors. This is due to the loose 6,287 daily returns, but tight enough to rule out values that are not sensible. I started each prior from Week 3 MLE and then widened it well beyond the plausible range.
 
 **Table 1. Priors and the reasoning behind each.**
 
@@ -32,7 +32,7 @@ The NIG needed a different kind of care. Its parameters obey α > |β|, and samp
 
 ## 3. Checking the priors before sampling
 
-A prior can read sensibly in a table and still imply nonsense once it runs through the model. The honest way to find out is to simulate. Before any sampling I drew returns straight from each prior and looked at what came out. This prior predictive check is how I actually decided the priors were acceptable, not the table above.
+A prior can read sensibly in a table and imply correct results once ran through the model, the most accurate way to decide is through simulation. Before any sampling I drew returns straight from each prior and looked at what came out. This prior predictive check is how I actually decided the priors were acceptable, not the table above.
 
 Figures 1 to 4 show the four. The shared feature is the one I was after: almost all the simulated mass sits inside the worst move the market actually produced, marked by the red lines at ±12.8%, with only thin tails past it. The differences between them matter too. The Gaussian prior is the tightest, its 99.9% range inside ±9.7%. The Student-t and Laplace reach further, to roughly ±12.4% and ±16.7%, because their priors permit heavier tails. The NIG is the only lopsided one, its left tail stretching to about −18.6% against +16.0% on the right, which is the asymmetry its β parameter exists to capture. So the priors are not just harmless. They already carry the tail character each model is meant to bring, before the data has said a word.
 
@@ -52,13 +52,13 @@ Figures 1 to 4 show the four. The shared feature is the one I was after: almost 
 
 *Figure 4. Prior predictive returns for the NIG. The one asymmetric prior: its left tail stretches further than its right, the skew the β parameter allows.*
 
-The numbers back up the eye. The fraction of simulated days beyond ±25%, a move bigger than anything in the sample, was 0.0001% for the Gaussian, 0.02% for the Student-t, 0.03% for the Laplace and 0.08% for the NIG. All four are negligible. Had any come back fat with absurd moves, I would have tightened the scale or tail prior and tried again. None did, so I sampled.
+The fraction of simulated days beyond ±25%, a move bigger than anything in the sample, was 0.0001% for the Gaussian, 0.02% for the Student-t, 0.03% for the Laplace and 0.08% for the NIG. All four are negligible. Had any come back fat with absurd moves, I would have tightened the scale or tail prior and tried again. None did, so I sampled.
 
 ---
 
 ## 4. Sampling and convergence
 
-I ran four chains for each model, with 1,000 tuning steps and 1,000 kept draws per chain. NUTS works by following the gradient of the log-density, which is straightforward for the Gaussian, Laplace and Student-t. The NIG was the real task. Its density contains a modified Bessel function, K₁, and the sampler needs the derivative of that. PyTensor supplies it, so I could code the NIG density directly instead of introducing the latent time-change variable the distribution is built from. I checked my version of the density against the one in scipy and they matched to machine precision, which gave me confidence the gradient it was differentiating was the right one.
+I ran four chains for each model, with 1,000 tuning steps and 1,000 kept draws per chain. NUTS works by following the gradient of the log-density, which is straightforward for the Gaussian, Laplace and Student-t. The NIG was the real task. Its density contains a modified Bessel function, K₁, and the sampler needs the derivative of that. PyTensor supplies it, so I could code the NIG density directly instead of introducing the latent time-change variable the distribution is built from. I checked my version of the density against the one in scipy and they matched, which gave me confidence the gradient it was differentiating was the right one.
 
 Every model converged cleanly. R-hat sat at 1.00 across the board, and the effective sample size never fell below about 2,000. Figures 5 to 8 show the traces. In each one the chains sit on top of each other on the left, and the raw draws on the right form a flat, stationary band with no drift and no chain wandering off, which is what good mixing looks like. The Gaussian and Laplace settle fastest, as their two-parameter posteriors should. The Student-t panel is the one I watch most closely, because it shows the ν chains circling steadily around 2.66 rather than creeping toward the ν = 2 boundary. The NIG, with four parameters and a Bessel function in its density, mixes just as well as the rest.
 
@@ -82,9 +82,9 @@ Every model converged cleanly. R-hat sat at 1.00 across the board, and the effec
 
 ## 5. What the posteriors say
 
-The posteriors come out almost exactly where the MLE did. With this much data and priors this loose, that is what should happen, and seeing it is reassuring rather than dull: it tells me the sampler and the MLE agree. The payoff is not a new centre. It is the shape around it.
+The posteriors come out almost exactly where the MLE did. With this much data and priors this loose, that is what should happen, and seeing it is reassuring rather than dull: it tells me the sampler and the MLE agree.
 
-**Table 2. Posterior summaries against the Week 3 MLE. HDI is the 94% highest-density interval.**
+**Table 2. Posterior summaries against the Week 3 MLE. HDI (Highest Density Interval) is the 94% highest-density interval.**
 
 | Model | Parameter | Posterior mean | 94% HDI | Week 3 MLE |
 |-------|-----------|----------------|---------|------------|
@@ -105,11 +105,3 @@ Two results are worth dwelling on.
 The first is the Student-t ν. Its 94% interval runs from about 2.46 to 2.87, and the whole of it sits above 2. That is the question from Section 1 answered. The finite variance is not a fragile property of one point estimate that happens to land just north of the singularity. It holds across the entire credible range. The tails are genuinely heavy, and the variance is genuinely finite, both at once.
 
 The second is the NIG asymmetry β. Every part of its interval is negative, from roughly −8.75 to −3.25. Week 3 reported a negative point estimate and read it as left skew. The posterior says that skew is a stable feature of the fit rather than something that could round away to zero. Losses sit in a heavier tail than gains, and the data is fairly firm about it.
-
----
-
-## 6. Where this leaves the project
-
-The Student-t tail is heavy but its variance is finite, and that statement now rests on a full posterior instead of a single number with an asymptotic error bar. The NIG left skew survives the same scrutiny.
-
-The honest caveats are about the priors. They are weakly informative, not absent, and with a shorter sample they would carry more weight than they do here. The Laplace also only captures the symmetric half of the VG idea, so it speaks to how thick the tails are, not to skew. Next week I will run posterior predictive checks, pushing each fitted posterior back through the data to see where the models still miss.
