@@ -4,7 +4,7 @@
 
 Weeks 2 and 3 fitted every model by maximum likelihood. That gives one best value for each parameter and a standard error read off the curvature of the likelihood. The standard error leans on an assumption: that the sampling distribution of the estimate is roughly normal. For most of these parameters that is harmless. For the Student-t degrees of freedom it is worth a second look, because the MLE lands at ν ≈ 2.65, not far above ν = 2, the point where the variance of the distribution blows up to infinity. Close to that boundary the likelihood stops being symmetric, and a normal error bar can quietly mislead.
 
-So this week I refitted four models in a Bayesian setting and drew their full posteriors with the No-U-Turn Sampler (NUTS) in PyMC. I am not trying to overturn the Week 3 numbers. I want the whole shape of the uncertainty rather than a centre and a width, and above all I want to know whether the posterior for ν stays on the finite-variance side of 2 or whether it leaks below.
+So this week I refitted four models in a Bayesian setting and drew their full posteriors with the No-U-Turn Sampler (NUTS) in PyMC. I want the whole shape of the uncertainty rather than a centre and a width, and above all I want to know whether the posterior for ν stays on the finite-variance side of 2 or whether it leaks below.
 
 The four models are the Gaussian, the Laplace, the Student-t and the NIG. The Laplace stands in for the Variance-Gamma family here. It is the symmetric VG with θ = 0 and ν = 1, and unlike the full VG it has a closed-form density, so it carries the heavy-tail idea without dragging in any special functions. The NIG keeps its full four-parameter density.
 
