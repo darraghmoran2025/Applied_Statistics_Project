@@ -127,3 +127,25 @@ The VG scale moves with the crises. σ peaks in 2008 at 39.8% annualised and aga
 The NIG says the same thing through its tail. Its tail-heaviness α (smaller means heavier tails) falls to its lowest values, around 22, in exactly 2008 and 2020, so the heaviest tails of the whole sample land on the two largest crises. In the calmest years the NIG drifts toward the Gaussian: α runs into the thousands and the scale destabilises, which is the signature of that limit rather than a failed fit. The asymmetry β is most negative, most left-skewed, in 2001 to 2002, in 2008 and in 2022, the dot-com unwind, the GFC and the rate-hike drawdown. That matches the full-sample posterior in Section 5, which put β firmly below zero.
 
 The two models agree. Tail heaviness and scale are not fixed features of the market; they rise sharply in crises and settle back in calm years, and the negative skew bunches into the stressed periods. The single full-sample fit is then best read as an average over a distribution that changes through time, and the heavy-tailed, left-skewed picture it gives comes mostly from the crisis years rather than evenly from the whole sample.
+
+Figures 9 and 10 track the parameters; Figures 11 to 15 show the fitted densities they produce, one panel per year against that year's empirical distribution, in the same five-year-block layout as the Week 2 marginals. Each panel shades its background with the shock window the year belongs to, overlays the fitted VG (green) and NIG (orange dashed) densities on the empirical kernel estimate, and prints the year's annualised scale together with the two tail parameters. The crisis years stand out by eye: 2008 and 2020 have the sharpest peaks and the longest tails, the calm years are visibly closer to normal, and the two Lévy densities sit almost on top of each other throughout, which is why the choice between them turns on tail risk rather than overall shape.
+
+![Figure 11. Per-year fitted VG and NIG densities, 2000–2004.](../figures/week4_marginals_2000_2004.png)
+
+*Figure 11. Per-year empirical distribution (kernel estimate) with fitted VG and NIG densities (μ = 0), 2000–2004. Panel backgrounds mark the shock windows; each panel prints the annualised scale σ, the VG ν, and the NIG α.*
+
+![Figure 12. Per-year fitted VG and NIG densities, 2005–2009.](../figures/week4_marginals_2005_2009.png)
+
+*Figure 12. As Figure 11, for 2005–2009. The GFC years 2008–2009 carry the sharpest peaks and heaviest tails of the block.*
+
+![Figure 13. Per-year fitted VG and NIG densities, 2010–2014.](../figures/week4_marginals_2010_2014.png)
+
+*Figure 13. As Figure 11, for 2010–2014.*
+
+![Figure 14. Per-year fitted VG and NIG densities, 2015–2019.](../figures/week4_marginals_2015_2019.png)
+
+*Figure 14. As Figure 11, for 2015–2019.*
+
+![Figure 15. Per-year fitted VG and NIG densities, 2020–2024.](../figures/week4_marginals_2020_2024.png)
+
+*Figure 15. As Figure 11, for 2020–2024. The COVID year 2020 has the most extreme peak-and-tail shape of the whole sample.*

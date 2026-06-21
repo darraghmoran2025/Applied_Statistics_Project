@@ -36,6 +36,8 @@ OUTPUTS
 ───────
     week4_yearly_vg_params.png    VG σ(ann), θ, ν by year (forest-green)
     week4_yearly_nig_params.png   NIG α, β, δ(ann) by year (dark-orange)
+    week4_marginals_<block>.png   per-year empirical KDE + fitted VG/NIG (μ=0),
+                                  one figure per 5-year block (Week-2 format)
     week4/data/week4_yearly_levy_params.csv   the annual estimates + SEs
 """
 
@@ -47,6 +49,9 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.ticker as mticker
+from scipy import stats
 from scipy.optimize import minimize
 
 warnings.filterwarnings("ignore")
@@ -59,7 +64,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, "..", "..", "week3", "code"))
 from levy_models import (                       # noqa: E402
     _logpdf_vg, _logpdf_nig, _numerical_hessian,
-    MODEL_COLOURS, SHOCK_PERIODS,
+    MODEL_COLOURS, SHOCK_PERIODS, SHOCK_COLOURS,
 )
 # Reuse the cached-returns loader from the Bayesian script.
 sys.path.insert(0, _HERE)
@@ -192,11 +197,19 @@ def fit_by_year(r_series, start=2000, end=2024, min_obs=120):
 # ════════════════════════════════════════════════════════════════════════════
 
 def _shade_shock_years(ax):
-    """Light shading of the shock windows on a calendar-year x-axis."""
-    for (start, end) in SHOCK_PERIODS.values():
+    """Shade the shock windows in the project's standard shock colours."""
+    for label, (start, end) in SHOCK_PERIODS.items():
         x0 = pd.Timestamp(start).year + (pd.Timestamp(start).month - 1) / 12.0
         x1 = pd.Timestamp(end).year + (pd.Timestamp(end).month - 1) / 12.0
-        ax.axvspan(x0, x1, color="0.85", alpha=0.6, lw=0, zorder=0)
+        ax.axvspan(x0, x1, color=SHOCK_COLOURS[label], alpha=0.85, lw=0, zorder=0)
+
+
+def _shock_legend(fig):
+    """Figure-level legend mapping the shock colours to their windows."""
+    patches = [mpatches.Patch(color=SHOCK_COLOURS[lbl], alpha=0.85, label=lbl)
+               for lbl in SHOCK_PERIODS]
+    fig.legend(handles=patches, loc="upper center", ncol=4, fontsize=9,
+               frameon=False, bbox_to_anchor=(0.5, 0.945))
 
 
 def _panel(ax, years, vals, ses, colour, ylabel, hline=None, logy=False):
@@ -231,9 +244,10 @@ def make_vg_figure(df, save_dir):
     _panel(ax[2], yrs, df["vg_nu"].values, df["vg_nu_se"].values,
            c, "ν  (variance rate; tail heaviness)")
     ax[2].set_xlabel("Year", fontsize=10)
-    fig.suptitle("Year-by-year Variance-Gamma fit (μ = 0)\n"
-                 "shaded = shock windows; bars = ±1 SE", fontsize=12, y=0.995)
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
+    fig.suptitle("Year-by-year Variance-Gamma fit (μ = 0); bars = ±1 SE",
+                 fontsize=12, y=0.995)
+    fig.tight_layout(rect=[0, 0, 1, 0.93])
+    _shock_legend(fig)
     out = os.path.join(save_dir, "week4_yearly_vg_params.png")
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -253,14 +267,118 @@ def make_nig_figure(df, save_dir):
     _panel(ax[2], yrs, df["nig_delta_ann"].values, df["nig_delta_ann_se"].values,
            c, "δ  (annualised scale, log)", logy=True)
     ax[2].set_xlabel("Year", fontsize=10)
-    fig.suptitle("Year-by-year Normal-Inverse-Gaussian fit (μ = 0)\n"
-                 "shaded = shock windows; α, δ on log axes (Gaussian-limit "
-                 "years 2004/05/23); β bars = ±1 SE", fontsize=11.5, y=0.995)
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
+    fig.suptitle("Year-by-year Normal-Inverse-Gaussian fit (μ = 0); α, δ on log "
+                 "axes (Gaussian-limit years 2004/05/23); β bars = ±1 SE",
+                 fontsize=11.5, y=0.995)
+    fig.tight_layout(rect=[0, 0, 1, 0.93])
+    _shock_legend(fig)
     out = os.path.join(save_dir, "week4_yearly_nig_params.png")
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"  saved -> {out}")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PER-YEAR MARGINAL DENSITIES  (VG and NIG, 5-year blocks; Week-2 format)
+# ════════════════════════════════════════════════════════════════════════════
+
+def _shock_map():
+    """Map each calendar year to the shock window it falls in (if any)."""
+    m = {}
+    for label, (start, end) in SHOCK_PERIODS.items():
+        for yr in range(int(start[:4]), int(end[:4]) + 1):
+            m.setdefault(yr, label)
+    return m
+
+
+def _make_marginal_figure(r_series, years_block, shock_map, save_dir):
+    """One 5-year figure: per-year empirical KDE with fitted VG and NIG (μ=0).
+
+    Mirrors the Week 2 marginal figures (week2_marginals_*), but overlays the
+    two Lévy densities instead of the Gaussian and Student-t, with the same
+    shock-coloured panel backgrounds.
+    """
+    period = f"{years_block[0]}-{years_block[-1]}"
+    print(f"  marginals {period} ...")
+    cvg, cnig = MODEL_COLOURS["VG"], MODEL_COLOURS["NIG"]
+
+    fig, axes = plt.subplots(1, 5, figsize=(24, 6))
+    fig.subplots_adjust(left=0.04, right=0.99, top=0.86, bottom=0.20, wspace=0.25)
+    LINE_TOP = 0.66
+
+    for col, year in enumerate(years_block):
+        ax = axes[col]
+        r_yr = r_series[r_series.index.year == year].values.astype(float)
+        shock = shock_map.get(year)
+        ax.set_facecolor(SHOCK_COLOURS[shock] if shock else "#f5f5f5")
+        if len(r_yr) < 120:
+            ax.set_title(str(year), fontsize=16, fontweight="bold")
+            continue
+
+        vg = fit_vg0(r_yr)
+        ng = fit_nig0(r_yr)
+
+        half = max(4.5 * r_yr.std(), 0.08)
+        x = np.linspace(-half, half, 700)
+        kde = stats.gaussian_kde(r_yr)
+        ax.fill_between(x, kde(x), alpha=0.22, color="#5090c8", zorder=1)
+        ax.plot(x, kde(x), color="#5090c8", lw=0.9, alpha=0.6, zorder=2)
+
+        vg_pdf = np.exp(_logpdf_vg(x, 0.0, vg["sigma"], vg["theta"], vg["nu"]))
+        ng_pdf = np.exp(_logpdf_nig(x, 0.0, ng["alpha"], ng["beta"], ng["delta"]))
+        ax.plot(x, vg_pdf, color=cvg, lw=2.2, ls="-", zorder=4)
+        ax.plot(x, ng_pdf, color=cnig, lw=2.0, ls="--", zorder=5)
+
+        ax.axvline(0.0, ymin=0, ymax=LINE_TOP, color="#aaaaaa", lw=1.2, ls="--",
+                   zorder=3)
+
+        y_peak = max(kde(x).max(), np.nanmax(vg_pdf), np.nanmax(ng_pdf))
+        ax.set_ylim(0, y_peak * 1.45)
+        ax.set_title(str(year), fontsize=16, fontweight="bold",
+                     color="#3a1800" if shock else "black", pad=8)
+
+        info = (f"σ = {vg['sigma']*ANNUALISE:.0%}\n"
+                f"VG ν = {vg['nu']:.2f}\n"
+                f"NIG α = {ng['alpha']:.0f}")
+        ax.text(0.04, 0.97, info, transform=ax.transAxes, ha="left", va="top",
+                fontsize=10, color="#111111", linespacing=1.6,
+                fontfamily="monospace",
+                bbox=dict(boxstyle="round,pad=0.3", fc="white", alpha=0.82,
+                          ec="#cccccc", lw=0.5))
+
+        ax.set_xlim(-half, half)
+        ax.xaxis.set_major_locator(mticker.MultipleLocator(0.05))
+        ax.xaxis.set_major_formatter(mticker.FormatStrFormatter("%.2f"))
+        ax.tick_params(axis="x", labelsize=9)
+        ax.set_yticks([])
+        ax.set_xlabel("Daily log-return", fontsize=9)
+        ax.spines[["top", "right", "left"]].set_visible(False)
+
+    legend_elements = [
+        mpatches.Patch(color="#5090c8", alpha=0.5, label="Empirical KDE"),
+        plt.Line2D([0], [0], color=cvg, lw=2.2, ls="-", label="Fitted VG (μ=0)"),
+        plt.Line2D([0], [0], color=cnig, lw=2.0, ls="--", label="Fitted NIG (μ=0)"),
+        plt.Line2D([0], [0], color="#aaaaaa", lw=1.2, ls="--", label="x = 0"),
+    ]
+    shock_patches = [mpatches.Patch(color=SHOCK_COLOURS[lbl], alpha=0.75, label=lbl)
+                     for lbl in SHOCK_PERIODS]
+    fig.legend(handles=legend_elements + shock_patches, loc="lower center",
+               bbox_to_anchor=(0.5, -0.01), ncol=4, fontsize=9, framealpha=0.95)
+    fig.suptitle(f"S&P 500 annual return distributions: fitted VG and NIG "
+                 f"(μ = 0)  {period}", fontsize=14, y=0.965)
+
+    out = os.path.join(save_dir, f"week4_marginals_{years_block[0]}_{years_block[-1]}.png")
+    fig.savefig(out, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"    saved -> {out}")
+
+
+def plot_levy_marginals_by_period(r_series, save_dir, start=2000, end=2024):
+    """Five 5-year figures of per-year VG and NIG marginal fits."""
+    shock_map = _shock_map()
+    years = list(range(start, end + 1))
+    for i in range(0, len(years), 5):
+        _make_marginal_figure(r_series, years[i:i + 5], shock_map, save_dir)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -287,6 +405,7 @@ def main():
 
     make_vg_figure(df, save_dir)
     make_nig_figure(df, save_dir)
+    plot_levy_marginals_by_period(r, save_dir, start=args.start, end=args.end)
 
     data_dir = os.path.abspath(os.path.join(_HERE, "..", "data"))
     os.makedirs(data_dir, exist_ok=True)
