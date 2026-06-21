@@ -154,7 +154,7 @@ _BASELINE_KEYS = ["rv21"]
 # FEATURE PANEL
 # ════════════════════════════════════════════════════════════════════════════
 
-def build_feature_panel(r_series, horizon=21):
+def build_feature_panel(r_series, horizon=21, vix_start="2000-01-01"):
     """
     Build the daily panel of lagged predictors and the forward-vol target.
 
@@ -162,6 +162,10 @@ def build_feature_panel(r_series, horizon=21):
     including day t.  The target uses only days t+1 … t+h, so there is a
     strict temporal gap between predictors and outcome — the feature that
     makes this a lead-up regression rather than a contemporaneous one.
+
+    `vix_start` controls how far back the VIX download begins; it is widened
+    only when the returns series is itself extended before 2000 to warm up
+    the 252-day drawdown for the dot-com lead-up (see fetch_extended_returns).
 
     Returns a pd.DataFrame indexed by date with columns:
         rv5, rv21, vix, dvix5, absret, skew21, kurt21, ddown, fwd_rv
@@ -184,7 +188,7 @@ def build_feature_panel(r_series, horizon=21):
 
     # VIX level and 5-day change
     print("Downloading VIX (^VIX)…")
-    vix = yf.download("^VIX", start="2000-01-01", end="2024-12-31",
+    vix = yf.download("^VIX", start=vix_start, end="2024-12-31",
                       auto_adjust=True, progress=False)["Close"]
     if isinstance(vix, pd.DataFrame):
         vix = vix.iloc[:, 0]
@@ -201,6 +205,28 @@ def build_feature_panel(r_series, horizon=21):
             "skew21", "kurt21", "ddown", "fwd_rv"]
     panel = df[cols].dropna()
     return panel
+
+
+def fetch_extended_returns(lookback_start="1999-01-01", end="2024-12-31"):
+    """
+    S&P 500 log-returns starting BEFORE the 2000-2024 study window.
+
+    This is used for ONE purpose only: warming up the 252-day trailing-peak
+    drawdown so the dot-com lead-up window (the 21 days before 2000-03-01)
+    has a defined drawdown and can appear in the lead-up table on the same
+    footing as the other three shocks.  The extra pre-2000 history is NOT
+    carried into the regression, the figures, or anywhere else in the
+    project — every other result stays on the 2000-2024 sample.
+    """
+    print(f"Downloading extended ^GSPC history from {lookback_start} "
+          f"(dot-com drawdown warm-up only)…")
+    raw = yf.download("^GSPC", start=lookback_start, end=end,
+                      auto_adjust=True, progress=False)["Close"]
+    if isinstance(raw, pd.DataFrame):
+        raw = raw.iloc[:, 0]
+    r = np.log(raw / raw.shift(1)).dropna()
+    r.index = pd.to_datetime(r.index)
+    return r
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -317,27 +343,38 @@ def run_models(panel_df, horizon=21):
 # RETROSPECTIVE LEAD-UP TABLE
 # ════════════════════════════════════════════════════════════════════════════
 
-def leadup_table(panel_df, periods=None, window=21):
+def leadup_table(panel_df, periods=None, window=21, ref_stats=None):
     """
     Mean standardised factor level in the `window` trading days BEFORE each
     shock window start.
 
-    Each factor is z-scored over the full sample, so a value of, say, +1.8
-    means that factor stood 1.8 sample standard deviations above its
-    typical level in the run-up to that crisis.  This is the retrospective
-    attribution exhibit: it describes the conditions that preceded each
-    episode in the historical record.  It is NOT a forecast.
+    Each factor is z-scored, so a value of, say, +1.8 means that factor
+    stood 1.8 standard deviations above its typical level in the run-up to
+    that crisis.  This is the retrospective attribution exhibit: it
+    describes the conditions that preceded each episode in the historical
+    record.  It is NOT a forecast.
+
+    `ref_stats=(mean, std)` supplies the standardisation reference.  When the
+    table is computed on the dot-com-extended panel we pass the ORIGINAL
+    2000-2024 panel's mean/std here, so the GFC/COVID/Fed rows are byte-for-
+    byte identical to the un-extended table and only the dot-com row is added.
+    A shock is included only when a full `window` of lead-up days is defined.
     """
     if periods is None:
         periods = SHOCK_PERIODS
 
-    z, _, _ = _standardise(panel_df[_FACTOR_KEYS])
-    z = z.copy()
+    feats = panel_df[_FACTOR_KEYS]
+    if ref_stats is None:
+        mu, sd = feats.mean(), feats.std(ddof=0)
+    else:
+        mu, sd = ref_stats
+    z = (feats - mu) / sd
+
     rows = []
     for name, (start, _end) in periods.items():
         start_ts = pd.Timestamp(start)
         pre = z[z.index < start_ts].tail(window)
-        if len(pre) == 0:
+        if len(pre) < window:           # need a complete lead-up window
             continue
         row = {"Shock": name, "n_days": len(pre)}
         for kkey in _FACTOR_KEYS:
@@ -375,6 +412,47 @@ def _shade_shocks(ax, periods, alpha=0.33):
                    color=SHADE_COLOURS[name], alpha=alpha, lw=0, zorder=0)
 
 
+def make_vix_scatter(panel_df, save_dir=None):
+    """
+    Scatter of the VIX against trailing 21-day realised volatility, both on
+    an annualised-percent footing, with the correlation coefficient reported.
+
+    This is the motivating exhibit for using the VIX as a risk predictor:
+    options-implied volatility and recently realised volatility move together
+    very closely, so the VIX carries genuine information about dispersion.
+    """
+    x = panel_df["vix"].values                 # VIX points ≈ annualised %
+    y = panel_df["rv21"].values * 100.0        # trailing 21d vol, annualised %
+
+    pearson = float(np.corrcoef(x, y)[0, 1])
+    spearman = float(scipy_stats.spearmanr(x, y).statistic)
+    slope, intercept = np.polyfit(x, y, 1)
+    xline = np.array([x.min(), x.max()])
+
+    print(f"\nVIX vs trailing 21d realised vol: "
+          f"Pearson r = {pearson:.3f}, Spearman ρ = {spearman:.3f}")
+
+    fig, ax = plt.subplots(figsize=(7.5, 6))
+    ax.scatter(x, y, s=6, alpha=0.25, color="steelblue", edgecolors="none",
+               zorder=2)
+    ax.plot(xline, slope * xline + intercept, color="black", lw=1.4,
+            zorder=3, label=f"OLS fit (slope {slope:.2f})")
+    ax.plot(xline, xline, color="0.5", lw=1.0, ls="--", zorder=1,
+            label="45° line")
+    ax.set_xlabel("VIX level (annualised %)", fontsize=11)
+    ax.set_ylabel("Trailing 21-day realised volatility (annualised %)",
+                  fontsize=11)
+    ax.set_title("VIX vs realised volatility\n"
+                 f"Pearson r = {pearson:.2f},  Spearman ρ = {spearman:.2f}  "
+                 f"(n = {len(x):,})", fontsize=12)
+    ax.grid(color="0.92", lw=0.6, zorder=0)
+    ax.legend(fontsize=9, loc="upper left")
+    fig.tight_layout()
+    _save_fig(fig, save_dir, "week3_vix_scatter.png")
+    plt.close(fig)
+    return {"pearson": pearson, "spearman": spearman, "slope": float(slope)}
+
+
 def make_leadup_plots(panel_df, std_full, horizon, save_dir=None):
     """Produce the three lead-up figures (see module docstring)."""
     periods = SHOCK_PERIODS
@@ -402,51 +480,89 @@ def make_leadup_plots(panel_df, std_full, horizon, save_dir=None):
     _save_fig(fig1, save_dir, "week3_leadup_factors.png")
     plt.close(fig1)
 
-    # ── 2. Actual vs in-sample fitted forward vol ─────────────────────────
+    # ── 2. Actual vs in-sample fitted forward vol (two panels) ────────────
+    # The target fwd_rv[t] is realised over [t+1, t+h] while the predictors
+    # are trailing/contemporaneous.  At a sharp jump (COVID) the actual curve,
+    # which already 'sees' the coming month, therefore leads the fitted curve
+    # by up to the horizon: the model cannot anticipate a jump from trailing
+    # data.  That lead is genuine model error, NOT an indexing bug (the two
+    # series share the exact same row index).  The right-hand fitted-vs-actual
+    # scatter drops the time axis entirely and shows the agreement directly.
     Xf = panel_df[_FACTOR_KEYS].values
     n = len(Xf)
     Xc = np.column_stack([np.ones(n), Xf])
-    # refit raw full model to get fitted values
     full_raw = ols_hac(Xf, panel_df["fwd_rv"].values, horizon)
     fitted = Xc @ full_raw["beta"]
-    fig2, ax = plt.subplots(figsize=(13, 5.5))
-    _shade_shocks(ax, periods)
-    ax.plot(panel_df.index, panel_df["fwd_rv"].values * 100,
-            color="black", lw=0.8, label="Actual forward 21d vol (ann., %)")
-    ax.plot(panel_df.index, fitted * 100,
-            color="crimson", lw=0.9, alpha=0.85, label="In-sample fitted")
-    ax.set_ylabel("Annualised vol (%)", fontsize=11)
-    ax.margins(x=0.01)
-    ax.set_title(
+    actual = panel_df["fwd_rv"].values
+
+    fig2, (axL, axR) = plt.subplots(
+        1, 2, figsize=(15, 5.2), gridspec_kw={"width_ratios": [2.4, 1.0]})
+
+    _shade_shocks(axL, periods)
+    axL.plot(panel_df.index, actual * 100,
+             color="black", lw=0.8, label="Actual forward 21d vol (ann., %)")
+    axL.plot(panel_df.index, fitted * 100,
+             color="crimson", lw=0.9, alpha=0.85, label="In-sample fitted")
+    axL.set_ylabel("Annualised vol (%)", fontsize=11)
+    axL.margins(x=0.01)
+    axL.set_title(
         f"Forward {horizon}-day realised volatility: actual vs in-sample fit "
         f"(R² = {full_raw['r2']:.2f})", fontsize=12)
-    line_handles, _ = ax.get_legend_handles_labels()
-    shock_handles = [mpatches.Patch(facecolor=SHADE_COLOURS[n], alpha=0.55, label=n)
-                     for n in periods]
-    ax.legend(handles=line_handles + shock_handles, fontsize=9,
-              loc="upper center", ncol=3, framealpha=0.9)
+    line_handles, _ = axL.get_legend_handles_labels()
+    shock_handles = [mpatches.Patch(facecolor=SHADE_COLOURS[nm], alpha=0.55, label=nm)
+                     for nm in periods]
+    axL.legend(handles=line_handles + shock_handles, fontsize=8,
+               loc="upper center", ncol=3, framealpha=0.9)
+
+    lim = float(max((actual * 100).max(), (fitted * 100).max())) * 1.03
+    axR.scatter(actual * 100, fitted * 100, s=5, alpha=0.20,
+                color="steelblue", edgecolors="none", zorder=2)
+    axR.plot([0, lim], [0, lim], color="black", lw=1.2, ls="--",
+             zorder=3, label="45° (perfect fit)")
+    axR.set_xlim(0, lim); axR.set_ylim(0, lim)
+    axR.set_xlabel("Actual forward vol (%)", fontsize=10)
+    axR.set_ylabel("Fitted forward vol (%)", fontsize=10)
+    axR.set_title(f"Fitted vs actual\n(R² = {full_raw['r2']:.2f}, "
+                  f"alignment-free)", fontsize=11)
+    axR.grid(color="0.92", lw=0.6, zorder=0)
+    axR.legend(fontsize=8, loc="upper left")
+
     fig2.tight_layout()
     _save_fig(fig2, save_dir, "week3_leadup_fit.png")
     plt.close(fig2)
 
-    # ── 3. Standardised coefficients with HAC 95% CI ──────────────────────
+    # ── 3. Forest plot: standardised coefficients with HAC 95% CI ─────────
     beta = std_full["beta"][1:]          # drop intercept
     se   = std_full["se"][1:]
     labels = [dict(_FACTORS)[k] for k in _FACTOR_KEYS]
     ci = 1.96 * se
-    order = np.argsort(beta)
+    order = np.argsort(beta)             # ascending effect size
+    b_o, ci_o = beta[order], ci[order]
+    lab_o = [labels[i] for i in order]
+
     fig3, ax = plt.subplots(figsize=(9, 5))
-    ypos = np.arange(len(beta))
-    colors = ["crimson" if b < 0 else "steelblue" for b in beta[order]]
-    ax.barh(ypos, beta[order], xerr=ci[order], color=colors, alpha=0.8,
-            error_kw=dict(ecolor="gray", lw=1, capsize=3))
-    ax.axvline(0, color="black", lw=0.8)
+    ypos = np.arange(len(b_o))
+    ax.axvline(0, color="black", lw=1.0, zorder=1)
+    for yi, bi, ei in zip(ypos, b_o, ci_o):
+        sig = (bi - ei) > 0 or (bi + ei) < 0       # 95% CI excludes zero
+        col = "crimson" if bi < 0 else "steelblue"
+        ax.plot([bi - ei, bi + ei], [yi, yi], color=col, lw=1.6,
+                alpha=0.9, zorder=2)                # CI whisker
+        for cap in (bi - ei, bi + ei):
+            ax.plot([cap, cap], [yi - 0.12, yi + 0.12], color=col, lw=1.2,
+                    zorder=2)
+        ax.scatter([bi], [yi], s=60 if sig else 42, color=col,
+                   edgecolors="black", linewidths=0.6,
+                   marker="o" if sig else "D", zorder=3)
     ax.set_yticks(ypos)
-    ax.set_yticklabels([labels[i] for i in order], fontsize=9)
-    ax.set_xlabel("Standardised coefficient (σ of forward vol per σ of factor)",
-                  fontsize=9)
+    ax.set_yticklabels(lab_o, fontsize=10)
+    ax.set_ylim(-0.6, len(b_o) - 0.4)
+    ax.set_xlabel("Standardised coefficient "
+                  "(σ of forward vol per σ of factor)", fontsize=10)
     ax.set_title("Lead-up regression: standardised factor loadings\n"
-                 "(Newey–West HAC 95% intervals)", fontsize=11)
+                 "(forest plot; point estimate ● and Newey–West HAC 95% interval; "
+                 "◆ = interval spans zero)", fontsize=10.5)
+    ax.grid(axis="x", color="0.92", lw=0.6, zorder=0)
     fig3.tight_layout()
     _save_fig(fig3, save_dir, "week3_leadup_coefs.png")
     plt.close(fig3)
@@ -495,9 +611,28 @@ def run_leadup_regression(r_series, horizon=21, save_dir=None):
     print("Retrospective lead-up: mean standardised factor level in the 21")
     print("trading days BEFORE each shock window (z-scores; descriptive only):")
     print("─" * 70)
-    lt = leadup_table(panel_df, window=21)
+
+    # The dot-com lead-up (Jan-Feb 2000) sits inside the 252-day drawdown
+    # warm-up of the 2000-2024 sample, so it is missing from the un-extended
+    # table.  Build a second panel that prepends pre-2000 history PURELY to
+    # warm the drawdown, then standardise it against the 2000-2024 panel's
+    # mean/std so the GFC/COVID/Fed rows are unchanged and only dot-com is added.
+    ref_mu = panel_df[_FACTOR_KEYS].mean()
+    ref_sd = panel_df[_FACTOR_KEYS].std(ddof=0)
+    try:
+        ext_returns = fetch_extended_returns()
+        ext_panel = build_feature_panel(ext_returns, horizon=horizon,
+                                        vix_start="1999-01-01")
+        lt = leadup_table(ext_panel, window=21, ref_stats=(ref_mu, ref_sd))
+        print("(dot-com included via pre-2000 drawdown warm-up; "
+              "other rows standardised against the 2000-2024 sample)")
+    except Exception as exc:
+        print(f"  extended panel unavailable ({exc}); falling back to "
+              f"2000-2024 table without dot-com")
+        lt = leadup_table(panel_df, window=21)
     print(lt.to_string(float_format="{:+.2f}".format))
 
+    make_vix_scatter(panel_df, save_dir=save_dir)
     make_leadup_plots(panel_df, std_full, horizon, save_dir=save_dir)
 
     print("\nLead-up regression complete.")

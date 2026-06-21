@@ -105,3 +105,25 @@ Two results are worth dwelling on.
 The first is the Student-t ν. Its 94% interval runs from about 2.46 to 2.87, and the whole of it sits above 2. That is the question from Section 1 answered. The finite variance is not a fragile property of one point estimate that happens to land just north of the singularity. It holds across the entire credible range. The tails are genuinely heavy, and the variance is genuinely finite, both at once.
 
 The second is the NIG asymmetry β. Every part of its interval is negative, from roughly −8.75 to −3.25. Week 3 reported a negative point estimate and read it as left skew. The posterior says that skew is a stable feature of the fit rather than something that could round away to zero. Losses sit in a heavier tail than gains, and the data is fairly firm about it.
+
+---
+
+## 6. Year-by-year VG and NIG fits
+
+Everything so far, here and in Weeks 2 and 3, fits one set of parameters to the whole 2000–2024 sample. A single fit cannot say whether the heavy tails are a permanent feature of the market or something that switches on in crises and fades in calm years. To see that, I refitted the Variance-Gamma and NIG densities by maximum likelihood one calendar year at a time, twenty-five fits each, and read the parameters as a time series.
+
+Two choices shape these fits. First, the location is fixed at μ = 0. Within a single year there are only about 250 returns, the daily drift is tiny and barely identified, and leaving it free just adds a noisy nuisance parameter; pinning it to zero lets the scale, tail and asymmetry parameters carry the year's shape, and whatever small mean exists is absorbed by the asymmetry parameter (θ for VG, β for NIG), which is where it belongs. Second, the daily scale parameters σ and δ are reported annualised (× √252), so a year's scale reads on the same footing as the VIX and the Gaussian σ. The densities, the α > |β| reparametrisation and the standard errors are reused from the Week 3 code, so these yearly fits are numerically of a piece with the full-sample ones.
+
+![Figure 9. Year-by-year Variance-Gamma parameters (μ = 0): annualised scale σ, asymmetry θ, and variance rate ν, with shock windows shaded and ±1 SE bars.](../figures/week4_yearly_vg_params.png)
+
+*Figure 9. Year-by-year Variance-Gamma fit (μ = 0). Top to bottom: the annualised scale σ, the asymmetry θ, and the variance rate ν (tail heaviness). Shaded bands are the four shock windows; bars are ±1 standard error.*
+
+The VG scale moves with the crises. σ peaks in 2008 at 39.8% annualised and again in 2020 at 31.3%, the GFC and COVID years, and bottoms out in the calm of 2017 at 6.5%. The variance rate ν, which sets the tail heaviness, tends to run higher through the turbulent 2008 to 2020 stretch than in the quiet mid-2000s or the 2021 to 2023 years, though it is a good deal noisier than the scale.
+
+![Figure 10. Year-by-year NIG parameters (μ = 0): tail α and scale δ on log axes, asymmetry β with ±1 SE bars; shock windows shaded.](../figures/week4_yearly_nig_params.png)
+
+*Figure 10. Year-by-year Normal-Inverse-Gaussian fit (μ = 0). Tail-heaviness α and annualised scale δ are on log axes; asymmetry β is linear with ±1 SE bars. In the very calm years 2004, 2005 and 2023 the NIG runs into its Gaussian limit, where α and δ both grow large and are only weakly identified individually (the SEs there are enormous, so the bars are omitted on the log panels); their product stays finite and the tails are simply close to normal.*
+
+The NIG says the same thing through its tail. Its tail-heaviness α (smaller means heavier tails) falls to its lowest values, around 22, in exactly 2008 and 2020, so the heaviest tails of the whole sample land on the two largest crises. In the calmest years the NIG drifts toward the Gaussian: α runs into the thousands and the scale destabilises, which is the signature of that limit rather than a failed fit. The asymmetry β is most negative, most left-skewed, in 2001 to 2002, in 2008 and in 2022, the dot-com unwind, the GFC and the rate-hike drawdown. That matches the full-sample posterior in Section 5, which put β firmly below zero.
+
+The two models agree. Tail heaviness and scale are not fixed features of the market; they rise sharply in crises and settle back in calm years, and the negative skew bunches into the stressed periods. The single full-sample fit is then best read as an average over a distribution that changes through time, and the heavy-tailed, left-skewed picture it gives comes mostly from the crisis years rather than evenly from the whole sample.
