@@ -110,6 +110,6 @@ The second is the NIG asymmetry β. Every part of its interval is negative, from
 
 ## 6. Where this leaves the project
 
-The Bayesian pass did not rewrite Week 3. It backed it up and tightened the one claim that needed tightening. The Student-t tail is heavy but its variance is finite, and that statement now rests on a full posterior instead of a single number with an asymptotic error bar. The NIG left skew survives the same scrutiny.
+The Student-t tail is heavy but its variance is finite, and that statement now rests on a full posterior instead of a single number with an asymptotic error bar. The NIG left skew survives the same scrutiny.
 
-The honest caveats are about the priors. They are weakly informative, not absent, and with a shorter sample they would carry more weight than they do here. The Laplace also only captures the symmetric half of the VG idea, so it speaks to how thick the tails are, not to skew. Next week I will run posterior predictive checks, pushing each fitted posterior back through the data to see where the models still miss, which is the natural test of whether these fits are good for anything beyond describing the sample they were trained on.
+The honest caveats are about the priors. They are weakly informative, not absent, and with a shorter sample they would carry more weight than they do here. The Laplace also only captures the symmetric half of the VG idea, so it speaks to how thick the tails are, not to skew. Next week I will run posterior predictive checks, pushing each fitted posterior back through the data to see where the models still miss.
