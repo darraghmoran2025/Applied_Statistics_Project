@@ -1,6 +1,6 @@
 # Week 4: Bayesian estimation with NUTS
 
-## 1. Why refit everything the Bayesian way
+## 1. Bayesian Refitting
 
 Weeks 2 and 3 fitted every model by maximum likelihood. That gives one best value for each parameter and a standard error read off the curvature of the likelihood. The standard error leans on an assumption: that the sampling distribution of the estimate is roughly normal. For the Student-t degrees of freedom it is worth a second look, because the MLE lands at ν ≈ 2.65, not far above ν = 2, the point where the variance of the distribution blows up to infinity. Close to that boundary the likelihood stops being symmetric.
 
