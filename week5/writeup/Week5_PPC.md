@@ -106,7 +106,7 @@ Table 2 has the numbers. Every R-hat rounds to 1.00. Bulk ESS never drops below 
 
 ![Figure 6. Trace diagnostics for all four models.](../figures/week5_diagnostics_nig.png)
 
-*Figure 6. Per-chain traces for the NIG, the hardest of the four to sample. The chains overlap and stay flat with no drift; the diagnostics for the other three models look the same and are saved alongside.*
+*Figure 6. Per-chain traces for the NIG.*
 
 ---
 
