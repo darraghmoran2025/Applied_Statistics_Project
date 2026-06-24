@@ -64,11 +64,11 @@ VIX level is the strongest factor (+0.40, t = 4.2): options-implied volatility i
 
 *Figure 3. Left: actual forward 21-day realised volatility (black) against the in-sample fitted values (red), with the four shock windows shaded. Right: the same fit as fitted-against-actual, which removes the time axis altogether; points cluster on the 45-degree line, falling below it at the highest volatilities where the model under-predicts. In-sample R² = 0.55.*
 
-The two curves sit on top of each other across the calm bulk of the sample but separate at the sharpest spikes, most visibly at the onset of COVID-19, where the black leads the red. This is structural, not a graphical or coding artefact (the two series share the same daily index, and the forward target was verified against an explicit forward sum to machine precision):
+The two curves sit on top of each other across the calm bulk of the sample but separate at the sharpest spikes. This is structural: 
 
-- The actual (black) is forward-looking. The forward realised volatility for day t is the volatility of the coming month, so at the onset of COVID in late February 2020 that value is already enormous because the crash is in the window it covers.
-- The fitted (red) is built from trailing and contemporaneous factors, trailing 21-day volatility, the VIX level, the absolute return, all measured at t. At that same late-February moment trailing volatility is still low and the predictors have not yet moved.
-- So at a jump the black leaps immediately and the red only catches up about a horizon later, once trailing volatility and the VIX have risen. The black leads the red by up to the horizon at regime onsets, the model being structurally unable to anticipate a jump from backward-looking data, the same finding as the COVID-19 row of Table 4 (the crash erupted from a calm market, with trailing volatility and the VIX below average going in).
+- The actual (black) is forward-looking. The forward realised volatility for day t 
+- The fitted (red) is built from trailing and contemporaneous factors, trailing 21-day volatility, the VIX level, the absolute return, all measured at t. 
+- So at a jump the black leaps immediately and the red only catches up about a horizon later, once trailing volatility and the VIX have risen. 
 
 The right panel makes the same point without a time axis: agreement is tight in the dense low-to-mid-volatility cloud and the largest actual volatilities sit below the 45-degree line, the days the model under-predicts.
 
