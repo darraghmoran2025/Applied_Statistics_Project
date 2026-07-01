@@ -235,12 +235,14 @@ def fit_student_t(r):
 # 4. VALUE-AT-RISK AND EXPECTED SHORTFALL
 # ════════════════════════════════════════════════════════════════════════════
 
-def compute_risk_measures(g, t, alphas=(0.95, 0.99)):
+def compute_risk_measures(g, t, alphas=(0.95, 0.975, 0.99)):
     """
     VaR and ES at each confidence level α under both fitted distributions.
 
     Convention: α = confidence level; p = 1 - α (tail probability).
     All figures are daily log-returns; negative values are losses.
+    97.5% is included by default: it is the ES confidence level mandated
+    by FRTB (BCBS 2013), the project's regulatory motivation.
 
     Gaussian ES:   μ - σ · φ(Φ⁻¹(p)) / p
     Student-t ES:  μ + σ · [-f_ν(q_p) · (ν + q_p²) / (ν - 1)] / p
@@ -259,7 +261,7 @@ def compute_risk_measures(g, t, alphas=(0.95, 0.99)):
         es_t  = mu + sig * (-stats.t.pdf(q_t, df=nu) * (nu + q_t**2) / (nu - 1)) / p
 
         rows.append({
-            "Confidence":    f"{int(a * 100)}%",
+            "Confidence":    f"{a * 100:g}%",
             "VaR (Gaussian)":  var_g,
             "ES (Gaussian)":   es_g,
             "VaR (Student-t)": var_t,

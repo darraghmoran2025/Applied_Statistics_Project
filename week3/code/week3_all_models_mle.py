@@ -119,26 +119,29 @@ def model_comparison_table(g, lap, t, vg, nig):
     return df
 
 
-def risk_table_all_models(g, lap, t, vg, nig, n_sim=500_000):
+def risk_table_all_models(g, lap, t, vg, nig, n_sim=500_000,
+                          alphas=(0.95, 0.975, 0.99)):
     """
-    VaR and ES at 95% and 99% for all five models.
+    VaR and ES at each confidence level for all five models.  97.5% is
+    included by default: it is the FRTB (BCBS 2013) ES confidence level.
 
     Gaussian, Laplace and Student-t use closed-form expressions; VG and NIG
     use Monte Carlo with n_sim draws.  The Laplace VaR/ES come from
     laplace_var_es() (exponential lower-tail identities).
     """
     # Closed-form risk measures for Gaussian and Student-t (Week 2 convention)
-    risk_gt  = compute_risk_measures(g, t, alphas=(0.95, 0.99))
-    rm_lap   = laplace_var_es(lap, alphas=(0.95, 0.99))
+    risk_gt  = compute_risk_measures(g, t, alphas=alphas)
+    rm_lap   = laplace_var_es(lap, alphas=alphas)
 
     samp_vg  = simulate_vg(vg,  n=n_sim, seed=42)
     samp_nig = simulate_nig(nig, n=n_sim, seed=42)
 
-    rm_vg  = var_es_mc(samp_vg,  alphas=(0.95, 0.99))
-    rm_nig = var_es_mc(samp_nig, alphas=(0.95, 0.99))
+    rm_vg  = var_es_mc(samp_vg,  alphas=alphas)
+    rm_nig = var_es_mc(samp_nig, alphas=alphas)
 
     rows = []
-    for label, a in [("95%", 0.95), ("99%", 0.99)]:
+    for a in alphas:
+        label = f"{a * 100:g}%"
         rows.append({
             "Confidence":    label,
             "VaR (Gaussian)":    risk_gt.loc[label, "VaR (Gaussian)"],
@@ -316,18 +319,20 @@ def make_plots_week3_mle(r_series, g, lap, t, vg, nig,
     _save_fig(fig2, save_dir, "week3_qq_all_models.png")
     plt.close(fig2)
 
-    # ── 3. VaR/ES bar chart ───────────────────────────────────────────────
-    rm_vg  = var_es_mc(samp_vg,  alphas=(0.95, 0.99))
-    rm_nig = var_es_mc(samp_nig, alphas=(0.95, 0.99))
+    # ── 3. VaR/ES bar chart (97.5% = FRTB ES confidence level) ────────────
+    alphas = (0.95, 0.975, 0.99)
+    rm_vg  = var_es_mc(samp_vg,  alphas=alphas)
+    rm_nig = var_es_mc(samp_nig, alphas=alphas)
 
     labels  = ["Gaussian", "Laplace", "Student-t", "VG", "NIG"]
     colours = [MODEL_COLOURS[m] for m in labels]
 
-    risk_gt = compute_risk_measures(g, t, alphas=(0.95, 0.99))
-    rm_lap  = laplace_var_es(lap, alphas=(0.95, 0.99))
+    risk_gt = compute_risk_measures(g, t, alphas=alphas)
+    rm_lap  = laplace_var_es(lap, alphas=alphas)
 
-    fig3, axes = plt.subplots(1, 2, figsize=(13, 5))
-    for ax_i, (conf_label, a) in enumerate([("95%", 0.95), ("99%", 0.99)]):
+    fig3, axes = plt.subplots(1, len(alphas), figsize=(6.5 * len(alphas), 5))
+    for ax_i, a in enumerate(alphas):
+        conf_label = f"{a * 100:g}%"
         ax = axes[ax_i]
         var_vals = [
             risk_gt.loc[conf_label, "VaR (Gaussian)"],
@@ -433,7 +438,7 @@ def run_all_models_mle(r_series, n_sim=500_000, save_dir=None):
     # ── Risk measures ─────────────────────────────────────────────────────
     print(f"\nComputing risk measures (Monte Carlo n = {n_sim:,})…")
     risk = risk_table_all_models(g, lap, t, vg, nig, n_sim=n_sim)
-    print("\nVaR and ES — all four models (daily log-returns; negative = loss):")
+    print("\nVaR and ES — all five models (daily log-returns; negative = loss):")
     print(risk.to_string(float_format="{:.6f}".format))
 
     # ── Goodness-of-fit ───────────────────────────────────────────────────

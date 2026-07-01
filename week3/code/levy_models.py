@@ -407,9 +407,10 @@ def simulate_nig(nig, n=1_000_000, seed=None):
 # RISK MEASURES (Monte Carlo)
 # ════════════════════════════════════════════════════════════════════════════
 
-def var_es_mc(samples, alphas=(0.95, 0.99)):
+def var_es_mc(samples, alphas=(0.95, 0.975, 0.99)):
     """
     VaR and ES at each confidence level from a pre-generated simulated sample.
+    97.5% is included by default (the FRTB ES confidence level, BCBS 2013).
 
     Convention matches compute_risk_measures() in week2_gaussian_student_mle.py:
       VaR_α = α-quantile of the return distribution (negative value = loss)
@@ -471,7 +472,7 @@ def fit_laplace(r, **kwargs):
     }
 
 
-def laplace_var_es(lap, alphas=(0.95, 0.99)):
+def laplace_var_es(lap, alphas=(0.95, 0.975, 0.99)):
     """
     Closed-form VaR and ES for a fitted Laplace model.
 
