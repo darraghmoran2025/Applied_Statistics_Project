@@ -241,8 +241,8 @@ def compute_risk_measures(g, t, alphas=(0.95, 0.975, 0.99)):
 
     Convention: α = confidence level; p = 1 - α (tail probability).
     All figures are daily log-returns; negative values are losses.
-    97.5% is included by default: it is the ES confidence level mandated
-    by FRTB (BCBS 2013), the project's regulatory motivation.
+    97.5% is included by default because it is the ES confidence level
+    FRTB (BCBS 2013) mandates, the project's regulatory motivation.
 
     Gaussian ES:   μ - σ · φ(Φ⁻¹(p)) / p
     Student-t ES:  μ + σ · [-f_ν(q_p) · (ν + q_p²) / (ν - 1)] / p

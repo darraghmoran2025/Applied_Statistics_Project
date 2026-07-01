@@ -121,7 +121,7 @@ The Laplace reaches ΔAIC −1,771 with two parameters (96% of NIG's gain), conf
 
 At 99% ES the five models span from −3.24% (Gaussian) to −5.81% (Student-t). The Laplace at −3.91% already exceeds the Gaussian by 21% from exponential tails alone. The Student-t's outlier reading reflects its symmetric constraint at ν = 2.648, which inflates the right tail to match the left. VG and NIG, with asymmetry parameters, sit at −4.28% and −5.19%. Using the Gaussian ES to set capital leaves a 37% shortfall against NIG. Under FRTB (BCBS 2013), that shortfall is material.
 
-The 97.5% row is the one FRTB actually mandates: the Basel III/IV internal-models framework sets regulatory capital from ES at 97.5% confidence. At that level the Gaussian ES of −2.84% sits 28% below the NIG's −3.94% and 29% below the Student-t's −4.02%. The Gaussian shortfall is therefore not an artefact of looking deep into the 99% tail; it is already material at the confidence level the regulation uses.
+The 97.5% row is the one FRTB mandates: the Basel III/IV internal-models framework sets regulatory capital from ES at 97.5% confidence. At that level the Gaussian ES of −2.84% sits 28% below the NIG's −3.94% and 29% below the Student-t's −4.02%. The Gaussian shortfall is already material at the confidence level the regulation uses, well before the deep 99% tail.
 
 ![Figure 3. VaR and ES at 95%, 97.5% and 99% for all five models. Hatched bars are ES.](../figures/week3_risk_comparison.png)
 

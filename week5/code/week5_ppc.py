@@ -14,11 +14,11 @@ questions that decide whether those fits are trustworthy:
      the PPC statistics are tail-weighted: VaR/ES at 95%, 97.5% (the
      FRTB ES level) and 99%, excess kurtosis, min/max, each reported
      with a posterior-predictive credible band and a Bayesian p-value.
-     One DEPENDENCE statistic is included on purpose — the lag-1
+     One DEPENDENCE statistic is included on purpose: the lag-1
      autocorrelation of squared returns (volatility clustering, Cont
      2001).  All four models are iid, so all four are expected to fail
-     it; that failure is the honest boundary of what a static marginal
-     can do, and the motivation for the Week 6 rolling backtest.
+     it.  That failure shows where a static marginal stops working and
+     is the reason for the Week 6 rolling backtest.
      Expectation: the Gaussian PPC should visibly FAIL in the tails
      (the Bayesian echo of the 79.5% ES gap) while Student-t and NIG
      cover the extremes.
@@ -138,11 +138,11 @@ def _simulate_one(name, row, n, rng):
 
 
 def _acf1_sq(x):
-    """Lag-1 autocorrelation of squared returns — the volatility-clustering
+    """Lag-1 autocorrelation of squared returns: the volatility clustering
     statistic (Cont 2001).  All four fitted models are iid, so their
     replicates have ACF ≈ 0 by construction; the observed series does not.
-    Deliberately included so the PPC also tests a DEPENDENCE feature, not
-    only marginal ones."""
+    Included so the PPC also tests a DEPENDENCE feature rather than
+    marginal ones only."""
     s = x**2
     s = s - s.mean()
     return float(np.sum(s[1:] * s[:-1]) / np.sum(s * s))
@@ -281,7 +281,7 @@ def plot_risk_bands(rep_stats_by_model, obs_stats, save_dir):
 # bulk-ESS via Geyer's initial-monotone-sequence estimator, and tail-ESS as
 # the ESS of the 5%/95% quantile indicators.  For these well-mixed, unimodal
 # posteriors the rank-normalisation refinement makes no practical difference;
-# the Week 4 az.summary output provides the library-computed cross-check.
+# the Week 4 az.summary output gives a library cross-check.
 
 def _split_chains(x):
     """x: (n_chain, n_draw) -> (2*n_chain, n_draw//2) split-half chains."""

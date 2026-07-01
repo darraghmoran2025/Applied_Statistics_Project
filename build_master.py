@@ -29,7 +29,7 @@ PARTS = [
 
 HEADER = (
     "# Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns\n\n"
-    "*Master writeup — combined Week 1 to Week 5. Compiled from the committed "
+    "*Master writeup, Weeks 1 to 5 combined. Compiled from the committed "
     "markdown sources; regenerate with `build_master.py`.*\n"
 )
 
