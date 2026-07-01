@@ -1,0 +1,17 @@
+# Exact versions the project's results were produced with (Python 3.14.0).
+#
+# The pins matter more than usual here:
+#   - arviz 1.x is a full API rewrite (az.summary uses ci_prob/ci_kind, the
+#     interval columns are hdi94_lb/ub, plot_trace returns a PlotCollection,
+#     az.to_netcdf is gone).  week4_bayesian.py is written against 1.2.0 and
+#     will NOT run against the 0.x API.
+#   - pytensor 3.0.7 carries correct gradients for pt.kv/pt.kve, which the
+#     custom NIG log-density in week4_bayesian.py differentiates through.
+numpy==2.4.3
+pandas==2.3.3
+scipy==1.17.1
+matplotlib==3.10.8
+yfinance==1.4.0
+pymc==6.0.1
+pytensor==3.0.7
+arviz==1.2.0
