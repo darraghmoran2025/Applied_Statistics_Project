@@ -11,3 +11,6 @@ venv/
 # Generated data: cached returns and saved posterior draws
 # (regenerate deterministically from the week scripts)
 week*/data/
+
+# Word renders of the writeups live outside the repo; only markdown is tracked
+*.docx

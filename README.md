@@ -33,7 +33,12 @@ week4/
   figures/  - prior predictive checks and NUTS traces for each model
   writeup/  - Week4_Bayesian.md
 
-week5/      - Posterior predictive checks; convergence diagnostics  [upcoming]
+week5/
+  code/     - week5_ppc.py (posterior predictive checks + convergence diagnostics)
+  figures/  - PPC density fans, tail-risk bands, per-chain trace diagnostics
+  writeup/  - Week5_PPC.md
+  data/     - week5_ppc_stats.csv, week5_diagnostics.csv (regenerated; gitignored)
+
 week6/      - Rolling VaR backtest (Christoffersen)  [upcoming]
 week7/      - Final write-up  [upcoming]
 ```
@@ -46,7 +51,7 @@ week7/      - Final write-up  [upcoming]
 | 2 | Gaussian and Student-t MLE | Complete |
 | 3 | Five-model MLE (incl. Laplace, VG, NIG); sub-period analysis; lead-up regression | Complete |
 | 4 | Bayesian estimation (PyMC/NUTS) | Complete |
-| 5 | Posterior predictive checks; diagnostics | Upcoming |
+| 5 | Posterior predictive checks; diagnostics | Complete |
 | 6 | Rolling VaR backtest (Christoffersen) | Upcoming |
 | 7 | Final write-up | Upcoming |
 
@@ -89,6 +94,9 @@ parameters versus VIX). Key findings:
 - NIG is the best fit overall (ΔAIC −1,851) and the only model not rejected by KS.
 - 99% Expected Shortfall: −3.24% (Gaussian), −3.91% (Laplace), −4.27% (VG),
   −5.19% (NIG), −5.81% (Student-t).
+- At the FRTB-mandated 97.5% ES level the Gaussian (−2.84%) sits 28% below
+  the NIG (−3.94%): the shortfall is material at the confidence level the
+  regulation actually uses, not just deep in the 99% tail.
 - Sub-period fits show the GFC and COVID differ in kind from the dot-com and
   rate-hike episodes: ν near 2.3–2.6 versus 6.5, NIG α near 18–26 versus 99–112.
 - Lead-up regression on forward 21-day realised volatility: tail/VIX/drawdown
@@ -132,6 +140,35 @@ special case (θ = 0, ν = 1). Write-up: `Week4_Bayesian.md`. Key points:
 pip install numpy pandas scipy yfinance matplotlib pymc arviz
 python week4/code/week4_bayesian.py               # all four models, full sampling
 python week4/code/week4_bayesian.py --prior_only  # prior predictive checks only
+```
+
+## Week 5
+
+Validates the four Bayesian fits with posterior predictive checks and fuller
+convergence diagnostics, working directly from the Week 4 posterior CSVs (no
+re-sampling). Write-up: `Week5_PPC.md`. Key points:
+
+- Each model generates 1,000 replicate return histories from its posterior;
+  the observed data is scored against the replicate bands with two-sided
+  posterior predictive p-values. Statistics cover the marginal distribution
+  (moments, extremes, VaR/ES at 95%, 97.5% and 99%) plus one dependence
+  statistic: the lag-1 autocorrelation of squared returns.
+- The Gaussian fails everything beyond the centre of the distribution. The
+  Laplace closes about half the tail gap. The Student-t covers the tail
+  quantiles but its moments are too heavy to pin down. The NIG passes every
+  marginal check, including skew and the FRTB 97.5% ES.
+- All four models fail the volatility-clustering statistic (observed 0.32
+  vs replicate bands on zero) — the structural limit of any static marginal,
+  and the motivation for the Week 6 rolling backtest.
+- Hand-computed diagnostics on the saved chains: split R-hat 1.00 throughout,
+  bulk ESS > 2,000, tail ESS > 2,100, small MCSEs.
+
+### Running Week 5
+
+```bash
+pip install numpy pandas scipy matplotlib
+python week5/code/week5_ppc.py                 # all four models
+python week5/code/week5_ppc.py --model nig     # single model
 ```
 
 ## Key references
