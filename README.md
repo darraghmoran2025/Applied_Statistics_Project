@@ -39,8 +39,16 @@ week5/
   writeup/  - Week5_PPC.md
   data/     - week5_ppc_stats.csv, week5_diagnostics.csv (regenerated; gitignored)
 
-week6/      - Rolling VaR backtest (Christoffersen)  [upcoming]
-week7/      - Final write-up  [upcoming]
+week6/
+  code/     - week6_weekday.py, week6_open_close.py,
+              week6_param_regressions.py, week6_earnings.py
+  figures/  - weekday MLEs, overnight/intraday split, weekly vol,
+              quarterly NIG fits, delta regressions, earnings profile
+  writeup/  - Week6_Results.md
+  data/     - cached OHLC and VIX, quarterly parameter panel (gitignored)
+
+week7/      - Rolling VaR backtest (Christoffersen)  [upcoming]
+week8/      - Final write-up  [upcoming]
 ```
 
 ## Weekly progress
@@ -52,8 +60,9 @@ week7/      - Final write-up  [upcoming]
 | 3 | Five-model MLE (incl. Laplace, VG, NIG); sub-period analysis; lead-up regression | Complete |
 | 4 | Bayesian estimation (PyMC/NUTS) | Complete |
 | 5 | Posterior predictive checks; diagnostics | Complete |
-| 6 | Rolling VaR backtest (Christoffersen) | Upcoming |
-| 7 | Final write-up | Upcoming |
+| 6 | Weekday and open/close structure; quarterly parameter regressions; earnings windows | Complete |
+| 7 | Rolling VaR backtest (Christoffersen) | Upcoming |
+| 8 | Final write-up | Upcoming |
 
 ## Week 1
 
@@ -159,7 +168,7 @@ re-sampling). Write-up: `Week5_PPC.md`. Key points:
   marginal check, including skew and the FRTB 97.5% ES.
 - All four models fail the volatility clustering statistic (observed 0.32
   vs replicate bands on zero). That is the limit of any static marginal and
-  the reason for the Week 6 rolling backtest.
+  the reason for the Week 7 rolling backtest.
 - Hand-computed diagnostics on the saved chains: split R-hat 1.00 throughout,
   bulk ESS > 2,000, tail ESS > 2,100, small MCSEs.
 
@@ -169,6 +178,42 @@ re-sampling). Write-up: `Week5_PPC.md`. Key points:
 pip install numpy pandas scipy matplotlib
 python week5/code/week5_ppc.py                 # all four models
 python week5/code/week5_ppc.py --model nig     # single model
+```
+
+## Week 6
+
+Turns to the calendar and cross-sectional structure of the same returns:
+day-of-week effects, the market-open vs market-closed split, week-on-week
+volatility, quarterly parameter regressions, and earnings seasons.
+Write-up: `Week6_Results.md`. Key findings:
+
+- The week has a real shape. The Mon / midweek / Fri grouping beats a
+  pooled week decisively (LR = 42.9, p < 0.0001) and five separate days
+  add nothing over it (p = 0.59). Monday, which carries the weekend gap,
+  has the heaviest tail of the week (Student-t nu 2.17 vs Friday's 3.10).
+- The open market earns 61% of the variance; the closed market earns 20%
+  but takes the jumps: overnight nu 2.14 and kurtosis 36 against intraday
+  nu 2.79 and kurtosis 5 (2015-2024, where Yahoo's opens are usable).
+- Weekly realised volatility persists week on week (slope 0.72, R2 0.52),
+  and weekly returns lighten to nu 3.38 from the daily 2.648, the
+  aggregational Gaussianity of Cont (2001).
+- Quarterly NIG delta tracks the VIX (R2 0.64 in logs, t = 9.7 across the
+  67 well-identified quarters), and at quarterly frequency the skew
+  parameters show the VIX relationship the annual regression lacked power
+  to find. Tail-decay parameters stay flat against the VIX. A third of
+  quarters sit on the NIG's Gaussian-limit ridge.
+- Earnings seasons leave index volatility flat to the decimal (16.5 /
+  16.4 / 16.5 percent before, during, after). Index tail risk is macro
+  risk; single-name earnings surprises diversify away.
+
+### Running Week 6
+
+```bash
+pip install numpy pandas scipy yfinance matplotlib
+python week6/code/week6_weekday.py
+python week6/code/week6_open_close.py
+python week6/code/week6_param_regressions.py
+python week6/code/week6_earnings.py
 ```
 
 ## Key references
