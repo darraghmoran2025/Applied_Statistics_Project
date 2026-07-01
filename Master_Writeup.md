@@ -315,15 +315,15 @@ Its log-likelihood beats the Gaussian by 885.6 and falls only 15.6 short of the 
 
 | Parameter | Estimate | Standard Error |
 |-----------|----------|----------------|
-| σ (scale) | 0.011627 | 0.000163 |
-| θ (asymmetry) | −0.000684 | 0.000149 |
-| ν (variance rate) | 1.17306 | 0.043087 |
-| μ (location) | +0.000907 | 0.000028 |
+| σ (scale) | 0.011629 | 0.000163 |
+| θ (asymmetry) | −0.000660 | 0.000149 |
+| ν (variance rate) | 1.17431 | 0.043159 |
+| μ (location) | +0.000883 | 0.000023 |
 | Log-likelihood | 19,665.5 |  |
 | AIC | −39,322.9 |  |
 | BIC | −39,296.0 |  |
 
-VG's log-likelihood nearly matches the Student-t's despite two extra parameters, giving slightly worse AIC. Negative θ confirms left skew; ν = 1.173 confirms the Gamma time-change is active.
+VG's log-likelihood nearly matches the Student-t's despite two extra parameters, giving slightly worse AIC. Negative θ confirms left skew; ν = 1.174 confirms the Gamma time-change is active.
 
 **Table 5. Normal Inverse Gaussian MLE.**
 
@@ -385,11 +385,11 @@ The Laplace reaches ΔAIC −1,771 with two parameters (96% of NIG's gain), conf
 
 | Confidence | VaR (Gauss.) | ES (Gauss.) | VaR (Lap) | ES (Lap) | VaR (t) | ES (t) | VaR (VG) | ES (VG) | VaR (NIG) | ES (NIG) |
 |------------|-------------|------------|-----------|----------|---------|--------|----------|---------|-----------|----------|
-| 95% | −1.990% | −2.501% | −1.800% | −2.608% | −1.694% | −3.000% | −1.915% | −2.818% | −1.880% | −3.075% |
-| 97.5% | −2.376% | −2.838% | −2.360% | −3.168% | −2.366% | −4.021% | −2.542% | −3.442% | −2.646% | −3.941% |
-| 99% | −2.824% | −3.238% | −3.100% | −3.908% | −3.515% | −5.813% | −3.360% | −4.269% | −3.769% | −5.187% |
+| 95% | −1.990% | −2.501% | −1.800% | −2.608% | −1.694% | −3.000% | −1.915% | −2.820% | −1.880% | −3.075% |
+| 97.5% | −2.376% | −2.838% | −2.360% | −3.168% | −2.366% | −4.020% | −2.542% | −3.447% | −2.646% | −3.941% |
+| 99% | −2.824% | −3.238% | −3.100% | −3.908% | −3.515% | −5.813% | −3.363% | −4.283% | −3.769% | −5.187% |
 
-At 99% ES the five models span from −3.24% (Gaussian) to −5.81% (Student-t). The Laplace at −3.91% already exceeds the Gaussian by 21% from exponential tails alone. The Student-t's outlier reading reflects its symmetric constraint at ν = 2.648, which inflates the right tail to match the left. VG and NIG, with asymmetry parameters, sit at −4.27% and −5.19%. Using the Gaussian ES to set capital leaves a 37% shortfall against NIG. Under FRTB (BCBS 2013), that shortfall is material.
+At 99% ES the five models span from −3.24% (Gaussian) to −5.81% (Student-t). The Laplace at −3.91% already exceeds the Gaussian by 21% from exponential tails alone. The Student-t's outlier reading reflects its symmetric constraint at ν = 2.648, which inflates the right tail to match the left. VG and NIG, with asymmetry parameters, sit at −4.28% and −5.19%. Using the Gaussian ES to set capital leaves a 37% shortfall against NIG. Under FRTB (BCBS 2013), that shortfall is material.
 
 The 97.5% row is the one FRTB actually mandates: the Basel III/IV internal-models framework sets regulatory capital from ES at 97.5% confidence. At that level the Gaussian ES of −2.84% sits 28% below the NIG's −3.94% and 29% below the Student-t's −4.02%. The Gaussian shortfall is therefore not an artefact of looking deep into the 99% tail; it is already material at the confidence level the regulation uses.
 
@@ -405,10 +405,10 @@ The 97.5% row is the one FRTB actually mandates: the Basel III/IV internal-model
 
 | Period | n | Gauss. σ (ann.) | t ν | VG ν | VG θ | NIG α | NIG β |
 |--------|---|-----------------|-----|------|------|-------|-------|
-| Full sample | 6,287 | 19.4% | 2.648 | 1.173 | −0.00068 | 52.3 | −6.09 |
+| Full sample | 6,287 | 19.4% | 2.648 | 1.174 | −0.00066 | 52.3 | −6.09 |
 | Dot-com crash | 671 | 23.5% | 6.526 | 0.397 | +0.00190 | 98.6 | +10.04 |
-| GFC | 378 | 38.3% | 2.607 | 1.248 | −0.00296 | 25.9 | −2.74 |
-| COVID-19 | 104 | 50.5% | 2.285 | 1.439 | −0.00455 | 17.8 | −4.17 |
+| GFC | 378 | 38.3% | 2.607 | 1.250 | −0.00297 | 25.9 | −2.74 |
+| COVID-19 | 104 | 50.5% | 2.285 | 1.910 | −0.00495 | 17.8 | −4.17 |
 | Fed rate hikes | 501 | 19.5% | 6.525 | 0.493 | −0.00002 | 111.9 | −3.85 |
 
 The GFC and COVID return Student-t ν around 2.3–2.6, near the variance singularity at ν = 2, and NIG α falls to 17–26. The dot-com crash and rate-hike cycle show ν around 6.5 and NIG α near 99–112, near-Gaussian. The two crisis types differ in kind: the dot-com was a slow drawdown; the GFC and COVID were clusters of extreme single-day moves, invisible in volatility alone but clear in the tail parameters.
@@ -420,7 +420,7 @@ The GFC and COVID return Student-t ν around 2.3–2.6, near the variance singul
 | Full sample | 1,802.9 | 1,798.4 | 1,850.8 |
 | Dot-com crash | 22.7 | 22.3 | 23.0 |
 | GFC | 72.7 | 78.7 | 76.4 |
-| COVID-19 | 19.7 | 22.6 | 20.9 |
+| COVID-19 | 19.7 | 23.1 | 20.9 |
 | Fed rate hikes | 16.0 | 16.2 | 15.1 |
 
 The GFC improvement is 72–79 units; calm periods are 15–23. Lévy models earn their keep exactly when markets are worst.
@@ -542,14 +542,14 @@ Each calendar year from 2000 to 2024 is fitted separately, giving 25 annual esti
 
 | Parameter | What it controls | Relationship with the VIX |
 |-----------|------------------|---------------------------|
-| VG σ (scale) | Width of the diffusion component | Strong and positive (R² = 0.91, p < 0.001): scale rises almost one-for-one with the VIX |
-| VG θ (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.01, p = 0.57) |
+| VG σ (scale) | Width of the diffusion component | Strong and positive (R² = 0.90, p < 0.001): scale rises almost one-for-one with the VIX |
+| VG θ (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.01, p = 0.60) |
 | VG ν (variance rate) | Tail heaviness from the random time-change | None detectable (R² = 0.06, p = 0.24) |
-| NIG α (tail heaviness) | Larger means lighter tails | Weak and negative (R² = 0.14, p = 0.07): tails tend to get heavier as the VIX rises |
-| NIG β (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.10, p = 0.12) |
-| NIG δ (scale) | Overall spread | None detectable (R² = 0.00, p = 0.93) |
+| NIG α (tail heaviness) | Larger means lighter tails | Weak and negative (R² = 0.12, p = 0.09): tails tend to get heavier as the VIX rises |
+| NIG β (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.08, p = 0.16) |
+| NIG δ (scale) | Overall spread | None detectable (R² = 0.00, p = 0.95) |
 
-The VIX tracks distribution scale very closely (VG σ, R² = 0.91) but carries almost no information about tail shape or asymmetry. Every tail and skew parameter is statistically flat against the VIX; only NIG α shows a marginal signal. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are. That distinction matters for ES-based capital, since ES is driven by tail shape rather than scale.
+The VIX tracks distribution scale very closely (VG σ, R² = 0.90) but carries almost no information about tail shape or asymmetry. Every tail and skew parameter is statistically flat against the VIX; only NIG α shows a marginal signal. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are. That distinction matters for ES-based capital, since ES is driven by tail shape rather than scale.
 
 ![Figure 5. Annual VG and NIG parameter estimates against average annual VIX, with OLS regression lines.](week3/figures/week3_vix_regression.png)
 

@@ -105,14 +105,14 @@ Each calendar year from 2000 to 2024 is fitted separately, giving 25 annual esti
 
 | Parameter | What it controls | Relationship with the VIX |
 |-----------|------------------|---------------------------|
-| VG σ (scale) | Width of the diffusion component | Strong and positive (R² = 0.91, p < 0.001): scale rises almost one-for-one with the VIX |
-| VG θ (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.01, p = 0.57) |
+| VG σ (scale) | Width of the diffusion component | Strong and positive (R² = 0.90, p < 0.001): scale rises almost one-for-one with the VIX |
+| VG θ (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.01, p = 0.60) |
 | VG ν (variance rate) | Tail heaviness from the random time-change | None detectable (R² = 0.06, p = 0.24) |
-| NIG α (tail heaviness) | Larger means lighter tails | Weak and negative (R² = 0.14, p = 0.07): tails tend to get heavier as the VIX rises |
-| NIG β (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.10, p = 0.12) |
-| NIG δ (scale) | Overall spread | None detectable (R² = 0.00, p = 0.93) |
+| NIG α (tail heaviness) | Larger means lighter tails | Weak and negative (R² = 0.12, p = 0.09): tails tend to get heavier as the VIX rises |
+| NIG β (asymmetry) | Skew; negative means a heavier left tail | None detectable (R² = 0.08, p = 0.16) |
+| NIG δ (scale) | Overall spread | None detectable (R² = 0.00, p = 0.95) |
 
-The VIX tracks distribution scale very closely (VG σ, R² = 0.91) but carries almost no information about tail shape or asymmetry. Every tail and skew parameter is statistically flat against the VIX; only NIG α shows a marginal signal. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are. That distinction matters for ES-based capital, since ES is driven by tail shape rather than scale.
+The VIX tracks distribution scale very closely (VG σ, R² = 0.90) but carries almost no information about tail shape or asymmetry. Every tail and skew parameter is statistically flat against the VIX; only NIG α shows a marginal signal. Knowing the VIX tells you how wide the distribution will be, but little about how heavy or lopsided its tails are. That distinction matters for ES-based capital, since ES is driven by tail shape rather than scale.
 
 ![Figure 5. Annual VG and NIG parameter estimates against average annual VIX, with OLS regression lines.](../figures/week3_vix_regression.png)
 

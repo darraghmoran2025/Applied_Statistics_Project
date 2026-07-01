@@ -92,7 +92,7 @@ parameters versus VIX). Key findings:
   gain over the Gaussian. Most of the improvement over the Gaussian comes from
   exponential rather than thin tails.
 - NIG is the best fit overall (ΔAIC −1,851) and the only model not rejected by KS.
-- 99% Expected Shortfall: −3.24% (Gaussian), −3.91% (Laplace), −4.27% (VG),
+- 99% Expected Shortfall: −3.24% (Gaussian), −3.91% (Laplace), −4.28% (VG),
   −5.19% (NIG), −5.81% (Student-t).
 - At the FRTB-mandated 97.5% ES level the Gaussian (−2.84%) sits 28% below
   the NIG (−3.94%): the shortfall is material at the confidence level the
