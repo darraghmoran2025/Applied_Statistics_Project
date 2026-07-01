@@ -11,9 +11,14 @@ questions that decide whether those fits are trustworthy:
      replicate return series from its posterior, reproduce the
      features of the observed 6,287 S&P 500 log-returns that the
      project actually cares about?  The thesis lives in the TAILS, so
-     the PPC statistics are tail-weighted: VaR/ES at 95% and 99%,
-     excess kurtosis, min/max, and tail quantiles, each reported with
-     a posterior-predictive credible band and a Bayesian p-value.
+     the PPC statistics are tail-weighted: VaR/ES at 95%, 97.5% (the
+     FRTB ES level) and 99%, excess kurtosis, min/max, each reported
+     with a posterior-predictive credible band and a Bayesian p-value.
+     One DEPENDENCE statistic is included on purpose — the lag-1
+     autocorrelation of squared returns (volatility clustering, Cont
+     2001).  All four models are iid, so all four are expected to fail
+     it; that failure is the honest boundary of what a static marginal
+     can do, and the motivation for the Week 6 rolling backtest.
      Expectation: the Gaussian PPC should visibly FAIL in the tails
      (the Bayesian echo of the 79.5% ES gap) while Student-t and NIG
      cover the extremes.
@@ -83,7 +88,12 @@ MODEL_COLOURS = {
     "nig":       "darkorange",
 }
 
-ALPHAS = (0.95, 0.99)
+ALPHAS = (0.95, 0.975, 0.99)   # 97.5% is the FRTB/Basel III ES confidence level
+
+
+def _alpha_label(a):
+    """0.95 -> '95', 0.975 -> '97.5', 0.99 -> '99'."""
+    return f"{a * 100:g}"
 
 
 # ── data / posterior loading ──────────────────────────────────────────────────
@@ -127,6 +137,17 @@ def _simulate_one(name, row, n, rng):
     raise ValueError(f"unknown model: {name}")
 
 
+def _acf1_sq(x):
+    """Lag-1 autocorrelation of squared returns — the volatility-clustering
+    statistic (Cont 2001).  All four fitted models are iid, so their
+    replicates have ACF ≈ 0 by construction; the observed series does not.
+    Deliberately included so the PPC also tests a DEPENDENCE feature, not
+    only marginal ones."""
+    s = x**2
+    s = s - s.mean()
+    return float(np.sum(s[1:] * s[:-1]) / np.sum(s * s))
+
+
 def _stats_vector(x):
     """Test statistics computed on a return vector (observed or replicate)."""
     out = {
@@ -135,12 +156,13 @@ def _stats_vector(x):
         "skew":         float(sps.skew(x)),
         "min":          float(np.min(x)),
         "max":          float(np.max(x)),
+        "acf_sq_1":     _acf1_sq(x),
     }
     for a in ALPHAS:
         var = float(np.quantile(x, 1.0 - a))
         es  = float(x[x <= var].mean())
-        out[f"VaR_{int(a * 100)}"] = var
-        out[f"ES_{int(a * 100)}"]  = es
+        out[f"VaR_{_alpha_label(a)}"] = var
+        out[f"ES_{_alpha_label(a)}"]  = es
     return out
 
 
@@ -221,8 +243,8 @@ def plot_ppc_density(name, obs, reps_raw, save_dir):
 
 def plot_risk_bands(rep_stats_by_model, obs_stats, save_dir):
     """Posterior-predictive VaR/ES credible intervals vs the empirical values."""
-    metrics = [f"{m}_{int(a * 100)}" for a in ALPHAS for m in ("VaR", "ES")]
-    labels  = [f"{m} {int(a * 100)}%" for a in ALPHAS for m in ("VaR", "ES")]
+    metrics = [f"{m}_{_alpha_label(a)}" for a in ALPHAS for m in ("VaR", "ES")]
+    labels  = [f"{m} {_alpha_label(a)}%" for a in ALPHAS for m in ("VaR", "ES")]
     models = list(rep_stats_by_model)
 
     fig, axes = plt.subplots(1, len(metrics), figsize=(4 * len(metrics), 4.5),
@@ -254,8 +276,12 @@ def plot_risk_bands(rep_stats_by_model, obs_stats, save_dir):
 # ── convergence diagnostics ────────────────────────────────────────────────────
 #
 # Computed directly from the (chain, draw) layout in the posterior CSVs, so the
-# diagnostics need neither arviz nor a re-sample.  Definitions follow
-# Vehtari et al. (2021): rank-normalised split-R-hat, bulk-ESS, tail-ESS.
+# diagnostics need neither arviz nor a re-sample.  In the spirit of
+# Vehtari et al. (2021): split-R-hat (without their rank-normalisation step),
+# bulk-ESS via Geyer's initial-monotone-sequence estimator, and tail-ESS as
+# the ESS of the 5%/95% quantile indicators.  For these well-mixed, unimodal
+# posteriors the rank-normalisation refinement makes no practical difference;
+# the Week 4 az.summary output provides the library-computed cross-check.
 
 def _split_chains(x):
     """x: (n_chain, n_draw) -> (2*n_chain, n_draw//2) split-half chains."""
