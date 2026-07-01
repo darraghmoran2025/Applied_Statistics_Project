@@ -39,7 +39,12 @@ week5/
   writeup/  - Week5_PPC.md
   data/     - week5_ppc_stats.csv, week5_diagnostics.csv (regenerated; gitignored)
 
-week6/      - Rolling VaR backtest (Christoffersen)  [upcoming]
+week6/
+  Week6_Plan.md - this week's guide: per-parameter regressions, week-on-week
+                  and open/close volatility, day-of-week MLE contrasts, and
+                  earnings-window volatility. The rolling VaR backtest
+                  (Christoffersen) carries on from the original roadmap.
+
 week7/      - Final write-up  [upcoming]
 ```
 
@@ -52,7 +57,7 @@ week7/      - Final write-up  [upcoming]
 | 3 | Five-model MLE (incl. Laplace, VG, NIG); sub-period analysis; lead-up regression | Complete |
 | 4 | Bayesian estimation (PyMC/NUTS) | Complete |
 | 5 | Posterior predictive checks; diagnostics | Complete |
-| 6 | Rolling VaR backtest (Christoffersen) | Upcoming |
+| 6 | Parameter regressions; weekday and open/close volatility; earnings windows (see week6/Week6_Plan.md) | In progress |
 | 7 | Final write-up | Upcoming |
 
 ## Week 1
