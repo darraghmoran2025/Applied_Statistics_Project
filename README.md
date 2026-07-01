@@ -94,9 +94,9 @@ parameters versus VIX). Key findings:
 - NIG is the best fit overall (ΔAIC −1,851) and the only model not rejected by KS.
 - 99% Expected Shortfall: −3.24% (Gaussian), −3.91% (Laplace), −4.28% (VG),
   −5.19% (NIG), −5.81% (Student-t).
-- At the FRTB-mandated 97.5% ES level the Gaussian (−2.84%) sits 28% below
-  the NIG (−3.94%): the shortfall is material at the confidence level the
-  regulation actually uses, not just deep in the 99% tail.
+- At the 97.5% ES level FRTB mandates, the Gaussian (−2.84%) sits 28% below
+  the NIG (−3.94%). The shortfall is material at the confidence level the
+  regulation uses, well before the deep 99% tail.
 - Sub-period fits show the GFC and COVID differ in kind from the dot-com and
   rate-hike episodes: ν near 2.3–2.6 versus 6.5, NIG α near 18–26 versus 99–112.
 - Lead-up regression on forward 21-day realised volatility: tail/VIX/drawdown
@@ -157,9 +157,9 @@ re-sampling). Write-up: `Week5_PPC.md`. Key points:
   Laplace closes about half the tail gap. The Student-t covers the tail
   quantiles but its moments are too heavy to pin down. The NIG passes every
   marginal check, including skew and the FRTB 97.5% ES.
-- All four models fail the volatility-clustering statistic (observed 0.32
-  vs replicate bands on zero) — the structural limit of any static marginal,
-  and the motivation for the Week 6 rolling backtest.
+- All four models fail the volatility clustering statistic (observed 0.32
+  vs replicate bands on zero). That is the limit of any static marginal and
+  the reason for the Week 6 rolling backtest.
 - Hand-computed diagnostics on the saved chains: split R-hat 1.00 throughout,
   bulk ESS > 2,000, tail ESS > 2,100, small MCSEs.
 

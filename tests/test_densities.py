@@ -26,7 +26,7 @@ from levy_models import (  # noqa: E402
     simulate_nig, simulate_vg,
 )
 
-# Full-sample MLE values (Week 3) — realistic parameter magnitudes.
+# Full-sample MLE values (Week 3), so the checks run at realistic magnitudes.
 NIG = {"mu": 0.001111, "alpha": 52.341, "beta": -6.095, "delta": 0.007574}
 VG = {"mu": 0.000907, "sigma": 0.011627, "theta": -0.000684, "nu": 1.17306}
 
