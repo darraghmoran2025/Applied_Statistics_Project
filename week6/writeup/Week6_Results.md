@@ -1,18 +1,23 @@
-# Week 6 results: calendar structure and parameter regressions
+# Week 6 results: the calendar structure of returns
 
 ## 1. Overview
 
-This week follows the Week 6 plan: regress each Lévy parameter separately with the NIG δ first, split volatility into market-open and market-closed sessions, contrast the days of the week under two week definitions, measure volatility week on week, and look at quarterly earnings. Everything runs on the same 6,287 daily S&P 500 log-returns as Weeks 2 to 5, plus open prices and the VIX where those are needed.
+This week I looked at the same 6,287 daily S&P 500 log-returns from a different angle: the calendar. Instead of asking what distribution fits the returns, I asked when the risk actually shows up. Four questions, following the week's plan:
 
-Four results stand out. Quarterly NIG δ tracks the VIX closely (R² = 0.64 in logs), and at quarterly frequency the skew parameters finally show the VIX relationship the annual regression could not detect. The week has a real shape: Monday against midweek against Friday is exactly the right grouping, and five separate days add nothing beyond it. The market earns four fifths of its variance while open but takes its worst tail risk while closed. And earnings seasons, at the index level, do not move volatility at all.
+1. Does the day of the week matter, and is the right way to cut the week Monday / midweek / Friday, or is the week just one block?
+2. How does volatility split between the market being open (intraday) and closed (overnight), and what does the week-open (Monday) to week-close (Friday) picture look like inside each of our four crises?
+3. Can I explain the fitted Lévy parameters with a regression, one parameter at a time, starting with the NIG δ?
+4. Do quarterly earnings seasons move index volatility?
+
+Short answers: yes, Monday / midweek / Friday is exactly the right cut; the market is only open for three fifths of its variance and almost none of its jumps; δ is mostly a VIX story and the skew parameters turn out to follow the VIX too once there is enough data; and earnings seasons do nothing at the index level, which turned out to be the most interesting null of the project so far.
 
 ---
 
-## 2. Day-of-week structure
+## 2. The shape of the week
 
-I fitted the Gaussian and Student-t separately to each weekday. Monday returns span the weekend, Friday close to Monday close, so the weekend gap lives inside Monday.
+I fitted the Gaussian and the Student-t to each weekday separately. One thing to keep in mind: a Monday return runs from Friday's close to Monday's close, so the whole weekend is inside it.
 
-**Table 1. Per-weekday MLEs, 2000-2024. Mean in basis points per day; σ annualised.**
+**Table 1. Per-weekday MLEs, 2000-2024. Mean in basis points per day, σ annualised.**
 
 | Day | n | Mean (bp) | σ (ann.) | Student-t ν | SE(ν) | Excess kurtosis |
 |-----|---|-----------|----------|-------------|-------|-----------------|
@@ -22,33 +27,79 @@ I fitted the Gaussian and Student-t separately to each weekday. Monday returns s
 | Thursday | 1,268 | +3.4 | 19.6% | 2.61 | 0.24 | 8.3 |
 | Friday | 1,262 | +0.3 | 17.8% | 3.10 | 0.35 | 5.3 |
 
-The means are statistically flat (a per-day mean has a standard error near 3.4 bp), which is what an efficient market should give. The second moments are not flat. Monday carries the highest volatility and by far the heaviest tail: ν = 2.17 with a standard error of 0.18, so its interval brushes the ν = 2 variance boundary that the full sample stays clear of. Friday is the calmest and lightest-tailed day. The excess kurtosis column tells the same story, 17.5 on Monday against 5.3 on Friday.
+The means are all statistically zero (each one has a standard error of about 3.4 bp), which is what an efficient market should give. The interesting rows are the second moments. Monday is the most volatile day and has by far the heaviest tail: ν = 2.17, close enough to the ν = 2 boundary that its confidence interval brushes against infinite variance. Friday is the calmest and lightest day on every measure.
 
-The plan asked me to compare two week definitions, and the likelihood-ratio tests give a clean answer:
+The plan asked me to compare two definitions of the week, and the likelihood-ratio tests settle it:
 
 **Table 2. Gaussian likelihood-ratio tests between week definitions.**
 
 | Comparison | LR | df | p |
 |------------|----|----|---|
-| Mon / midweek / Fri vs pooled week | 42.9 | 4 | < 0.0001 |
-| Five days vs pooled week | 45.7 | 8 | < 0.0001 |
-| Five days vs Mon / midweek / Fri | 2.8 | 4 | 0.594 |
+| Mon / midweek / Fri vs one pooled week | 42.9 | 4 | < 0.0001 |
+| Five separate days vs one pooled week | 45.7 | 8 | < 0.0001 |
+| Five separate days vs Mon / midweek / Fri | 2.8 | 4 | 0.594 |
 
-The pooled "Monday (inclusive) to Friday" definition is rejected decisively, but the fully saturated five-day model is no better than the three-group version. Monday, midweek and Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically one day.
+Treating the week as one block is firmly rejected. But splitting it all the way into five days is no better than the three-group version. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
+
+Grouped that way over the full sample, the pattern is a clean staircase. Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Excess kurtosis falls from 17.5 to 8.0 to 5.3. The tail parameter rises from ν = 2.17 to 2.73 to 3.10. Every measure says the same thing: the week opens risky and heavy-tailed, and calms down as it goes.
 
 ![Figure 1. Volatility and tail parameter by weekday.](../figures/week6_weekday_params.png)
 
-*Figure 1. Left: annualised Gaussian volatility by weekday with 95% intervals. Right: Student-t ν by weekday against the full-sample 2.648. Monday is the most volatile and heaviest-tailed day; Friday the calmest.*
+*Figure 1. Left: annualised Gaussian volatility by weekday with 95% intervals. Right: Student-t ν by weekday against the full-sample 2.648.*
 
 ---
 
-## 3. Market open vs market closed
+## 3. The week inside each crisis
 
-The close-to-close return splits exactly into an overnight part (prior close to today's open, the market closed) and an intraday part (open to close, the market open).
+Next I ran the same week-open (Monday) to week-close (Friday) lens through each of the four crisis windows, measuring volatility, variance and the fat-tail measures in each. One warning before the table: the crisis windows are short, so the per-group samples get small. COVID has only about 20 Mondays and 20 Fridays, so I report volatility, variance and kurtosis there but not a Student-t fit, which would need more data than that to mean anything.
 
-One data problem first: Yahoo's ^GSPC open prices are stale in the early sample. The open equals the prior close on 96% of days in 2000-2004, 31% in 2005-2009 and 12% in 2010-2014, then near zero from 2015. The split therefore runs on 2015-2024 (n = 2,515, stale fraction 0.08%); the rest of the project is unaffected because it needs closes only.
+**Table 3. Week open vs midweek vs week close, full sample and per crisis. Variance is the daily variance in %². ν is omitted where n < 50.**
 
-**Table 3. Return components, 2015-2024.**
+| Window | Group | n | σ (ann.) | Daily var (%²) | Excess kurt | Worst day | ν |
+|--------|-------|---|----------|----------------|-------------|-----------|---|
+| Full sample | Monday | 1,178 | 21.4% | 1.81 | 17.5 | −12.8% | 2.17 |
+| | Midweek | 3,847 | 19.3% | 1.48 | 8.0 | −10.0% | 2.73 |
+| | Friday | 1,262 | 17.8% | 1.25 | 5.3 | −6.0% | 3.10 |
+| Dot-com crash | Monday | 127 | 23.1% | 2.12 | 2.0 | −5.0% | 4.78 |
+| | Midweek | 409 | 23.7% | 2.23 | 0.9 | −4.2% | 7.43 |
+| | Friday | 135 | 23.1% | 2.11 | 1.5 | −6.0% | 7.10 |
+| GFC | Monday | 73 | 44.8% | 7.98 | 4.8 | −9.4% | 2.01 |
+| | Midweek | 229 | 38.8% | 5.99 | 2.5 | −9.5% | 2.79 |
+| | Friday | 76 | 28.2% | 3.16 | 1.1 | −4.3% | 7.59 |
+| COVID-19 | Monday | 20 | 65.9% | 17.2 | 2.3 | −12.8% | |
+| | Midweek | 64 | 46.7% | 8.65 | 2.1 | −10.0% | 2.42 |
+| | Friday | 20 | 43.9% | 7.63 | 3.0 | −4.4% | |
+| Fed rate hikes | Monday | 90 | 16.7% | 1.10 | 2.8 | −4.0% | 2.64 |
+| | Midweek | 309 | 19.6% | 1.53 | 1.4 | −4.4% | 8.10 |
+| | Friday | 102 | 21.1% | 1.77 | 0.2 | −3.7% | 15.5 |
+
+The four crises do not treat the week the same way, and the differences line up with what Week 3 found about the crises themselves.
+
+The GFC is the extreme case. Monday volatility was 44.8% against Friday's 28.2%, so the variance of a GFC Monday was two and a half times the variance of a GFC Friday. The Monday tail parameter is ν = 2.01, sitting exactly on the infinite-variance boundary, while GFC Fridays fit at ν = 7.6, which is nearly Gaussian. The crisis was hitting hardest right as the week opened, after the weekend's bank failures and rescue announcements had piled up with no trading to absorb them.
+
+COVID shows the same shape even more sharply in volatility terms: 65.9% on Mondays against 43.9% on Fridays, and the single worst day of the whole 25-year sample, the −12.8% of 16 March 2020, was a Monday. With only 20 observations per group I would not lean on the kurtosis numbers, but the volatility gap is too big to be an accident of sampling.
+
+The dot-com crash is completely flat: 23.1%, 23.7%, 23.1% across the three groups, with mild tails throughout. That fits its character from Week 3. It was a long grind lower, not a sequence of weekend shocks, so it had no reason to care what day it was.
+
+The Fed rate-hike window is the surprise: the pattern reverses. Mondays were the calm days (16.7%) and Fridays the risky ones (21.1%). My reading is that this crisis ran on scheduled announcements rather than weekend surprises, and the big macro releases, CPI and the payrolls report, land on weekday mornings, with payrolls on Fridays. When the risk arrives by calendar appointment, the weekend stops mattering and the week's shape flips. The tail numbers back this up: those risky Fridays fit at ν = 15.5 with excess kurtosis of just 0.2, so the announcement volatility was big but nearly Gaussian. Scheduled news makes the market wide, not fat-tailed.
+
+So the full-sample Monday effect in Section 2 is really a crisis effect. It is driven by the GFC and COVID, absent in the dot-com years, and reversed in 2022-23.
+
+![Figure 2. The week inside each crisis.](../figures/week6_crisis_weekday.png)
+
+*Figure 2. Annualised volatility (left) and excess kurtosis (right) for Monday, midweek and Friday, over the full sample and inside each crisis window.*
+
+---
+
+## 4. Market open vs market closed within the day
+
+The other meaning of open versus closed is within a single day. The close-to-close return splits exactly into an overnight part (yesterday's close to today's open, while the market is shut) and an intraday part (open to close, while it is trading):
+
+r_close-to-close = r_overnight + r_intraday
+
+One data problem first. Yahoo's ^GSPC open prices are fake in the early sample: the open just equals the previous close on 96% of days in 2000-2004, 31% in 2005-2009 and 12% in 2010-2014, then almost never from 2015. So this section runs on 2015-2024 (n = 2,515, stale fraction 0.08%). Nothing else in the project is affected because everything else only needs closing prices.
+
+**Table 4. Return components, 2015-2024.**
 
 | Component | σ (ann.) | Variance share | Student-t ν | Excess kurtosis | Skew |
 |-----------|----------|----------------|-------------|-----------------|------|
@@ -56,43 +107,43 @@ One data problem first: Yahoo's ^GSPC open prices are stale in the early sample.
 | Overnight (closed) | 8.0% | 20.0% | 2.14 | 36.1 | −1.76 |
 | Intraday (open) | 14.0% | 61.0% | 2.79 | 5.2 | −0.41 |
 
-The two shares sum to 81%; the remaining 19% comes from twice the positive covariance (the components correlate at +0.27, so overnight moves tend to carry into the day session).
+The two shares add to 81%; the missing 19% is twice the covariance, because the components correlate at +0.27 and overnight moves tend to continue into the day.
 
-The split is lopsided in an interesting way. The open market carries three times the closed market's variance, but the closed market carries the tail. Overnight ν is 2.14, right at the variance boundary, with excess kurtosis of 36 and skew of −1.8; intraday returns are comparatively tame at ν = 2.79 and kurtosis 5. Jumps arrive while the market is shut, when news accumulates and no trading can absorb it gradually, and they arrive disproportionately on the downside. This is the Lévy story of the whole project told by the clock: the diffusive part of the return accrues while the market is open, and the jump part accrues while it is closed.
+The split is lopsided in a way I find really satisfying. The open market carries three times the closed market's variance, but the closed market carries the tails. Overnight returns fit at ν = 2.14 with excess kurtosis of 36 and skew of −1.8. Intraday returns are comparatively tame: ν = 2.79, kurtosis 5. The reason seems clear enough: while the market is shut, news piles up and nothing can be traded against it, so it all lands at once at the open. That is a jump. And the whole project has been about jumps, so it is nice to find out what time of day they happen: mostly while nobody can trade.
 
-![Figure 2. Overnight vs intraday densities.](../figures/week6_open_close_density.png)
+![Figure 3. Overnight vs intraday densities.](../figures/week6_open_close_density.png)
 
-*Figure 2. Overnight and intraday return densities, 2015-2024, linear and log scale. The overnight density is narrower in the body but crosses over in the tails.*
+*Figure 3. Overnight and intraday return densities, 2015-2024, on a linear and a log scale. The overnight density is narrower in the middle but crosses over in the tails.*
 
-The weekday and session dimensions interact exactly where they should: Monday's overnight volatility is about 10% annualised against 7.3 to 7.8% for the other days, and that gap is the weekend premium identified in Section 2, now located in the session where it actually accrues.
+The two calendar effects also meet exactly where they should. Monday's overnight component runs at about 10% annualised against 7.3 to 7.8% for the other days. That extra piece is the weekend gap from Sections 2 and 3, now located in the specific session where it accrues.
 
-![Figure 3. Volatility by weekday and session.](../figures/week6_open_close_weekday.png)
+![Figure 4. Volatility by weekday and session.](../figures/week6_open_close_weekday.png)
 
-*Figure 3. Annualised volatility by weekday, split into overnight and intraday. The Monday overnight bar contains the weekend gap.*
-
----
-
-## 4. Week-on-week volatility
-
-Weekly realised volatility (the root of the summed squared daily returns within each week, annualised) gives the week-on-week measure the plan asked for, on the full 2000-2024 sample of 1,302 weeks.
-
-Volatility persists strongly from week to week: vol_w = 4.30 + 0.72 × vol_(w−1) with R² = 0.52. A calm week is followed by a calm week and a violent one by a violent one, which is the weekly-resolution version of the volatility clustering that the Week 5 posterior predictive check showed no static model can produce.
-
-Weekly returns also confirm aggregational Gaussianity from the Week 1 literature review: the Student-t fitted to weekly returns gives ν = 3.38 (SE 0.35) against the daily 2.648. One step of time aggregation already lightens the tail measurably, though weekly returns remain far from Gaussian.
-
-![Figure 4. Weekly realised volatility, 2000-2024.](../figures/week6_weekly_vol.png)
-
-*Figure 4. Left: weekly realised volatility with the four shock windows shaded. Right: week w against week w−1, slope 0.72, R² 0.52.*
+*Figure 4. Annualised volatility by weekday, split into overnight and intraday. The weekend lives in Monday's overnight bar.*
 
 ---
 
-## 5. Quarterly parameter regressions
+## 5. Week-on-week volatility
 
-The plan's central item: fit the Lévy models through time and regress each parameter separately. Yearly fits give only 25 points, so I refitted VG(σ, θ, ν) and NIG(α, β, δ) with μ = 0 one calendar quarter at a time, 100 quarters of roughly 63 returns each, reusing the zero-mean machinery from the Week 4 yearly fits.
+For the week-on-week measure I built weekly realised volatility (the root of each week's summed squared daily returns, annualised) over the full 2000-2024 sample, 1,302 weeks.
 
-One identification caveat governs how the results are read. In calm quarters the NIG runs into its Gaussian limit: α and δ grow together along a likelihood ridge where only their ratio (the variance) is determined. Thirty-three of the 100 quarters sit on that ridge (α above 500), and the δ values they report are artifacts, so the δ regressions use the 67 well-identified quarters. That a third of quarters are statistically indistinguishable from Gaussian is itself a finding, and it repeats the sub-period message of Week 3: heavy tails are episodic, not permanent.
+Volatility carries over strongly from one week to the next: vol_w = 4.30 + 0.72 × vol_(w−1), with R² = 0.52. A calm week is usually followed by a calm week and a wild one by a wild one. This is the weekly version of the volatility clustering that the Week 5 posterior predictive check showed none of our static models can produce.
 
-**Table 4. One regression per parameter. Newey-West standard errors, 4 lags. The VIX column is from the VIX-only specification; the full specification adds realised volatility, drawdown and the parameter's own lag.**
+Weekly returns also let me check aggregational Gaussianity, one of the stylised facts from the Week 1 literature review. The Student-t fitted to weekly returns gives ν = 3.38 (SE 0.35) against the daily 2.648. One step of aggregation already lightens the tail by a measurable amount, though weekly returns are still nowhere near Gaussian.
+
+![Figure 5. Weekly realised volatility.](../figures/week6_weekly_vol.png)
+
+*Figure 5. Left: weekly realised volatility, 2000-2024, with the four crisis windows shaded. Right: each week's volatility against the previous week's, slope 0.72, R² 0.52.*
+
+---
+
+## 6. Quarterly parameter regressions
+
+The central item of the plan: fit the Lévy models through time and regress each parameter separately. Yearly fits only give 25 data points, so I refitted VG(σ, θ, ν) and NIG(α, β, δ) with μ = 0 one calendar quarter at a time. That gives 100 quarters of roughly 63 returns each, using the same zero-mean machinery as the Week 4 yearly fits.
+
+One thing has to be dealt with before any regression. In calm quarters the NIG cannot tell itself apart from a Gaussian: α and δ both blow up together, and only their ratio (which sets the variance) is pinned down by the data. The individual values of α and δ in those quarters are meaningless. This happens in 33 of the 100 quarters (I flagged any quarter with α above 500), so the δ regressions run on the 67 quarters where δ actually means something. The fact that a third of all quarters look Gaussian is a finding in itself: it repeats the Week 3 message that heavy tails are something markets do in episodes, not all the time.
+
+**Table 5. One regression per parameter. Newey-West standard errors, 4 lags. The full specification adds realised volatility, drawdown and the parameter's own lag to the VIX.**
 
 | Parameter | R² (VIX only) | VIX t-stat | R² (full) | AR(1) slope | AR(1) R² |
 |-----------|---------------|------------|-----------|-------------|----------|
@@ -103,43 +154,43 @@ One identification caveat governs how the results are read. In calm quarters the
 | VG θ | 0.19 | −5.1 | 0.65 | +0.04 | 0.00 |
 | VG ν | 0.04 | −2.1 | 0.22 | +0.19 | 0.04 |
 
-The δ result is the one the plan named. In levels, δ against the VIX gives R² = 0.50; in logs, which tames the crisis quarters' leverage, R² = 0.64 with a t-statistic of 9.7. The scale of the NIG is, to a good approximation, a VIX read-out. The VG σ says the same even more strongly (R² = 0.82 at n = 100, matching the 0.90 the annual regression found at n = 25). The full-specification R² of 1.00 for σ is not a triumph, it is a tautology: quarterly realised volatility is nearly the same quantity as the fitted VG scale, and the table keeps it only for completeness.
+The δ result is the one the plan asked for first. Against the VIX alone, δ gives R² = 0.50 in levels. In logs, which stops a few crisis quarters from dominating the fit, it reaches R² = 0.64 with a t-statistic of 9.7. The NIG's scale parameter is, to a decent approximation, a re-reading of the VIX. The VG σ says the same even louder: R² = 0.82 with 100 quarters, matching the 0.90 that Week 3 found with 25 years. (The R² of 1.00 in σ's full specification is not impressive, it is circular: quarterly realised volatility and the fitted VG scale are almost the same number, so one explains the other perfectly. I kept the row only for completeness.)
 
-The new finding relative to Week 3 is the skew. The annual regression found no VIX relationship for either asymmetry parameter (p = 0.60 and 0.16 at n = 25). At quarterly frequency both show up clearly: VG θ has t = −5.1 and NIG β has t = −3.2, higher-VIX quarters are more left-skewed quarters. The annual nulls were a power problem, which the Week 3 limitations section suspected. The tail parameters, in contrast, stay flat against the VIX at any frequency (log α R² = 0.02, VG ν R² = 0.04), so the Week 3 conclusion survives intact and sharper: the VIX prices the scale and, at quarterly resolution, the skew of the return distribution, but not its tail decay.
+The genuinely new result is the skew. The Week 3 annual regression found no relationship between the VIX and either asymmetry parameter, with p-values of 0.60 and 0.16 on 25 points. With 100 quarters both show up clearly: VG θ at t = −5.1 and NIG β at t = −3.2. Higher-VIX quarters are more left-skewed quarters. The annual nulls were a sample-size problem, which the Week 3 limitations section suspected at the time. The tail-decay parameters, on the other hand, stay flat against the VIX at any frequency (log α at R² = 0.02, VG ν at 0.04). So the sharper version of Week 3's conclusion is: the VIX prices the scale of the distribution and, seen quarterly, its skew, but it says nothing about how fast the tails decay.
 
-"Two parameters as a function of themselves": the AR(1) row gives each parameter regressed on its own lag. The scale parameters persist (log δ has an AR slope of 0.58 with R² = 0.34; VG σ 0.52), the skew and tail parameters do not (AR slopes indistinguishable from zero for β and θ). Scale is a slowly moving state; asymmetry and tail weight are episode-specific and reset from quarter to quarter.
+The plan's "two parameters as a function of themselves" is the AR(1) column: each parameter regressed on its own previous value. The scale parameters persist (log δ has an AR slope of 0.58 with R² = 0.34, VG σ sits at 0.52). The skew and tail parameters have AR slopes of essentially zero. So the scale of the market moves slowly and remembers itself from quarter to quarter, while asymmetry and tail weight belong to specific episodes and reset.
 
-![Figure 5. Quarterly NIG parameters through time.](../figures/week6_quarterly_nig.png)
+![Figure 6. Quarterly NIG parameters through time.](../figures/week6_quarterly_nig.png)
 
-*Figure 5. Quarterly NIG δ (top) and α (bottom), both on log axes with shock windows shaded. Grey crosses mark the 33 weakly identified quarters on the Gaussian-limit ridge, where δ and α are determined only through their ratio. Among the identified quarters, α reaches its sample minimum of about 7 in 2020Q1, the heaviest quarterly tail of the sample.*
+*Figure 6. Quarterly NIG δ (top) and α (bottom), both on log axes, crisis windows shaded. Grey crosses are the 33 weakly identified quarters where only the ratio of δ to α means anything. Among the identified quarters, α bottoms out near 7 in 2020Q1, the heaviest quarterly tail in the sample.*
 
-![Figure 6. The δ regressions.](../figures/week6_delta_regressions.png)
+![Figure 7. The δ regressions.](../figures/week6_delta_regressions.png)
 
-*Figure 6. Left: quarterly NIG δ against the quarter's average VIX, well-identified quarters only. Right: δ against its own lag, the AR(1) from the plan.*
+*Figure 7. Left: quarterly NIG δ against that quarter's average VIX, well-identified quarters only. Right: δ against its own lag, the AR(1).*
 
 ---
 
-## 6. Earnings seasons
+## 7. Earnings seasons
 
-The index has no earnings dates of its own, so this section uses the aggregate reporting calendar as a proxy: each earnings season is the month starting on the 15th of January, April, July and October, when the bulk of S&P 500 constituents report. That covers 34% of trading days. A constituent-level event study would need individual reporting dates and is a different exercise.
+The index has no earnings dates of its own, so I used the aggregate reporting calendar as a proxy: each earnings season is the month starting on the 15th of January, April, July and October, when most S&P 500 companies report. That covers 34% of trading days. This is a proxy, and a study with company-level reporting dates would be a different and bigger exercise.
 
-**Table 5. In-season vs out-of-season, 2000-2024.**
+**Table 6. In season vs out of season, 2000-2024.**
 
 | Window | n | σ (ann.) | Student-t ν | Excess kurtosis |
 |--------|---|----------|-------------|-----------------|
 | In season | 2,161 | 19.1% | 2.87 | 7.4 |
 | Out of season | 4,126 | 19.6% | 2.55 | 11.8 |
 
-The event-study profile is flat to the decimal: average annualised volatility is 16.5% in the 21 days before a season, 16.4% during it and 16.5% in the 21 days after, with paired t-statistics all below 0.15 in magnitude across 99 seasons.
+I also ran an event-study profile: average volatility in the 21 trading days before each season, during it, and in the 21 days after, across 99 seasons. The answer is flat to the decimal: 16.5%, 16.4%, 16.5%, with paired t-statistics all under 0.15.
 
-The null is informative rather than disappointing. Earnings risk is idiosyncratic, and inside a 500-name index the single-name surprises diversify away almost completely. If anything the in-season distribution is slightly lighter-tailed (ν = 2.87 against 2.55), because the macro shocks that actually drive index tails, March 2020, August 2011, the 2008 cascade, mostly landed outside the reporting windows. Index-level tail risk is macro risk, not earnings risk.
+I expected at least something here, so the flatness took me a moment to accept. But it makes sense. Earnings risk is company-specific, and inside a 500-name index the individual surprises average away almost completely. If anything the in-season distribution has lighter tails (ν = 2.87 against 2.55), because the shocks that actually move the index tail, March 2020, August 2011, the 2008 cascade, mostly happened outside reporting windows. The conclusion I take: index-level tail risk is macro risk, not earnings risk.
 
-![Figure 7. Volatility around earnings seasons.](../figures/week6_earnings_profile.png)
+![Figure 8. Volatility around earnings seasons.](../figures/week6_earnings_profile.png)
 
-*Figure 7. Mean annualised volatility before, during and after the 99 earnings seasons, with 95% intervals. The profile is flat.*
+*Figure 8. Average annualised volatility before, during and after the 99 earnings seasons, with 95% intervals.*
 
 ---
 
-## 7. Limitations
+## 8. Limitations
 
-The open/close split rests on ten years of clean opens, so its estimates are less precise than the full-sample ones and describe the post-2015 regime only. The quarterly NIG fits are noisy for the tail and skew parameters at 63 observations per quarter, and a third of quarters sit on the Gaussian-limit ridge; the identified-subset treatment handles δ but means the δ results describe turbulent-to-normal quarters, not calm ones. The regressions are contemporaneous attribution in the sense of Week 3, not forecasts, and the VIX and realised volatility remain strongly correlated, so their coefficients in the full specification are partial associations. The earnings windows are a calendar proxy at the index level; a constituent-level study could still find effects the index averages away.
+The crisis-window weekday cuts run on small samples, down to 20 Mondays for COVID, so those rows lean on volatility and variance rather than fitted tail parameters, and the kurtosis figures there are indicative at best. The overnight/intraday split rests on ten years of usable open prices and describes the post-2015 market only. The quarterly NIG fits are noisy for the tail and skew parameters at 63 observations a quarter, and the ridge treatment means the δ results describe normal-to-turbulent quarters, not calm ones. The regressions are contemporaneous attribution in the Week 3 sense, not forecasts, and the VIX and realised volatility are strongly correlated, so their coefficients in the full specifications are partial associations. The earnings windows are a calendar proxy at index level; a constituent-level event study could still find effects the index averages away.
