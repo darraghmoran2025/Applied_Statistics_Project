@@ -43,7 +43,7 @@ The plan asked me to compare two definitions of the week, and the likelihood-rat
 
 Splitting it all the way into five days, is not very effective. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
 
-Grouped that way over the full sample, the pattern is a clean staircase. Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Excess kurtosis falls from 17.5 to 8.0 to 5.3. The tail parameter rises from ν = 2.17 to 2.73 to 3.10. Every measure says the same thing: the week opens risky and heavy-tailed, and calms down as it goes.
+Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Excess kurtosis falls from 17.5 to 8.0 to 5.3. The tail parameter rises from ν = 2.17 to 2.73 to 3.10. Every measure says the same thing: the week opens risky and heavy-tailed, and calms down as it goes.
 
 ![Figure 1. Volatility and tail parameter by weekday.](../figures/week6_weekday_params.png)
 
