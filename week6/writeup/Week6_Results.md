@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This week I looked at the same 6,287 daily S&P 500 log-returns from a different angle: the calendar. Instead of asking what distribution fits the returns, I asked when the risk actually shows up. Four questions, following the week's plan:
+This week I looked at the same 6,287 daily S&P 500 log-returns from a different angle: the calendar. Instead of asking what distribution fits the returns, I asked when the risk actually shows up. Four questions:
 
 1. Does the day of the week matter, and is the right way to cut the week Monday / midweek / Friday, or is the week just one block?
 2. How does volatility split between the market being open (intraday) and closed (overnight), and what does the week-open (Monday) to week-close (Friday) picture look like inside each of our four crises?
