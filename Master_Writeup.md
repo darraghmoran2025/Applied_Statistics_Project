@@ -1,7 +1,10 @@
 # Beyond Black-Scholes: Fitting Lévy Processes to Stock Returns
 
-*Master writeup, Weeks 1 to 5 combined. Compiled from the committed markdown sources; regenerate with `build_master.py`.*
+*Master writeup, Weeks 1 to 7 combined. Compiled from the committed weekly markdown sources; render to Word with `generate_master_doc.py`.*
 
+## Abstract
+
+Daily stock returns are not Gaussian, and the difference is expensive. This project fits five distributional models to 6,287 daily S&P 500 log-returns from January 2000 to December 2024: the Gaussian benchmark that underlies Black-Scholes, the Laplace, the Student-t, and two Lévy models built by Brownian subordination, the Variance-Gamma (Madan, Carr and Chang, 1998) and the Normal Inverse Gaussian. Estimation is carried out twice, by maximum likelihood and again in a Bayesian setting with the No-U-Turn Sampler, so the headline parameters arrive with full posteriors rather than point estimates. The fitted Student-t degrees of freedom is 2.648, with a 94% credible interval of (2.46, 2.87) sitting entirely above the variance singularity at 2: the tails are heavy, and the variance is finite. At the 99% level the Gaussian understates Expected Shortfall by 79.5% against the Student-t and by 37% against the NIG, the only model that survives every in-sample goodness-of-fit and posterior predictive check. A rolling out-of-sample backtest of one-day Value-at-Risk over 5,787 days, scored with the Christoffersen (1998) conditional coverage framework, confirms both halves of the story: the Gaussian produces 2.6 times the nominal number of 99% violations while the NIG cuts the excess to 1.6, yet every model, at every level, fails the independence test, because no static distribution can time the volatility clustering documented by Cont (2001). The conclusion is symmetric. Choosing a heavier marginal materially improves the measurement of tail risk under the FRTB metrics (BCBS, 2013), and what remains unexplained is dynamics, not shape.
 
 ---
 
@@ -843,3 +846,378 @@ Table 2 has the numbers. Every R-hat rounds to 1.00. Bulk ESS never drops below 
 The NIG reproduces every marginal feature of the data: the body, both tails, the skew, and the risk numbers at all three confidence levels including the FRTB 97.5%. The Student-t gets the tail quantiles right but has moments too heavy to pin down. The Laplace closes part of the Gaussian's gap but stops at exponential tails. The Gaussian fails the moment the test moves past the centre of the distribution. This confirms the Week 2 shortfall by a different route.
 
 What no static model reproduces is the clustering. All four fail the squared-return autocorrelation check, because independent draws cannot produce the market's long calm stretches broken by turbulent ones. So the summary has two parts: the NIG gets the size of tail risk right, and no fixed marginal gets the timing. Whether re-estimating the parameters through time is enough to fix the timing is the question for the Week 7 rolling backtest. Christoffersen's independence test catches the clustered VaR violations a fixed model produces, and the rolling window gives each model its chance to pass.
+
+---
+
+# Week 6: The calendar structure of returns
+
+## 1. Overview
+
+This week I looked at the same 6,287 daily S&P 500 log-returns from a different angle: the calendar. Instead of asking what distribution fits the returns, I asked when the risk actually shows up. Four questions, following the week's plan:
+
+1. Does the day of the week matter, and is the right way to cut the week Monday / midweek / Friday, or is the week just one block?
+2. How does volatility split between the market being open (intraday) and closed (overnight), and what does the week-open (Monday) to week-close (Friday) picture look like inside each of our four crises?
+3. Can I explain the fitted Lévy parameters with a regression, one parameter at a time, starting with the NIG δ?
+4. Do quarterly earnings seasons move index volatility?
+
+Short answers: yes, Monday / midweek / Friday is exactly the right cut; the market is only open for three fifths of its variance and almost none of its jumps; δ is mostly a VIX story and the skew parameters turn out to follow the VIX too once there is enough data; and earnings seasons do nothing at the index level, which turned out to be the most interesting null of the project so far.
+
+---
+
+## 2. The shape of the week
+
+I fitted the Gaussian and the Student-t to each weekday separately. One thing to keep in mind: a Monday return runs from Friday's close to Monday's close, so the whole weekend is inside it.
+
+**Table 1. Per-weekday MLEs, 2000-2024. Mean in basis points per day, σ annualised.**
+
+| Day | n | Mean (bp) | σ (ann.) | Student-t ν | SE(ν) | Excess kurtosis |
+|-----|---|-----------|----------|-------------|-------|-----------------|
+| Monday | 1,178 | +0.1 | 21.4% | 2.17 | 0.18 | 17.5 |
+| Tuesday | 1,289 | +5.5 | 19.4% | 2.88 | 0.27 | 8.7 |
+| Wednesday | 1,290 | +1.6 | 18.9% | 2.70 | 0.25 | 6.9 |
+| Thursday | 1,268 | +3.4 | 19.6% | 2.61 | 0.24 | 8.3 |
+| Friday | 1,262 | +0.3 | 17.8% | 3.10 | 0.35 | 5.3 |
+
+The means are all statistically zero (each one has a standard error of about 3.4 bp), which is what an efficient market should give. The interesting rows are the second moments. Monday is the most volatile day and has by far the heaviest tail: ν = 2.17, close enough to the ν = 2 boundary that its confidence interval brushes against infinite variance. Friday is the calmest and lightest day on every measure.
+
+The plan asked me to compare two definitions of the week, and the likelihood-ratio tests settle it:
+
+**Table 2. Gaussian likelihood-ratio tests between week definitions.**
+
+| Comparison | LR | df | p |
+|------------|----|----|---|
+| Mon / midweek / Fri vs one pooled week | 42.9 | 4 | < 0.0001 |
+| Five separate days vs one pooled week | 45.7 | 8 | < 0.0001 |
+| Five separate days vs Mon / midweek / Fri | 2.8 | 4 | 0.594 |
+
+Treating the week as one block is firmly rejected. But splitting it all the way into five days is no better than the three-group version. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
+
+Grouped that way over the full sample, the pattern is a clean staircase. Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Excess kurtosis falls from 17.5 to 8.0 to 5.3. The tail parameter rises from ν = 2.17 to 2.73 to 3.10. Every measure says the same thing: the week opens risky and heavy-tailed, and calms down as it goes.
+
+![Figure 1. Volatility and tail parameter by weekday.](week6/figures/week6_weekday_params.png)
+
+*Figure 1. Left: annualised Gaussian volatility by weekday with 95% intervals. Right: Student-t ν by weekday against the full-sample 2.648.*
+
+---
+
+## 3. The week inside each crisis
+
+Next I ran the same week-open (Monday) to week-close (Friday) lens through each of the four crisis windows, measuring volatility, variance and the fat-tail measures in each. One warning before the table: the crisis windows are short, so the per-group samples get small. COVID has only about 20 Mondays and 20 Fridays, so I report volatility, variance and kurtosis there but not a Student-t fit, which would need more data than that to mean anything.
+
+**Table 3. Week open vs midweek vs week close, full sample and per crisis. Variance is the daily variance in %². ν is omitted where n < 50.**
+
+| Window | Group | n | σ (ann.) | Daily var (%²) | Excess kurt | Worst day | ν |
+|--------|-------|---|----------|----------------|-------------|-----------|---|
+| Full sample | Monday | 1,178 | 21.4% | 1.81 | 17.5 | −12.8% | 2.17 |
+| | Midweek | 3,847 | 19.3% | 1.48 | 8.0 | −10.0% | 2.73 |
+| | Friday | 1,262 | 17.8% | 1.25 | 5.3 | −6.0% | 3.10 |
+| Dot-com crash | Monday | 127 | 23.1% | 2.12 | 2.0 | −5.0% | 4.78 |
+| | Midweek | 409 | 23.7% | 2.23 | 0.9 | −4.2% | 7.43 |
+| | Friday | 135 | 23.1% | 2.11 | 1.5 | −6.0% | 7.10 |
+| GFC | Monday | 73 | 44.8% | 7.98 | 4.8 | −9.4% | 2.01 |
+| | Midweek | 229 | 38.8% | 5.99 | 2.5 | −9.5% | 2.79 |
+| | Friday | 76 | 28.2% | 3.16 | 1.1 | −4.3% | 7.59 |
+| COVID-19 | Monday | 20 | 65.9% | 17.2 | 2.3 | −12.8% | |
+| | Midweek | 64 | 46.7% | 8.65 | 2.1 | −10.0% | 2.42 |
+| | Friday | 20 | 43.9% | 7.63 | 3.0 | −4.4% | |
+| Fed rate hikes | Monday | 90 | 16.7% | 1.10 | 2.8 | −4.0% | 2.64 |
+| | Midweek | 309 | 19.6% | 1.53 | 1.4 | −4.4% | 8.10 |
+| | Friday | 102 | 21.1% | 1.77 | 0.2 | −3.7% | 15.5 |
+
+The four crises do not treat the week the same way, and the differences line up with what Week 3 found about the crises themselves.
+
+The GFC is the extreme case. Monday volatility was 44.8% against Friday's 28.2%, so the variance of a GFC Monday was two and a half times the variance of a GFC Friday. The Monday tail parameter is ν = 2.01, sitting exactly on the infinite-variance boundary, while GFC Fridays fit at ν = 7.6, which is nearly Gaussian. The crisis was hitting hardest right as the week opened, after the weekend's bank failures and rescue announcements had piled up with no trading to absorb them.
+
+COVID shows the same shape even more sharply in volatility terms: 65.9% on Mondays against 43.9% on Fridays, and the single worst day of the whole 25-year sample, the −12.8% of 16 March 2020, was a Monday. With only 20 observations per group I would not lean on the kurtosis numbers, but the volatility gap is too big to be an accident of sampling.
+
+The dot-com crash is completely flat: 23.1%, 23.7%, 23.1% across the three groups, with mild tails throughout. That fits its character from Week 3. It was a long grind lower, not a sequence of weekend shocks, so it had no reason to care what day it was.
+
+The Fed rate-hike window is the surprise: the pattern reverses. Mondays were the calm days (16.7%) and Fridays the risky ones (21.1%). My reading is that this crisis ran on scheduled announcements rather than weekend surprises, and the big macro releases, CPI and the payrolls report, land on weekday mornings, with payrolls on Fridays. When the risk arrives by calendar appointment, the weekend stops mattering and the week's shape flips. The tail numbers back this up: those risky Fridays fit at ν = 15.5 with excess kurtosis of just 0.2, so the announcement volatility was big but nearly Gaussian. Scheduled news makes the market wide, not fat-tailed.
+
+So the full-sample Monday effect in Section 2 is really a crisis effect. It is driven by the GFC and COVID, absent in the dot-com years, and reversed in 2022-23.
+
+![Figure 2. The week inside each crisis.](week6/figures/week6_crisis_weekday.png)
+
+*Figure 2. Annualised volatility (left) and excess kurtosis (right) for Monday, midweek and Friday, over the full sample and inside each crisis window.*
+
+---
+
+## 4. Market open vs market closed within the day
+
+The other meaning of open versus closed is within a single day. The close-to-close return splits exactly into an overnight part (yesterday's close to today's open, while the market is shut) and an intraday part (open to close, while it is trading):
+
+r_close-to-close = r_overnight + r_intraday
+
+One data problem first. Yahoo's ^GSPC open prices are fake in the early sample: the open just equals the previous close on 96% of days in 2000-2004, 31% in 2005-2009 and 12% in 2010-2014, then almost never from 2015. So this section runs on 2015-2024 (n = 2,515, stale fraction 0.08%). Nothing else in the project is affected because everything else only needs closing prices.
+
+**Table 4. Return components, 2015-2024.**
+
+| Component | σ (ann.) | Variance share | Student-t ν | Excess kurtosis | Skew |
+|-----------|----------|----------------|-------------|-----------------|------|
+| Close-to-close | 17.9% | 100% | 2.68 | 15.7 | −0.81 |
+| Overnight (closed) | 8.0% | 20.0% | 2.14 | 36.1 | −1.76 |
+| Intraday (open) | 14.0% | 61.0% | 2.79 | 5.2 | −0.41 |
+
+The two shares add to 81%; the missing 19% is twice the covariance, because the components correlate at +0.27 and overnight moves tend to continue into the day.
+
+The split is lopsided in a way I find really satisfying. The open market carries three times the closed market's variance, but the closed market carries the tails. Overnight returns fit at ν = 2.14 with excess kurtosis of 36 and skew of −1.8. Intraday returns are comparatively tame: ν = 2.79, kurtosis 5. The reason seems clear enough: while the market is shut, news piles up and nothing can be traded against it, so it all lands at once at the open. That is a jump. And the whole project has been about jumps, so it is nice to find out what time of day they happen: mostly while nobody can trade.
+
+![Figure 3. Overnight vs intraday densities.](week6/figures/week6_open_close_density.png)
+
+*Figure 3. Overnight and intraday return densities, 2015-2024, on a linear and a log scale. The overnight density is narrower in the middle but crosses over in the tails.*
+
+The two calendar effects also meet exactly where they should. Monday's overnight component runs at about 10% annualised against 7.3 to 7.8% for the other days. That extra piece is the weekend gap from Sections 2 and 3, now located in the specific session where it accrues.
+
+![Figure 4. Volatility by weekday and session.](week6/figures/week6_open_close_weekday.png)
+
+*Figure 4. Annualised volatility by weekday, split into overnight and intraday. The weekend lives in Monday's overnight bar.*
+
+---
+
+## 5. Week-on-week volatility
+
+For the week-on-week measure I built weekly realised volatility (the root of each week's summed squared daily returns, annualised) over the full 2000-2024 sample, 1,302 weeks.
+
+Volatility carries over strongly from one week to the next: vol_w = 4.30 + 0.72 × vol_(w−1), with R² = 0.52. A calm week is usually followed by a calm week and a wild one by a wild one. This is the weekly version of the volatility clustering that the Week 5 posterior predictive check showed none of our static models can produce.
+
+Weekly returns also let me check aggregational Gaussianity, one of the stylised facts from the Week 1 literature review. The Student-t fitted to weekly returns gives ν = 3.38 (SE 0.35) against the daily 2.648. One step of aggregation already lightens the tail by a measurable amount, though weekly returns are still nowhere near Gaussian.
+
+![Figure 5. Weekly realised volatility.](week6/figures/week6_weekly_vol.png)
+
+*Figure 5. Left: weekly realised volatility, 2000-2024, with the four crisis windows shaded. Right: each week's volatility against the previous week's, slope 0.72, R² 0.52.*
+
+---
+
+## 6. Quarterly parameter regressions
+
+The central item of the plan: fit the Lévy models through time and regress each parameter separately. Yearly fits only give 25 data points, so I refitted VG(σ, θ, ν) and NIG(α, β, δ) with μ = 0 one calendar quarter at a time. That gives 100 quarters of roughly 63 returns each, using the same zero-mean machinery as the Week 4 yearly fits.
+
+One thing has to be dealt with before any regression. In calm quarters the NIG cannot tell itself apart from a Gaussian: α and δ both blow up together, and only their ratio (which sets the variance) is pinned down by the data. The individual values of α and δ in those quarters are meaningless. This happens in 33 of the 100 quarters (I flagged any quarter with α above 500), so the δ regressions run on the 67 quarters where δ actually means something. The fact that a third of all quarters look Gaussian is a finding in itself: it repeats the Week 3 message that heavy tails are something markets do in episodes, not all the time.
+
+**Table 5. One regression per parameter. Newey-West standard errors, 4 lags. The full specification adds realised volatility, drawdown and the parameter's own lag to the VIX.**
+
+| Parameter | R² (VIX only) | VIX t-stat | R² (full) | AR(1) slope | AR(1) R² |
+|-----------|---------------|------------|-----------|-------------|----------|
+| NIG δ (ann., 67 quarters) | 0.50 | +3.0 | 0.60 | +0.40 | 0.16 |
+| NIG log α | 0.02 | −1.3 | 0.24 | +0.26 | 0.07 |
+| NIG β | 0.17 | −3.2 | 0.28 | −0.01 | 0.00 |
+| VG σ (ann.) | 0.82 | +19.9 | 1.00 | +0.52 | 0.27 |
+| VG θ | 0.19 | −5.1 | 0.65 | +0.04 | 0.00 |
+| VG ν | 0.04 | −2.1 | 0.22 | +0.19 | 0.04 |
+
+The δ result is the one the plan asked for first. Against the VIX alone, δ gives R² = 0.50 in levels. In logs, which stops a few crisis quarters from dominating the fit, it reaches R² = 0.64 with a t-statistic of 9.7. The NIG's scale parameter is, to a decent approximation, a re-reading of the VIX. The VG σ says the same even louder: R² = 0.82 with 100 quarters, matching the 0.90 that Week 3 found with 25 years. (The R² of 1.00 in σ's full specification is not impressive, it is circular: quarterly realised volatility and the fitted VG scale are almost the same number, so one explains the other perfectly. I kept the row only for completeness.)
+
+The genuinely new result is the skew. The Week 3 annual regression found no relationship between the VIX and either asymmetry parameter, with p-values of 0.60 and 0.16 on 25 points. With 100 quarters both show up clearly: VG θ at t = −5.1 and NIG β at t = −3.2. Higher-VIX quarters are more left-skewed quarters. The annual nulls were a sample-size problem, which the Week 3 limitations section suspected at the time. The tail-decay parameters, on the other hand, stay flat against the VIX at any frequency (log α at R² = 0.02, VG ν at 0.04). So the sharper version of Week 3's conclusion is: the VIX prices the scale of the distribution and, seen quarterly, its skew, but it says nothing about how fast the tails decay.
+
+The plan's "two parameters as a function of themselves" is the AR(1) column: each parameter regressed on its own previous value. The scale parameters persist (log δ has an AR slope of 0.58 with R² = 0.34, VG σ sits at 0.52). The skew and tail parameters have AR slopes of essentially zero. So the scale of the market moves slowly and remembers itself from quarter to quarter, while asymmetry and tail weight belong to specific episodes and reset.
+
+![Figure 6. Quarterly NIG parameters through time.](week6/figures/week6_quarterly_nig.png)
+
+*Figure 6. Quarterly NIG δ (top) and α (bottom), both on log axes, crisis windows shaded. Grey crosses are the 33 weakly identified quarters where only the ratio of δ to α means anything. Among the identified quarters, α bottoms out near 7 in 2020Q1, the heaviest quarterly tail in the sample.*
+
+![Figure 7. The δ regressions.](week6/figures/week6_delta_regressions.png)
+
+*Figure 7. Left: quarterly NIG δ against that quarter's average VIX, well-identified quarters only. Right: δ against its own lag, the AR(1).*
+
+---
+
+## 7. Earnings seasons
+
+The index has no earnings dates of its own, so I used the aggregate reporting calendar as a proxy: each earnings season is the month starting on the 15th of January, April, July and October, when most S&P 500 companies report. That covers 34% of trading days. This is a proxy, and a study with company-level reporting dates would be a different and bigger exercise.
+
+**Table 6. In season vs out of season, 2000-2024.**
+
+| Window | n | σ (ann.) | Student-t ν | Excess kurtosis |
+|--------|---|----------|-------------|-----------------|
+| In season | 2,161 | 19.1% | 2.87 | 7.4 |
+| Out of season | 4,126 | 19.6% | 2.55 | 11.8 |
+
+I also ran an event-study profile: average volatility in the 21 trading days before each season, during it, and in the 21 days after, across 99 seasons. The answer is flat to the decimal: 16.5%, 16.4%, 16.5%, with paired t-statistics all under 0.15.
+
+I expected at least something here, so the flatness took me a moment to accept. But it makes sense. Earnings risk is company-specific, and inside a 500-name index the individual surprises average away almost completely. If anything the in-season distribution has lighter tails (ν = 2.87 against 2.55), because the shocks that actually move the index tail, March 2020, August 2011, the 2008 cascade, mostly happened outside reporting windows. The conclusion I take: index-level tail risk is macro risk, not earnings risk.
+
+![Figure 8. Volatility around earnings seasons.](week6/figures/week6_earnings_profile.png)
+
+*Figure 8. Average annualised volatility before, during and after the 99 earnings seasons, with 95% intervals.*
+
+---
+
+## 8. Limitations
+
+The crisis-window weekday cuts run on small samples, down to 20 Mondays for COVID, so those rows lean on volatility and variance rather than fitted tail parameters, and the kurtosis figures there are indicative at best. The overnight/intraday split rests on ten years of usable open prices and describes the post-2015 market only. The quarterly NIG fits are noisy for the tail and skew parameters at 63 observations a quarter, and the ridge treatment means the δ results describe normal-to-turbulent quarters, not calm ones. The regressions are contemporaneous attribution in the Week 3 sense, not forecasts, and the VIX and realised volatility are strongly correlated, so their coefficients in the full specifications are partial associations. The earnings windows are a calendar proxy at index level; a constituent-level event study could still find effects the index averages away.
+
+---
+
+# Week 7: The rolling VaR backtest
+
+## 1. Overview
+
+Everything up to now has been in-sample: fit a distribution to the full history, read the risk numbers off the fitted tail. This week the models finally had to work for a living. Each one was refitted on a rolling 500-day window and asked, every day from January 2002 to December 2024, for tomorrow's Value-at-Risk. That gives 5,787 genuine out-of-sample forecasts per model per confidence level, and a hit sequence of days where the realised return fell below the forecast. Christoffersen's (1998) framework then asks the two questions that matter about that sequence: are there the right *number* of violations, and do they arrive *independently*? A model can only be called correct if the answer to both is yes.
+
+This also puts the last of the four references to work. Christoffersen (1998) has been in the bibliography since Week 1 waiting for exactly this exercise.
+
+The models are the four from the Bayesian arc: Gaussian, Laplace, Student-t and NIG, with the Laplace again standing in for the Variance-Gamma family as its symmetric special case. Windows were refitted every 21 trading days, roughly the monthly update cycle a risk desk would run, and the forecasts held fixed between refits.
+
+The headline is a clean split. Rolling refits repair the *number* of violations at the 95% level for the Gaussian and the NIG, and the NIG comes closest at 99%. But every model, at every level, fails the independence test outright. The violations do not arrive as a trickle; they arrive as bursts in late 2008 and March 2020. A rolling window drags the whole distribution towards yesterday's volatility, but a month too late. The missing ingredient is not a heavier tail. It is conditional volatility, and no static marginal, however well chosen, can supply it.
+
+---
+
+## 2. Design
+
+- **Window**: 500 trading days (about two years), long enough for a stable four-parameter NIG fit, short enough to adapt across regimes.
+- **Refit**: every 21 trading days; parameters held between refits.
+- **Forecast**: one-day-ahead VaR at 95%, 97.5% and 99%, computed as the corresponding quantile of the fitted distribution (closed form for Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG).
+- **Violation**: realised return strictly below the VaR forecast.
+
+One numerical note. On calm windows the rolling NIG regularly lands on its Gaussian-limit ridge (very large α with big standard errors), the same weakly identified regime the quarterly fits found in Week 6. scipy's generic NIG quantile fails to converge there, so the quantile is solved by hand: bracket using the NIG's own mean and standard deviation, then Brent's method on the CDF. On the ridge the quantile smoothly approaches the Gaussian one, which is the right behaviour.
+
+Three likelihood-ratio tests per model and level, following Christoffersen (1998):
+
+- **LR_uc** (Kupiec, unconditional coverage): is the violation rate equal to the nominal 5%, 2.5% or 1%? Chi-squared, 1 df.
+- **LR_ind** (independence): is the chance of a violation today unaffected by whether yesterday was a violation, against a first-order Markov alternative? Chi-squared, 1 df.
+- **LR_cc** (conditional coverage): the sum of the two, chi-squared with 2 df. This is the joint test the paper is about.
+
+---
+
+## 3. Coverage: how many violations
+
+**Table 1. Rolling backtest, 5,787 out-of-sample days (Jan 2002 to Dec 2024). Expected violations are n x (1 - level).**
+
+| Model | Level | Expected | Hits | Rate | LR_uc | p_uc | LR_ind | p_ind | LR_cc | p_cc |
+|-------|-------|----------|------|------|-------|------|--------|-------|-------|------|
+| Gaussian | 95% | 289 | 308 | 5.32% | 1.24 | 0.265 | 47.2 | <0.0001 | 48.5 | <0.0001 |
+| Gaussian | 97.5% | 145 | 223 | 3.85% | 37.4 | <0.0001 | 39.7 | <0.0001 | 77.1 | <0.0001 |
+| Gaussian | 99% | 58 | 152 | 2.63% | 106.9 | <0.0001 | 36.1 | <0.0001 | 142.9 | <0.0001 |
+| Laplace | 95% | 289 | 323 | 5.58% | 3.98 | 0.046 | 35.7 | <0.0001 | 39.6 | <0.0001 |
+| Laplace | 97.5% | 145 | 193 | 3.34% | 15.0 | 0.0001 | 34.6 | <0.0001 | 49.6 | <0.0001 |
+| Laplace | 99% | 58 | 110 | 1.90% | 37.5 | <0.0001 | 28.0 | <0.0001 | 65.5 | <0.0001 |
+| Student-t | 95% | 289 | 358 | 6.19% | 16.0 | 0.0001 | 39.0 | <0.0001 | 55.0 | <0.0001 |
+| Student-t | 97.5% | 145 | 218 | 3.77% | 33.1 | <0.0001 | 35.9 | <0.0001 | 69.0 | <0.0001 |
+| Student-t | 99% | 58 | 104 | 1.80% | 30.0 | <0.0001 | 18.6 | <0.0001 | 48.7 | <0.0001 |
+| NIG | 95% | 289 | 313 | 5.41% | 1.98 | 0.159 | 37.5 | <0.0001 | 39.5 | <0.0001 |
+| NIG | 97.5% | 145 | 177 | 3.06% | 6.92 | 0.009 | 31.9 | <0.0001 | 38.8 | <0.0001 |
+| NIG | 99% | 58 | 91 | 1.57% | 16.3 | 0.0001 | 19.3 | <0.0001 | 35.6 | <0.0001 |
+
+Three things stand out.
+
+**At 95% the Gaussian is fine and the Student-t is the worst model in the table.** That inversion is worth dwelling on. The full-sample Student-t carries ν = 2.648, a tail heavy enough to flirt with infinite kurtosis. A distribution with that much mass far out in the tail has to take it from somewhere, and it takes it from the shoulders: its 5% quantile sits *closer to zero* than the Gaussian's for the same data. So at the everyday 95% level the t under-covers (358 hits against 289 expected, rejected at p = 0.0001) while the thin-tailed Gaussian, which spends its probability exactly where the 5% quantile lives, passes comfortably (p = 0.27). Heavy tails are a statement about extremes, and they carry a cost at moderate quantiles.
+
+**At 99% the ordering flips and the Gaussian collapses.** It produces 152 violations where 58 were expected, a factor of 2.6, with LR_uc = 106.9. This is the out-of-sample counterpart of the 79.5% ES gap from Week 2: the Gaussian tail is simply too short where it matters. The NIG does best (91 hits, a factor of 1.57), then Student-t (104) and Laplace (110). Note that even the NIG is rejected on pure coverage at 99%; a static tail fitted to the last two years is still too short when the regime breaks.
+
+**Every cell of the LR_ind column is a rejection.** More on that next.
+
+![Figure 1. 99% VaR forecasts and violations per model.](week7/figures/week7_var_series.png)
+
+*Figure 1. Rolling one-day 99% VaR forecasts (coloured line) against realised returns (grey), with violations marked. The crosses bunch in the GFC and COVID windows for every model.*
+
+---
+
+## 4. Independence: when the violations arrive
+
+The independence statistics are large everywhere: LR_ind between 18.6 and 47.2, all with p-values that are zero to four decimal places. The mechanism is visible in the raw transition counts. At the 95% level, a day after a Gaussian violation had a 48-in-308 chance of being another violation, a repeat rate of about 16% against an unconditional 5.3%. The models are not wrong at random times; they are wrong in runs.
+
+Figure 2 shows the same fact cumulatively. Violations accrue as staircases: flat for years, then a vertical jump in late 2008 and again in March 2020. The dashed line is what a correct model's staircase should look like.
+
+![Figure 2. Cumulative violations against the nominal rate.](week7/figures/week7_cumulative_hits.png)
+
+*Figure 2. Cumulative violations at 95% (left) and 99% (right) against the nominal accrual (dashed). The GFC and COVID verticals are the independence failure made visible.*
+
+This is the out-of-sample confirmation of the Week 5 posterior predictive result. There, all four models failed the one dependence statistic in the battery (the lag-1 autocorrelation of squared returns, observed 0.32 against replicate bands centred on zero) while the NIG passed every marginal check. Here the same split reappears with real forecasts: the NIG gets the closest to the right number of violations, and still fails their timing, because a 500-day window updated monthly cannot chase volatility that doubles inside a week. Cont's (2001) volatility clustering is exactly the stylised fact these iid models were built without, and the backtest sends the bill.
+
+---
+
+## 5. The Basel traffic light
+
+Basel's backtesting regime keys the capital multiplier off the count of 99% violations in the trailing 250 days: green up to 4, yellow from 5 to 9, red at 10 or more, where the internal model is presumed broken.
+
+**Table 2. Share of out-of-sample days each model spends in each Basel zone (99% VaR, trailing 250 days).**
+
+| Model | Green | Yellow | Red | Worst 250-day count |
+|-------|-------|--------|-----|---------------------|
+| Gaussian | 53.2% | 16.0% | 30.8% | 32 |
+| Laplace | 63.8% | 17.5% | 18.7% | 28 |
+| Student-t | 65.3% | 16.7% | 17.9% | 22 |
+| NIG | 66.6% | 19.3% | 14.1% | 15 |
+
+A Gaussian desk spends almost a third of the 23 years in the red zone, and its worst 250-day window contains 32 violations, more than three times the red threshold and a level at which a regulator would simply withdraw model approval. The Lévy tails halve the red-zone time, and the NIG's worst window (15) is half the Gaussian's. But no model stays out of the red: every one of them breaches the threshold through the GFC and again around COVID, which is the traffic-light version of the independence failure.
+
+![Figure 3. Rolling 250-day violation counts against the Basel zones.](week7/figures/week7_basel_traffic.png)
+
+*Figure 3. Trailing 250-day count of 99% violations per model over the Basel green, yellow and red bands.*
+
+---
+
+## 6. Expected Shortfall at 97.5%: what the models promised
+
+FRTB (BCBS, 2013) replaces 99% VaR with 97.5% ES as the capital metric, so the last check compares, on the days each model's 97.5% VaR was breached, the average realised loss with the average ES the model had forecast for those same days. A ratio above 1 means the tail bit harder than promised.
+
+**Table 3. Realised versus forecast losses on 97.5% breach days.**
+
+| Model | Breach days | Mean realised | Mean forecast ES | Ratio |
+|-------|-------------|---------------|------------------|-------|
+| Gaussian | 223 | −2.99% | −2.25% | 1.33 |
+| Laplace | 193 | −3.16% | −2.63% | 1.20 |
+| Student-t | 218 | −3.02% | −3.12% | 0.97 |
+| NIG | 177 | −3.18% | −2.96% | 1.07 |
+
+The Gaussian falls short twice over: too many breach days (223 against 145 expected) *and* losses 33% deeper than the ES it booked on those days. Under FRTB that is precisely the number a capital charge is built on. The Student-t's promised shortfall is actually adequate (ratio 0.97), the same phenomenon as its 95% failure viewed from the other end: the heavy ν buys deep-tail honesty at the price of shoulder coverage. The NIG is 7% short, much the best balance of breach count and depth, which matches its Week 5 status as the only model to pass the marginal FRTB check.
+
+---
+
+## 7. Where this leaves the project
+
+The backtest completes an argument that has been building since Week 2:
+
+1. The full-sample tail is heavy (ν = 2.648) and the Gaussian understates 99% ES by 79.5% in-sample (Week 2). Out of sample, that shows up as 2.6 times too many 99% violations and realised breach losses 33% beyond the booked ES.
+2. Choosing a better marginal genuinely helps. The NIG cuts the excess 99% violations from a factor 2.6 to 1.57, spends half as much time in the Basel red zone, and prices its own breaches to within 7%.
+3. No marginal is enough. Every model fails Christoffersen's independence test at every level, because iid models, however heavy their tails, put the violations in the wrong places. The failure is not the size of the tail but its timing, and the timing is volatility clustering.
+
+Point 3 is the honest limit of the project's model class, established formally in-sample in Week 5 and now out-of-sample here. It is also the natural closing argument for the write-up: the Lévy marginals fix what is fixable at the level of a static distribution, and what remains is, by construction, dynamics.
+
+---
+
+# Conclusions
+
+## 1. The consolidated scorecard
+
+Every model has now been examined four ways: in-sample fit by maximum likelihood (Weeks 2 and 3), full Bayesian posteriors (Week 4), posterior predictive checks against the observed data (Week 5), and a rolling out-of-sample VaR backtest (Week 7). Table 1 puts the whole project on one page. The Variance-Gamma's Bayesian and backtest columns are carried by the Laplace, its symmetric special case (θ = 0, ν = 1), which is how the VG family was represented from Week 4 onward.
+
+**Table 1. The five models across the full project. ΔAIC is against the Gaussian (more negative is better); KS is the Kolmogorov-Smirnov test on the full sample; PPC summarises the Week 5 posterior predictive checks; the backtest columns are the Week 7 rolling one-day 99% VaR results over 5,787 out-of-sample days (58 violations expected) and the 97.5% ES shortfall ratio (realised loss over promised ES on breach days; 1 is honest).**
+
+| | Gaussian | Laplace | Student-t | VG | NIG |
+|---|---|---|---|---|---|
+| Parameters | 2 | 2 | 3 | 4 | 4 |
+| ΔAIC vs Gaussian | 0 | −1,771 | −1,803 | −1,798 | −1,851 |
+| KS test | rejected | borderline | borderline | passes | passes |
+| 99% ES (in-sample) | −3.24% | −3.91% | −5.81% | −4.28% | −5.19% |
+| PPC verdict | fails beyond the centre | fails deep tail | tail quantiles pass; moments undefined | (via Laplace) | passes all marginal checks |
+| Backtest 99% violations | 152 (×2.6) | 110 (×1.9) | 104 (×1.8) | (via Laplace) | 91 (×1.6) |
+| Basel red-zone share | 30.8% | 18.7% | 17.9% | (via Laplace) | 14.1% |
+| ES shortfall ratio (97.5%) | 1.33 | 1.20 | 0.97 | (via Laplace) | 1.07 |
+| Independence test | fails | fails | fails | (via Laplace) | fails |
+
+## 2. What the project found
+
+Three findings organise everything above.
+
+**The Gaussian assumption fails where it is most expensive.** The full-sample Student-t degrees of freedom is ν = 2.648, and the Bayesian posterior places the entire 94% interval at (2.46, 2.87): heavy tails with a finite variance, as a stable population property rather than a point estimate. The price of ignoring this is concentrated in the tail the regulation cares about. In-sample, the Gaussian understates 99% Expected Shortfall by 79.5% against the Student-t; out-of-sample it produces 2.6 times the nominal number of 99% VaR violations, spends 31% of two decades in the Basel red zone, and books an ES one third smaller than the losses realised on its own breach days.
+
+**Most of the gain is exponential tails; the last part is the NIG's.** The two-parameter Laplace, with the same parameter count as the Gaussian, captures 96% of the best model's AIC improvement: simply replacing thin tails with exponential ones does most of the work. The NIG earns the rest with genuine structure. It is the only model to pass the KS test and every posterior predictive check including skew and the FRTB 97.5% ES, its posterior asymmetry β is negative across its whole credible interval, and out of sample it comes closest to the nominal violation count at every level. Between them sits an instructive anomaly: the Student-t, at the everyday 95% level, is the *worst* forecaster in the table, because a tail heavy enough to cover crashes thins the shoulders where the 5% quantile lives. Tail heaviness is a budget, not a free improvement.
+
+**No static distribution passes the timing test.** Every model fails Christoffersen's independence test at every confidence level, in-sample (the Week 5 volatility clustering check) and out-of-sample (Week 7) alike. Violations arrive in bursts, in late 2008 and March 2020, exactly as Cont's (2001) volatility clustering says they must and exactly as Christoffersen (1998) found for the static forecasts in his original application. A rolling window softens this but cannot fix it: refitting monthly on two years of data always arrives about a month late to a regime change. The residual failure is not the size of the tail but its timing, and timing is a property of dynamics, which an independent-increments model discards by construction.
+
+## 3. Limitations
+
+The results carry five caveats worth stating plainly.
+
+- **One index, one frequency.** Everything rests on daily log-returns of a single equity index. Cont (2001) documents that some stylised facts (the gain/loss asymmetry in particular) are equity-specific, so the parameter values, and especially the skew findings, should not be assumed to transfer to other asset classes. Weekly aggregation already lightens the tail (ν rises from 2.65 to 3.4 in Week 6), so conclusions are horizon-specific too.
+- **The model class is iid by design.** The project deliberately tests what a static marginal distribution can and cannot do, and the independence failures are the honest boundary of that design. The models do not condition on volatility state, and the backtest results quantify the cost of that choice rather than escape it.
+- **Sub-sample fits are sometimes weakly identified.** In calm windows the NIG runs into its Gaussian-limit ridge, where α and δ grow large with enormous standard errors and only their product is pinned down. Roughly a third of the Week 6 quarterly fits sit on that ridge, and the rolling backtest windows regularly do as well; quantile forecasts remain well behaved there, but individual parameter readings from calm periods should not be over-interpreted.
+- **Backtest design choices matter.** The 500-day window and 21-day refit cycle are conventional but not innocent: a shorter window adapts faster at the cost of noisier four-parameter fits, and results at the margins would shift. The Basel traffic-light figures in particular are descriptive, not an implementation of the full regulatory apparatus.
+- **The Bayesian arc represents the VG family by its Laplace special case.** The full four-parameter VG was fitted by maximum likelihood only; its posterior and backtest behaviour are inferred from its family rather than sampled directly. Given that the full-sample VG sits between the Laplace and the NIG on every in-sample measure, this is unlikely to change any ranking, but it is an economy, not a result.
+
+## 4. Closing remark
+
+The project set out to ask whether heavy-tailed Lévy models materially improve tail risk measurement under the Basel metrics. They do, by amounts that would change a capital number: roughly a third more Expected Shortfall at the FRTB's own confidence level, and half the regulatory red-zone time out of sample. And the same battery of tests that establishes this also locates, precisely, what a better marginal cannot buy: the arrival times of the violations. A static distribution can get the size of tail risk right; only dynamics can get its timing. That division of labour, measured on one dataset with one consistent toolkit, is the contribution of this work.
+
+---

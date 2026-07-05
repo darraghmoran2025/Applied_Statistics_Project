@@ -14,10 +14,11 @@
       --rule:     #dddddd;
       --bg:       #ffffff;
       --accent:   #1a1a1a;
-      --gaussian: #4682b4;
-      --student:  #dc143c;
-      --vg:       #e07b00;
-      --nig:      #2e8b57;
+      --gaussian: #4682b4;   /* steelblue */
+      --laplace:  #800080;   /* purple */
+      --student:  #dc143c;   /* crimson */
+      --vg:       #228b22;   /* forestgreen */
+      --nig:      #ff8c00;   /* darkorange */
       --dot-com:  #fff3cd;
       --gfc:      #f8d7da;
       --covid:    #d1ecf1;
@@ -115,7 +116,7 @@
     /* ── Model legend ── */
     .model-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 0.75rem;
       margin-bottom: 1.5rem;
     }
@@ -133,6 +134,28 @@
     }
     .model-card strong { display: block; margin-bottom: 0.2rem; }
     .model-card p { font-size: 0.8rem; margin: 0; color: var(--light); }
+
+    /* ── Scorecard table ── */
+    .scorecard {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-bottom: 1rem;
+    }
+    .scorecard th {
+      text-align: left;
+      padding: 0.4rem 0.6rem;
+      border-bottom: 2px solid var(--black);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .scorecard td {
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--mid);
+    }
+    .scorecard td:first-child { color: var(--black); }
 
     /* ── Trace plot canvas ── */
     .trace-container {
@@ -193,7 +216,7 @@
       margin-top: 0.5rem;
     }
 
-    /* ── Figure placeholder ── */
+    /* ── Figure box ── */
     .figure-box {
       border: 1px solid var(--rule);
       padding: 1rem;
@@ -232,27 +255,38 @@
 <nav>
   <a href="#overview">Overview</a>
   <a href="#models">Models</a>
-  <a href="#data">Data &amp; Returns</a>
-  <a href="#week2">Week 2 Results</a>
-  <a href="#roadmap">Roadmap</a>
+  <a href="#data">Data</a>
+  <a href="#mle">Fit</a>
+  <a href="#bayes">Bayesian</a>
+  <a href="#calendar">Calendar</a>
+  <a href="#backtest">Backtest</a>
   <a href="#references">References</a>
-  <a href="https://github.com/YOUR_USERNAME/levy-project" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project" target="_blank">GitHub ↗</a>
 </nav>
 
 <!-- ── Overview ──────────────────────────────────────────────── -->
 <section id="overview">
   <h2>Overview</h2>
   <p>
-    The Black-Scholes framework — and much of classical financial econometrics — assumes that daily
-    stock returns are normally distributed. This project tests that assumption systematically against
-    a hierarchy of four models fitted to 25 years of S&P 500 daily log-returns (2000–2024),
-    spanning three major market crises.
+    The Black-Scholes framework, and much of classical financial econometrics, assumes that daily
+    stock returns are normally distributed. This project tests that assumption against a hierarchy
+    of five models fitted to 25 years of S&amp;P 500 daily log-returns (2000&ndash;2024), a sample
+    that spans four distinct market crises.
   </p>
   <p>
-    The central question: by how much does the Gaussian model underestimate tail risk, and do
-    Lévy-based distributions (Variance-Gamma and Normal Inverse Gaussian) offer a statistically
-    meaningful improvement? Risk measures are evaluated both in-sample (MLE, AIC/BIC) and
-    out-of-sample (rolling VaR backtests, Bayesian PSIS-LOO).
+    The central question: by how much does the Gaussian model understate tail risk, and do
+    Lévy-based distributions offer a statistically meaningful improvement? Every model is
+    estimated twice, by maximum likelihood and again with full Bayesian posteriors (PyMC / NUTS),
+    validated in-sample with posterior predictive checks, and finally sent out of sample through a
+    rolling one-day VaR backtest scored with the Christoffersen (1998) framework and the Basel
+    traffic light.
+  </p>
+  <p>
+    The answer has two halves. The heavy-tailed marginals genuinely fix the <em>size</em> of tail
+    risk: the NIG passes every distributional test the Gaussian fails, and out of sample it cuts
+    excess 99% VaR violations from a factor of 2.6 to 1.6. But no static distribution fixes the
+    <em>timing</em>: every model fails the independence test, because violations arrive in bursts
+    (2008, 2020) that only a dynamic volatility model could anticipate.
   </p>
 
   <table class="progress-table">
@@ -260,13 +294,14 @@
       <tr><th>Week</th><th>Topic</th><th>Status</th></tr>
     </thead>
     <tbody>
-      <tr><td>1</td><td>Literature Review</td><td><span class="badge done">Complete</span></td></tr>
-      <tr><td>2</td><td>Gaussian &amp; Student-t MLE Benchmarks</td><td><span class="badge done">Complete</span></td></tr>
-      <tr><td>3</td><td>Variance-Gamma &amp; NIG MLE</td><td><span class="badge upcoming">Upcoming</span></td></tr>
-      <tr><td>4</td><td>Sub-period &amp; shock analysis</td><td><span class="badge upcoming">Upcoming</span></td></tr>
-      <tr><td>5</td><td>Bayesian MCMC (PyMC / NUTS)</td><td><span class="badge upcoming">Upcoming</span></td></tr>
-      <tr><td>6</td><td>Rolling VaR backtest &amp; VIX regression</td><td><span class="badge upcoming">Upcoming</span></td></tr>
-      <tr><td>7</td><td>Final write-up</td><td><span class="badge upcoming">Upcoming</span></td></tr>
+      <tr><td>1</td><td>Literature review and research proposal</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>2</td><td>Gaussian &amp; Student-t MLE benchmarks</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>3</td><td>Five-model MLE; sub-period analysis; lead-up regression</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>4</td><td>Bayesian estimation (PyMC / NUTS)</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>5</td><td>Posterior predictive checks; convergence diagnostics</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>6</td><td>Calendar structure; quarterly parameter regressions</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>7</td><td>Rolling VaR backtest (Christoffersen)</td><td><span class="badge done">Complete</span></td></tr>
+      <tr><td>8</td><td>Final write-up</td><td><span class="badge upcoming">Upcoming</span></td></tr>
     </tbody>
   </table>
 </section>
@@ -280,27 +315,48 @@
       <p>2 parameters. Black-Scholes baseline. Symmetric, thin tails.</p>
     </div>
     <div class="model-card">
+      <strong><span class="swatch" style="background:var(--laplace)"></span>Laplace</strong>
+      <p>2 parameters. Symmetric VG special case (θ = 0, ν = 1). Exponential tails.</p>
+    </div>
+    <div class="model-card">
       <strong><span class="swatch" style="background:var(--student)"></span>Student-t</strong>
-      <p>3 parameters. Symmetric fat tails via degrees-of-freedom ν.</p>
+      <p>3 parameters. Symmetric power-law tails via degrees of freedom ν.</p>
     </div>
     <div class="model-card">
       <strong><span class="swatch" style="background:var(--vg)"></span>Variance-Gamma</strong>
-      <p>4 parameters. Pure jump Lévy process. Finite variation, no Brownian component.</p>
+      <p>4 parameters. Pure-jump Lévy process via Gamma subordination.</p>
     </div>
     <div class="model-card">
       <strong><span class="swatch" style="background:var(--nig)"></span>Normal Inv. Gaussian</strong>
-      <p>4 parameters. Lévy process via IG subordination. Semi-heavy tails.</p>
+      <p>4 parameters. Lévy process via IG subordination. Semi-heavy tails, skew.</p>
     </div>
   </div>
+
+  <table class="scorecard">
+    <thead>
+      <tr><th></th><th>Gaussian</th><th>Laplace</th><th>Student-t</th><th>VG</th><th>NIG</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>ΔAIC vs Gaussian</td><td>0</td><td>−1,771</td><td>−1,803</td><td>−1,798</td><td>−1,851</td></tr>
+      <tr><td>KS test</td><td>rejected</td><td>borderline</td><td>borderline</td><td>passes</td><td>passes</td></tr>
+      <tr><td>99% ES (in-sample)</td><td>−3.24%</td><td>−3.91%</td><td>−5.81%</td><td>−4.28%</td><td>−5.19%</td></tr>
+      <tr><td>Backtest 99% violations (58 expected)</td><td>152</td><td>110</td><td>104</td><td>(via Laplace)</td><td>91</td></tr>
+      <tr><td>Basel red-zone share</td><td>30.8%</td><td>18.7%</td><td>17.9%</td><td>(via Laplace)</td><td>14.1%</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:0.8rem; color:var(--light); font-style:italic;">
+    The consolidated scorecard. From Week 4 onward the Variance-Gamma family is represented in the
+    Bayesian and backtest work by its Laplace special case.
+  </p>
 </section>
 
 <!-- ── Data ──────────────────────────────────────────────────── -->
 <section id="data">
   <h2>Data &amp; Returns</h2>
   <p>
-    6,287 daily log-returns on the S&P 500 index (^GSPC), computed as
+    6,287 daily log-returns on the S&amp;P 500 index (^GSPC), computed as
     r<sub>t</sub> = log(S<sub>t</sub> / S<sub>t−1</sub>), covering
-    2 January 2000 to 31 December 2024. Four market shock periods are tracked
+    January 2000 to December 2024. Four market shock periods are tracked
     throughout the analysis.
   </p>
 
@@ -309,66 +365,180 @@
   </div>
 
   <div class="shock-legend">
-    <span><span class="shock-swatch" style="background:var(--dot-com)"></span>Dot-com crash (2000–2002)</span>
-    <span><span class="shock-swatch" style="background:var(--gfc)"></span>GFC (2007–2009)</span>
+    <span><span class="shock-swatch" style="background:var(--dot-com)"></span>Dot-com crash (2000&ndash;2002)</span>
+    <span><span class="shock-swatch" style="background:var(--gfc)"></span>GFC (2007&ndash;2009)</span>
     <span><span class="shock-swatch" style="background:var(--covid)"></span>COVID-19 (2020)</span>
-    <span><span class="shock-swatch" style="background:var(--fed)"></span>Fed rate hikes (2022–2023)</span>
+    <span><span class="shock-swatch" style="background:var(--fed)"></span>Fed rate hikes (2022&ndash;2023)</span>
   </div>
 
   <p style="font-size:0.82rem; color:var(--light); font-style:italic;">
-    Interactive trace — hover over a shaded region for sub-period statistics.
-    Full interactivity added in Week 4.
+    Stylised sketch of the return series with the four shock windows shaded; the real series and
+    fitted models appear in the figures below.
   </p>
 </section>
 
-<!-- ── Week 2 Results ─────────────────────────────────────────── -->
-<section id="week2">
-  <h2>Week 2 — Gaussian &amp; Student-t MLE</h2>
+<!-- ── Weeks 2-3: the marginal fit ─────────────────────────────── -->
+<section id="mle">
+  <h2>Weeks 2&ndash;3 &mdash; How wrong is the Gaussian?</h2>
 
-  <h3>Key findings</h3>
   <div class="results-grid">
     <div class="result-card">
       <div class="metric">ν̂ = 2.65</div>
       <div class="metric-label">Student-t degrees of freedom</div>
-      <div class="metric-note">Consistent with infinite kurtosis. 95% CI: 2.43–2.87.</div>
+      <div class="metric-note">Heavy tails, finite variance. 95% CI: 2.43&ndash;2.87. Kurtosis is formally undefined.</div>
     </div>
     <div class="result-card">
       <div class="metric">79.5%</div>
       <div class="metric-label">99% ES gap (Student-t vs Gaussian)</div>
-      <div class="metric-note">−5.81% vs −3.24% daily loss at the 99th percentile.</div>
+      <div class="metric-note">−5.81% vs −3.24% daily loss. A Gaussian-calibrated book holds roughly 44% too little capital.</div>
     </div>
     <div class="result-card">
-      <div class="metric">44%</div>
-      <div class="metric-label">Gaussian capital shortfall</div>
-      <div class="metric-note">A Gaussian-calibrated risk model holds 44% less capital than the tail structure requires.</div>
+      <div class="metric">96%</div>
+      <div class="metric-label">of the NIG's AIC gain, from the Laplace</div>
+      <div class="metric-note">Two parameters of exponential tail do most of the work; the NIG's structure earns the rest.</div>
     </div>
   </div>
 
   <div class="figure-box">
     <img src="assets/img/week2_plots.png"
-         alt="S&P 500 density overlay and QQ plots — Gaussian vs Student-t MLE" />
+         alt="S&P 500 density overlay and QQ plots, Gaussian vs Student-t MLE" />
     <figcaption>
-      Figure 1. Top: histogram of 6,287 daily log-returns with fitted Gaussian (blue) and
-      Student-t (red, ν = 2.65) PDFs. Bottom left: Gaussian QQ plot — the S-shaped deviation
-      confirms fat tails. Bottom right: Student-t QQ — substantially improved alignment,
-      with residual departures confined to four or five structural-break events.
-      Note: the Student-t QQ y-axis spans ±25 standardised units because ν = 2.65
-      implies very heavy theoretical tails; this is expected, not an error.
+      Histogram of 6,287 daily log-returns with fitted Gaussian (blue) and Student-t (red, ν = 2.65)
+      PDFs, and the corresponding QQ plots. The Gaussian S-shape is the signature of fat tails.
+    </figcaption>
+  </div>
+
+  <div class="figure-box">
+    <img src="assets/img/week3_risk_comparison.png"
+         alt="VaR and ES at 95%, 97.5% and 99% for all five models" />
+    <figcaption>
+      VaR and ES at 95%, 97.5% (the FRTB ES level) and 99% for all five models. At the confidence
+      level the regulation actually uses, the Gaussian ES already sits 28% below the NIG's.
+    </figcaption>
+  </div>
+
+  <p>
+    The NIG is the best fit overall (ΔAIC −1,851) and the only model not rejected by
+    Kolmogorov-Smirnov. Sub-period fits split the four crises into two kinds: the GFC and COVID
+    produce ν near 2.3&ndash;2.6 and NIG α near 18&ndash;26 (clusters of extreme single days),
+    while the dot-com unwind and the rate-hike cycle look near-Gaussian (ν ≈ 6.5).
+  </p>
+</section>
+
+<!-- ── Weeks 4-5: Bayesian ─────────────────────────────────────── -->
+<section id="bayes">
+  <h2>Weeks 4&ndash;5 &mdash; Bayesian posteriors and predictive checks</h2>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="metric">(2.46, 2.87)</div>
+      <div class="metric-label">94% HDI for ν</div>
+      <div class="metric-note">The whole interval sits above the ν = 2 variance singularity. Finite variance is a stable property, not a knife-edge.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">β &lt; 0</div>
+      <div class="metric-label">NIG asymmetry, entire 94% HDI</div>
+      <div class="metric-note">(−8.75, −3.25). The left skew is a stable feature of the data, not a point estimate that could round to zero.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">11 / 11</div>
+      <div class="metric-label">Marginal PPC checks the NIG passes</div>
+      <div class="metric-note">Including skew and the FRTB 97.5% ES. The one failure, shared by all four models, is volatility clustering.</div>
+    </div>
+  </div>
+
+  <div class="figure-box">
+    <img src="assets/img/week5_ppc_risk.png"
+         alt="Posterior predictive VaR and ES bands for all four models" />
+    <figcaption>
+      Posterior predictive tail risk: each marker is a model's replicate median with its 94% band;
+      dashed lines are the observed values. The Gaussian misses everything beyond 95%; the NIG
+      band covers the truth on all six statistics.
+    </figcaption>
+  </div>
+
+  <p>
+    All four models sampled cleanly with NUTS (R-hat 1.00, effective sample sizes above 2,000);
+    the NIG required a custom PyTensor log-density through the modified Bessel function K₁ so the
+    sampler could differentiate through the full four-parameter distribution.
+  </p>
+</section>
+
+<!-- ── Week 6: calendar ────────────────────────────────────────── -->
+<section id="calendar">
+  <h2>Week 6 &mdash; When does the risk show up?</h2>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="metric">ν = 2.17</div>
+      <div class="metric-label">Monday's tail parameter</div>
+      <div class="metric-note">The week opens heavy (weekend gap) and calms into Friday's 3.10. Mon / midweek / Fri beats a pooled week at p &lt; 0.0001.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">20%</div>
+      <div class="metric-label">of variance is overnight, with the jumps</div>
+      <div class="metric-note">Closed-market returns: ν = 2.14, kurtosis 36. The open market carries 61% of variance but almost none of the jumps.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">R² = 0.64</div>
+      <div class="metric-label">Quarterly NIG δ on the VIX (logs)</div>
+      <div class="metric-note">Scale tracks implied volatility; the tail-decay parameters stay flat. Earnings seasons leave index volatility unchanged to the decimal.</div>
+    </div>
+  </div>
+
+  <div class="figure-box">
+    <img src="assets/img/week6_weekday_params.png"
+         alt="Volatility and Student-t tail parameter by weekday" />
+    <figcaption>
+      The shape of the week: annualised volatility falls Monday to Friday, and the tail parameter
+      rises, a clean staircase on every measure.
     </figcaption>
   </div>
 </section>
 
-<!-- ── Roadmap ────────────────────────────────────────────────── -->
-<section id="roadmap">
-  <h2>Roadmap</h2>
+<!-- ── Week 7: backtest ────────────────────────────────────────── -->
+<section id="backtest">
+  <h2>Week 7 &mdash; The rolling out-of-sample backtest</h2>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="metric">×2.6 → ×1.6</div>
+      <div class="metric-label">Excess 99% VaR violations, Gaussian → NIG</div>
+      <div class="metric-note">152 vs 91 violations against 58 expected, over 5,787 out-of-sample days (2002&ndash;2024).</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">0 / 12</div>
+      <div class="metric-label">Independence tests passed</div>
+      <div class="metric-note">Every model, every level, p &lt; 0.0001. Violations cluster in 2008 and 2020; a static marginal cannot time them.</div>
+    </div>
+    <div class="result-card">
+      <div class="metric">1.33</div>
+      <div class="metric-label">Gaussian ES shortfall ratio (97.5%)</div>
+      <div class="metric-note">Realised losses on breach days run 33% past the ES the model booked. Student-t: 0.97. NIG: 1.07.</div>
+    </div>
+  </div>
+
+  <div class="figure-box">
+    <img src="assets/img/week7_var_series.png"
+         alt="Rolling one-day 99% VaR forecasts and violations for all four models" />
+    <figcaption>
+      Rolling one-day 99% VaR forecasts (refit every 21 days on a 500-day window) against realised
+      returns, violations marked. The crosses bunch inside the GFC and COVID windows for every model.
+    </figcaption>
+  </div>
+
+  <div class="figure-box">
+    <img src="assets/img/week7_basel_traffic.png"
+         alt="Basel traffic light: rolling 250-day violation counts" />
+    <figcaption>
+      The Basel traffic light: trailing 250-day count of 99% violations. The Gaussian spends 31%
+      of two decades in the red zone, peaking at 32 violations; the NIG halves both numbers.
+    </figcaption>
+  </div>
+
   <p>
-    Weeks 3–4 introduce the Lévy models (VG, NIG) and conduct a full sub-period
-    distributional analysis across the four shock periods. Week 5 extends estimation
-    to Bayesian MCMC via PyMC (NUTS sampler), yielding posterior distributions over
-    all parameters and formal predictive accuracy comparison via PSIS-LOO.
-    Week 6 runs rolling VaR backtests and fits a regression of VG/NIG parameters
-    on the VIX index as a predictor of distributional regime. Week 7 produces the
-    final write-up.
+    Week 8 assembles the final write-up. The conclusion the backtest completes: a better marginal
+    fixes the size of tail risk, and only dynamics can fix its timing.
   </p>
 </section>
 
@@ -376,21 +546,21 @@
 <section id="references">
   <h2>References</h2>
   <p style="font-size:0.85rem; line-height:2;">
-    Madan, D. B., Carr, P. P. and Chang, E. C. (1998). The Variance Gamma Process and Option Pricing. <em>European Finance Review</em>, 2(1), 79–105.<br>
-    Cont, R. (2001). Empirical Properties of Asset Returns: Stylised Facts and Statistical Issues. <em>Quantitative Finance</em>, 1(2), 223–236.<br>
-    Christoffersen, P. F. (1998). Evaluating Interval Forecasts. <em>International Economic Review</em>, 39(4), 841–862.
+    Basel Committee on Banking Supervision (2013). Fundamental Review of the Trading Book. Bank for International Settlements.<br>
+    Christoffersen, P. F. (1998). Evaluating Interval Forecasts. <em>International Economic Review</em>, 39(4), 841&ndash;862.<br>
+    Cont, R. (2001). Empirical Properties of Asset Returns: Stylised Facts and Statistical Issues. <em>Quantitative Finance</em>, 1(2), 223&ndash;236.<br>
+    Madan, D. B., Carr, P. P. and Chang, E. C. (1998). The Variance Gamma Process and Option Pricing. <em>European Finance Review</em>, 2(1), 79&ndash;105.
   </p>
 </section>
 
 <footer>
   <span>Beyond Black-Scholes · BSc Financial Mathematics and Economics · 2026</span>
-  <span><a href="https://github.com/YOUR_USERNAME/levy-project" target="_blank">GitHub</a></span>
+  <span><a href="https://github.com/darraghmoran2025/Applied_Statistics_Project" target="_blank">GitHub</a></span>
 </footer>
 
 <!-- ── Trace canvas sketch ── -->
 <script>
-  // Placeholder trace — replaced with real data in Week 4
-  // Draws a synthetic noisy signal to illustrate the layout
+  // Stylised sketch of the return series; the real data appears in the figures
   (function () {
     const canvas = document.getElementById("trace");
     if (!canvas) return;
