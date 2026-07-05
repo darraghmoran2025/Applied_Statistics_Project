@@ -47,7 +47,13 @@ week6/
   writeup/  - Week6_Results.md
   data/     - cached OHLC and VIX, quarterly parameter panel (gitignored)
 
-week7/      - Rolling VaR backtest (Christoffersen)  [upcoming]
+week7/
+  code/     - week7_backtest.py (rolling VaR backtest, Christoffersen tests)
+  figures/  - VaR forecasts with violations, Basel traffic light,
+              cumulative violation curves
+  writeup/  - Week7_Backtest.md
+  data/     - daily forecast/hit series, test tables (gitignored)
+
 week8/      - Final write-up  [upcoming]
 ```
 
@@ -61,7 +67,7 @@ week8/      - Final write-up  [upcoming]
 | 4 | Bayesian estimation (PyMC/NUTS) | Complete |
 | 5 | Posterior predictive checks; diagnostics | Complete |
 | 6 | Weekday and open/close structure; quarterly parameter regressions; earnings windows | Complete |
-| 7 | Rolling VaR backtest (Christoffersen) | Upcoming |
+| 7 | Rolling VaR backtest (Christoffersen) | Complete |
 | 8 | Final write-up | Upcoming |
 
 ## Week 1
@@ -214,6 +220,35 @@ python week6/code/week6_weekday.py
 python week6/code/week6_open_close.py
 python week6/code/week6_param_regressions.py
 python week6/code/week6_earnings.py
+```
+
+## Week 7
+
+Puts the models to work out of sample: a rolling 500-day window, refitted
+every 21 days, issues one-day-ahead VaR forecasts at 95%, 97.5% and 99% for
+5,787 days (2002-2024), scored with the Christoffersen (1998) likelihood-ratio
+framework, the Basel traffic light and an FRTB-style ES comparison.
+Write-up: `Week7_Backtest.md`. Key findings:
+
+- At 95% the Gaussian and NIG pass unconditional coverage; the Student-t is
+  the worst model at that level (358 hits vs 289 expected) because its heavy
+  tail (nu near 2.6) thins the shoulders where the 5% quantile lives.
+- At 99% the Gaussian collapses: 152 violations against 58 expected, a factor
+  of 2.6 (LR_uc = 107). The NIG is closest at 91 (factor 1.57), yet even it is
+  rejected on coverage.
+- Every model fails the independence test at every level (all p < 0.0001).
+  Violations arrive in bursts (late 2008, March 2020), not as a trickle:
+  the out-of-sample counterpart of the Week 5 volatility-clustering failure.
+- Basel traffic light: the Gaussian spends 31% of days in the red zone with a
+  worst 250-day count of 32 violations; the NIG spends 14% with a worst of 15.
+- FRTB ES check at 97.5%: realised losses on breach days are 33% deeper than
+  the Gaussian's booked ES (ratio 1.33); Student-t 0.97, NIG 1.07.
+
+### Running Week 7
+
+```bash
+pip install numpy pandas scipy matplotlib
+python week7/code/week7_backtest.py
 ```
 
 ## Key references
