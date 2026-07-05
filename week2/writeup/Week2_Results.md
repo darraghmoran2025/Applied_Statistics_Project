@@ -27,10 +27,10 @@ I fitted both models by Maximum Likelihood Estimation (MLE). Tables 1 and 2 repo
 | Parameter | Estimate | Standard Error | t-statistic |
 |-----------|----------|----------------|-------------|
 | μ (daily drift) | +0.000223 | 0.000154 | 1.45 |
-| σ (scale) | 0.012234 | 0.000109 | — |
-| Log-likelihood | 18,764.3 | — | — |
-| AIC | −37,524.5 | — | — |
-| BIC | −37,511.0 | — | — |
+| σ (scale) | 0.012234 | 0.000109 |  |
+| Log-likelihood | 18,764.3 |  |  |
+| AIC | −37,524.5 |  |  |
+| BIC | −37,511.0 |  |  |
 
 The Gaussian results are unsurprising. The daily drift of +0.022% is indistinguishable from zero (t-statistic 1.45), which is what you'd expect in an efficient market. Annualised volatility comes out at 19.4%, in line with long-run S&P 500 figures.
 
@@ -39,11 +39,11 @@ The Gaussian results are unsurprising. The daily drift of +0.022% is indistingui
 | Parameter | Estimate | Standard Error | 95% CI |
 |-----------|----------|----------------|--------|
 | ν (degrees of freedom) | 2.648 | 0.110 | (2.43, 2.87) |
-| μ (location) | +0.000656 | 0.000110 | — |
-| σ (scale) | 0.007077 | 0.000128 | — |
-| Log-likelihood | 19,666.7 | — | — |
-| AIC | −39,327.5 | — | — |
-| BIC | −39,307.2 | — | — |
+| μ (location) | +0.000656 | 0.000110 |  |
+| σ (scale) | 0.007077 | 0.000128 |  |
+| Log-likelihood | 19,666.7 |  |  |
+| AIC | −39,327.5 |  |  |
+| BIC | −39,307.2 |  |  |
 
 The key result is ν̂ = 2.648. The confidence interval stays above 2 at the lower end, so the variance is technically finite. But 2.648 is below 3, which means skewness is formally undefined, and well below 4, which means kurtosis is formally undefined too. The data is consistent with a distribution of infinite kurtosis.
 

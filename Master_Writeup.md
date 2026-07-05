@@ -4,7 +4,7 @@
 
 ## Abstract
 
-Daily stock returns are not Gaussian, and the difference is expensive. This project fits five distributional models to 6,287 daily S&P 500 log-returns from January 2000 to December 2024: the Gaussian benchmark that underlies Black-Scholes, the Laplace, the Student-t, and two Lévy models built by Brownian subordination, the Variance-Gamma (Madan, Carr and Chang, 1998) and the Normal Inverse Gaussian. Estimation is carried out twice, by maximum likelihood and again in a Bayesian setting with the No-U-Turn Sampler, so the headline parameters arrive with full posteriors rather than point estimates. The fitted Student-t degrees of freedom is 2.648, with a 94% credible interval of (2.46, 2.87) sitting entirely above the variance singularity at 2: the tails are heavy, and the variance is finite. At the 99% level the Gaussian understates Expected Shortfall by 79.5% against the Student-t and by 37% against the NIG, the only model that survives every in-sample goodness-of-fit and posterior predictive check. A rolling out-of-sample backtest of one-day Value-at-Risk over 5,787 days, scored with the Christoffersen (1998) conditional coverage framework, confirms both halves of the story: the Gaussian produces 2.6 times the nominal number of 99% violations while the NIG cuts the excess to 1.6, yet every model, at every level, fails the independence test, because no static distribution can time the volatility clustering documented by Cont (2001). Choosing a heavier marginal therefore improves the measurement of tail risk by amounts that matter under the FRTB metrics (BCBS, 2013); what it cannot buy is the timing of that risk, which belongs to dynamics.
+Daily stock returns are not Gaussian, and the difference is expensive. In this project I fit five distributional models to 6,287 daily S&P 500 log-returns from January 2000 to December 2024: the Gaussian benchmark that underlies Black-Scholes, the Laplace, the Student-t, and two Lévy models built by Brownian subordination, the Variance-Gamma (Madan, Carr and Chang, 1998) and the Normal Inverse Gaussian. I estimated everything twice, by maximum likelihood and again in a Bayesian setting with the No-U-Turn Sampler, so the headline parameters come with full posteriors rather than point estimates. The fitted Student-t degrees of freedom is 2.648, with a 94% credible interval of (2.46, 2.87) sitting entirely above the variance singularity at 2: the tails are heavy, and the variance is finite. At the 99% level the Gaussian understates Expected Shortfall by 79.5% against the Student-t and by 37% against the NIG, the only model that survived every goodness-of-fit and posterior predictive check I ran. A rolling out-of-sample backtest of one-day Value-at-Risk over 5,787 days, scored with the Christoffersen (1998) conditional coverage framework, confirms both halves of the story: the Gaussian produces 2.6 times the nominal number of 99% violations while the NIG cuts the excess to 1.6, yet every model, at every level, fails the independence test, because no static distribution can time the volatility clustering documented by Cont (2001). Choosing a heavier marginal therefore improves the measurement of tail risk by amounts that matter under the FRTB metrics (BCBS, 2013); what it cannot buy is the timing of that risk, which belongs to dynamics.
 
 ---
 
@@ -134,10 +134,10 @@ I fitted both models by Maximum Likelihood Estimation (MLE). Tables 1 and 2 repo
 | Parameter | Estimate | Standard Error | t-statistic |
 |-----------|----------|----------------|-------------|
 | μ (daily drift) | +0.000223 | 0.000154 | 1.45 |
-| σ (scale) | 0.012234 | 0.000109 | — |
-| Log-likelihood | 18,764.3 | — | — |
-| AIC | −37,524.5 | — | — |
-| BIC | −37,511.0 | — | — |
+| σ (scale) | 0.012234 | 0.000109 |  |
+| Log-likelihood | 18,764.3 |  |  |
+| AIC | −37,524.5 |  |  |
+| BIC | −37,511.0 |  |  |
 
 The Gaussian results are unsurprising. The daily drift of +0.022% is indistinguishable from zero (t-statistic 1.45), which is what you'd expect in an efficient market. Annualised volatility comes out at 19.4%, in line with long-run S&P 500 figures.
 
@@ -146,11 +146,11 @@ The Gaussian results are unsurprising. The daily drift of +0.022% is indistingui
 | Parameter | Estimate | Standard Error | 95% CI |
 |-----------|----------|----------------|--------|
 | ν (degrees of freedom) | 2.648 | 0.110 | (2.43, 2.87) |
-| μ (location) | +0.000656 | 0.000110 | — |
-| σ (scale) | 0.007077 | 0.000128 | — |
-| Log-likelihood | 19,666.7 | — | — |
-| AIC | −39,327.5 | — | — |
-| BIC | −39,307.2 | — | — |
+| μ (location) | +0.000656 | 0.000110 |  |
+| σ (scale) | 0.007077 | 0.000128 |  |
+| Log-likelihood | 19,666.7 |  |  |
+| AIC | −39,327.5 |  |  |
+| BIC | −39,307.2 |  |  |
 
 The key result is ν̂ = 2.648. The confidence interval stays above 2 at the lower end, so the variance is technically finite. But 2.648 is below 3, which means skewness is formally undefined, and well below 4, which means kurtosis is formally undefined too. The data is consistent with a distribution of infinite kurtosis.
 
@@ -1052,11 +1052,11 @@ The crisis-window weekday cuts run on small samples, down to 20 Mondays for COVI
 
 ## 1. Overview
 
-Everything up to now has been in-sample: fit a distribution to the full history, read the risk numbers off the fitted tail. This week the models finally had to work for a living. Each one was refitted on a rolling 500-day window and asked, every day from January 2002 to December 2024, for tomorrow's Value-at-Risk. That gives 5,787 genuine out-of-sample forecasts per model per confidence level, and a hit sequence of days where the realised return fell below the forecast. Christoffersen's (1998) framework then asks the two questions that matter about that sequence: are there the right *number* of violations, and do they arrive *independently*? A model can only be called correct if the answer to both is yes.
+Everything up to now has been in-sample: fit a distribution to the full history, read the risk numbers off the fitted tail. This week I made the models work for a living. I refitted each one on a rolling 500-day window and asked it, every day from January 2002 to December 2024, for tomorrow's Value-at-Risk. That gave me 5,787 genuine out-of-sample forecasts per model per confidence level, and a hit sequence of days where the realised return fell below the forecast. Christoffersen's (1998) framework then asks the two questions that matter about that sequence: are there the right *number* of violations, and do they arrive *independently*? A model can only be called correct if the answer to both is yes.
 
-This also puts the last of the four references to work. Christoffersen (1998) has been in the bibliography since Week 1 waiting for exactly this exercise.
+This also puts the last of the four references to work. Christoffersen (1998) has been sitting in my bibliography since Week 1 waiting for exactly this exercise.
 
-The models are the four from the Bayesian arc: Gaussian, Laplace, Student-t and NIG, with the Laplace again standing in for the Variance-Gamma family as its symmetric special case. Windows were refitted every 21 trading days, roughly the monthly update cycle a risk desk would run, and the forecasts held fixed between refits.
+The models are the four from the Bayesian arc: Gaussian, Laplace, Student-t and NIG, with the Laplace again standing in for the Variance-Gamma family as its symmetric special case. I refitted every 21 trading days, roughly the monthly update cycle a risk desk would run, and held the forecasts fixed between refits.
 
 The headline is a clean split. Rolling refits repair the *number* of violations at the 95% level for the Gaussian and the NIG, and the NIG comes closest at 99%. But every model, at every level, fails the independence test outright. The violations do not arrive as a trickle; they arrive as bursts in late 2008 and March 2020. A rolling window drags the whole distribution towards yesterday's volatility, but a month too late. The missing ingredient is not a heavier tail. It is conditional volatility, and no static marginal, however well chosen, can supply it.
 
@@ -1064,11 +1064,11 @@ The headline is a clean split. Rolling refits repair the *number* of violations 
 
 ## 2. Design
 
-The window is 500 trading days, about two years: long enough for a stable four-parameter NIG fit, short enough to adapt across regimes. Models are refitted every 21 trading days and the parameters held in between. Each day's forecast is one-day-ahead VaR at 95%, 97.5% and 99%, read off the fitted distribution's quantile (closed form for the Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG). A violation is a realised return strictly below the forecast.
+I chose a window of 500 trading days, about two years: long enough for a stable four-parameter NIG fit, short enough to adapt across regimes. I refitted every 21 trading days and held the parameters in between. Each day's forecast is one-day-ahead VaR at 95%, 97.5% and 99%, read off the fitted distribution's quantile (closed form for the Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG). A violation is a realised return strictly below the forecast.
 
-One numerical note. On calm windows the rolling NIG regularly lands on its Gaussian-limit ridge (very large α with big standard errors), the same weakly identified regime the quarterly fits found in Week 6. scipy's generic NIG quantile fails to converge there, so the quantile is solved by hand: bracket using the NIG's own mean and standard deviation, then Brent's method on the CDF. On the ridge the quantile smoothly approaches the Gaussian one, which is the right behaviour.
+One numerical fight worth recording. On calm windows the rolling NIG regularly lands on its Gaussian-limit ridge (very large α with big standard errors), the same weakly identified regime my quarterly fits found in Week 6. scipy's generic NIG quantile refused to converge there, so I solved the quantile myself: bracket the root using the NIG's own mean and standard deviation, then run Brent's method on the CDF. On the ridge the quantile smoothly approaches the Gaussian one, which is the behaviour I wanted.
 
-Three likelihood-ratio tests per model and level, following Christoffersen (1998):
+I ran three likelihood-ratio tests per model and level, following Christoffersen (1998):
 
 - **LR_uc** (Kupiec, unconditional coverage): is the violation rate equal to the nominal 5%, 2.5% or 1%? Chi-squared, 1 df.
 - **LR_ind** (independence): is the chance of a violation today unaffected by whether yesterday was a violation, against a first-order Markov alternative? Chi-squared, 1 df.
@@ -1095,11 +1095,11 @@ Three likelihood-ratio tests per model and level, following Christoffersen (1998
 | NIG | 97.5% | 145 | 177 | 3.06% | 6.92 | 0.009 | 31.9 | <0.0001 | 38.8 | <0.0001 |
 | NIG | 99% | 58 | 91 | 1.57% | 16.3 | 0.0001 | 19.3 | <0.0001 | 35.6 | <0.0001 |
 
-Three things stand out.
+Three things stood out to me.
 
 At 95% the Gaussian is fine and the Student-t is the worst model in the table. That inversion is worth dwelling on. The full-sample Student-t carries ν = 2.648, a tail heavy enough to flirt with infinite kurtosis. A distribution with that much mass far out in the tail has to take it from somewhere, and it takes it from the shoulders: its 5% quantile sits *closer to zero* than the Gaussian's for the same data. So at the everyday 95% level the t under-covers (358 hits against 289 expected, rejected at p = 0.0001) while the thin-tailed Gaussian, which spends its probability exactly where the 5% quantile lives, passes comfortably (p = 0.27). Heavy tails are a statement about extremes, and they carry a cost at moderate quantiles.
 
-At 99% the ordering flips and the Gaussian collapses. It produces 152 violations where 58 were expected, a factor of 2.6, with LR_uc = 106.9. This is the out-of-sample counterpart of the 79.5% ES gap from Week 2: the Gaussian tail is simply too short where it matters. The NIG does best (91 hits, a factor of 1.57), then Student-t (104) and Laplace (110). Note that even the NIG is rejected on pure coverage at 99%; a static tail fitted to the last two years is still too short when the regime breaks.
+At 99% the ordering flips and the Gaussian collapses. It produces 152 violations where 58 were expected, a factor of 2.6, with LR_uc = 106.9. This is the out-of-sample counterpart of the 79.5% ES gap from Week 2: the Gaussian tail is simply too short where it matters. The NIG does best (91 hits, a factor of 1.57), then Student-t (104) and Laplace (110). Even the NIG is rejected on pure coverage at 99%; a static tail fitted to the last two years is still too short when the regime breaks.
 
 And every cell of the LR_ind column is a rejection. More on that next.
 
@@ -1119,7 +1119,7 @@ Figure 2 shows the same fact cumulatively. Violations accrue as staircases: flat
 
 *Figure 2. Cumulative violations at 95% (left) and 99% (right) against the nominal accrual (dashed). The GFC and COVID verticals are the independence failure made visible.*
 
-This is the out-of-sample confirmation of the Week 5 posterior predictive result. There, all four models failed the one dependence statistic in the battery (the lag-1 autocorrelation of squared returns, observed 0.32 against replicate bands centred on zero) while the NIG passed every marginal check. Here the same split reappears with real forecasts: the NIG gets the closest to the right number of violations, and still fails their timing, because a 500-day window updated monthly cannot chase volatility that doubles inside a week. Cont's (2001) volatility clustering is exactly the stylised fact these iid models were built without, and the backtest sends the bill.
+This is the out-of-sample confirmation of my Week 5 posterior predictive result. There, all four models failed the one dependence statistic in the battery (the lag-1 autocorrelation of squared returns, observed 0.32 against replicate bands centred on zero) while the NIG passed every marginal check. Here the same split reappears with real forecasts: the NIG gets the closest to the right number of violations, and still fails their timing, because a 500-day window updated monthly cannot chase volatility that doubles inside a week. Cont's (2001) volatility clustering is exactly the stylised fact these iid models were built without, and the backtest sends the bill.
 
 ---
 
@@ -1146,7 +1146,7 @@ A Gaussian desk spends almost a third of the 23 years in the red zone, and its w
 
 ## 6. Expected Shortfall at 97.5%: what the models promised
 
-FRTB (BCBS, 2013) replaces 99% VaR with 97.5% ES as the capital metric, so the last check compares, on the days each model's 97.5% VaR was breached, the average realised loss with the average ES the model had forecast for those same days. A ratio above 1 means the tail bit harder than promised.
+FRTB (BCBS, 2013) replaces 99% VaR with 97.5% ES as the capital metric, so my last check compares, on the days each model's 97.5% VaR was breached, the average realised loss with the average ES the model had forecast for those same days. A ratio above 1 means the tail bit harder than promised.
 
 **Table 3. Realised versus forecast losses on 97.5% breach days.**
 
@@ -1163,13 +1163,15 @@ The Gaussian falls short twice over: too many breach days (223 against 145 expec
 
 ## 7. Where this leaves the project
 
-The backtest completes an argument that has been building since Week 2:
+The backtest completes an argument I have been building since Week 2:
 
 1. The full-sample tail is heavy (ν = 2.648) and the Gaussian understates 99% ES by 79.5% in-sample (Week 2). Out of sample, that shows up as 2.6 times too many 99% violations and realised breach losses 33% beyond the booked ES.
 2. Choosing a better marginal genuinely helps. The NIG cuts the excess 99% violations from a factor 2.6 to 1.57, spends half as much time in the Basel red zone, and prices its own breaches to within 7%.
 3. No marginal is enough. Every model fails Christoffersen's independence test at every level, because iid models, however heavy their tails, put the violations in the wrong places. The failure is not the size of the tail but its timing, and the timing is volatility clustering.
 
-Point 3 is the honest limit of the project's model class, established formally in-sample in Week 5 and now out-of-sample here. It is also the natural closing argument for the write-up: the Lévy marginals fix what is fixable at the level of a static distribution, and what remains is, by construction, dynamics.
+Point 3 is the honest limit of the model class I have been working with, established formally in-sample in Week 5 and now out-of-sample here. It also hands me the closing argument for the final write-up: the Lévy marginals fix what is fixable at the level of a static distribution, and what remains is, by construction, dynamics.
+
+---
 
 ---
 
@@ -1177,7 +1179,7 @@ Point 3 is the honest limit of the project's model class, established formally i
 
 ## 1. The consolidated scorecard
 
-Every model has now been examined four ways: in-sample fit by maximum likelihood (Weeks 2 and 3), full Bayesian posteriors (Week 4), posterior predictive checks against the observed data (Week 5), and a rolling out-of-sample VaR backtest (Week 7). Table 1 puts the whole project on one page. The Variance-Gamma's Bayesian and backtest columns are carried by the Laplace, its symmetric special case (θ = 0, ν = 1), which is how the VG family was represented from Week 4 onward.
+I have now examined every model four ways: in-sample fit by maximum likelihood (Weeks 2 and 3), full Bayesian posteriors (Week 4), posterior predictive checks against the observed data (Week 5), and a rolling out-of-sample VaR backtest (Week 7). Table 1 puts the whole project on one page. The Variance-Gamma's Bayesian and backtest columns are carried by the Laplace, its symmetric special case (θ = 0, ν = 1), which is how I represented the VG family from Week 4 onward.
 
 **Table 1. The five models across the full project. ΔAIC is against the Gaussian (more negative is better); KS is the Kolmogorov-Smirnov test on the full sample; PPC summarises the Week 5 posterior predictive checks; the backtest columns are the Week 7 rolling one-day 99% VaR results over 5,787 out-of-sample days (58 violations expected) and the 97.5% ES shortfall ratio (realised loss over promised ES on breach days; 1 is honest).**
 
@@ -1197,22 +1199,22 @@ Every model has now been examined four ways: in-sample fit by maximum likelihood
 
 The Gaussian assumption fails where it is most expensive. The full-sample Student-t degrees of freedom is ν = 2.648, and the Bayesian posterior places the entire 94% interval at (2.46, 2.87): heavy tails with a finite variance, as a stable population property rather than a point estimate. The price of ignoring this is concentrated in the tail the regulation cares about. In-sample, the Gaussian understates 99% Expected Shortfall by 79.5% against the Student-t; out-of-sample it produces 2.6 times the nominal number of 99% VaR violations, spends 31% of two decades in the Basel red zone, and books an ES one third smaller than the losses realised on its own breach days.
 
-Most of the gain is exponential tails; the last part is the NIG's. The two-parameter Laplace, with the same parameter count as the Gaussian, captures 96% of the best model's AIC improvement: simply replacing thin tails with exponential ones does most of the work. The NIG earns the rest with genuine structure. It is the only model to pass the KS test and every posterior predictive check including skew and the FRTB 97.5% ES, its posterior asymmetry β is negative across its whole credible interval, and out of sample it comes closest to the nominal violation count at every level. Between them sits an instructive anomaly: the Student-t, at the everyday 95% level, is the *worst* forecaster in the table, because a tail heavy enough to cover crashes thins the shoulders where the 5% quantile lives. Tail heaviness is a budget, not a free improvement.
+Most of the gain is exponential tails; the last part is the NIG's. The two-parameter Laplace, with the same parameter count as the Gaussian, captures 96% of the best model's AIC improvement: simply replacing thin tails with exponential ones does most of the work. The NIG earns the rest with genuine structure. It is the only model to pass the KS test and every posterior predictive check including skew and the FRTB 97.5% ES, its posterior asymmetry β is negative across its whole credible interval, and out of sample it comes closest to the nominal violation count at every level. Between them sits the anomaly I found most instructive: the Student-t, at the everyday 95% level, is the *worst* forecaster in the table, because a tail heavy enough to cover crashes thins the shoulders where the 5% quantile lives. Tail heaviness is a budget, not a free improvement.
 
 No static distribution passes the timing test. Every model fails Christoffersen's independence test at every confidence level, in-sample (the Week 5 volatility clustering check) and out-of-sample (Week 7) alike. Violations arrive in bursts, in late 2008 and March 2020, exactly as Cont's (2001) volatility clustering says they must and exactly as Christoffersen (1998) found for the static forecasts in his original application. A rolling window softens this but cannot fix it: refitting monthly on two years of data always arrives about a month late to a regime change. What stays wrong after the marginal is fixed is the arrival pattern of the violations, and that is a property of dynamics, which an independent-increments model discards by construction.
 
 ## 3. Limitations
 
-The results carry five caveats worth stating plainly.
+There are five caveats I want to state plainly.
 
 - One index, one frequency. Everything rests on daily log-returns of a single equity index. Cont (2001) documents that some stylised facts (the gain/loss asymmetry in particular) are equity-specific, so the parameter values, and especially the skew findings, should not be assumed to transfer to other asset classes. Weekly aggregation already lightens the tail (ν rises from 2.65 to 3.4 in Week 6), so conclusions are horizon-specific too.
-- The model class is iid by design. The project deliberately tests what a static marginal distribution can and cannot do, and the independence failures are the honest boundary of that design. The models do not condition on volatility state, and the backtest results quantify the cost of that choice rather than escape it.
+- The model class is iid by design. I deliberately set out to test what a static marginal distribution can and cannot do, and the independence failures are the honest boundary of that design. The models do not condition on volatility state, and the backtest results quantify the cost of that choice rather than escape it.
 - Sub-sample fits are sometimes weakly identified. In calm windows the NIG runs into its Gaussian-limit ridge, where α and δ grow large with enormous standard errors and only their product is pinned down. Roughly a third of the Week 6 quarterly fits sit on that ridge, and the rolling backtest windows regularly do as well; quantile forecasts remain well behaved there, but individual parameter readings from calm periods should not be over-interpreted.
-- Backtest design choices matter. The 500-day window and 21-day refit cycle are conventional but not innocent: a shorter window adapts faster at the cost of noisier four-parameter fits, and results at the margins would shift. The Basel traffic-light figures are descriptive; the full regulatory apparatus around the multiplier is not implemented here.
-- The Bayesian arc represents the VG family by its Laplace special case. The full four-parameter VG was fitted by maximum likelihood only; its posterior and backtest behaviour are inferred from its family rather than sampled directly. Given that the full-sample VG sits between the Laplace and the NIG on every in-sample measure, this is unlikely to change any ranking, but it is a corner the project cut knowingly.
+- Backtest design choices matter. The 500-day window and 21-day refit cycle are conventional but not innocent: a shorter window adapts faster at the cost of noisier four-parameter fits, and results at the margins would shift. The Basel traffic-light figures are descriptive; I did not implement the full regulatory apparatus around the multiplier.
+- The Bayesian arc represents the VG family by its Laplace special case. The full four-parameter VG was fitted by maximum likelihood only; its posterior and backtest behaviour are inferred from its family rather than sampled directly. Given that the full-sample VG sits between the Laplace and the NIG on every in-sample measure, this is unlikely to change any ranking, but it is a corner I cut knowingly.
 
 ## 4. Closing remark
 
-The project set out to ask whether heavy-tailed Lévy models materially improve tail risk measurement under the Basel metrics. They do, by amounts that would change a capital number: roughly a third more Expected Shortfall at the FRTB's own confidence level, and half the regulatory red-zone time out of sample. The same battery of tests also locates what a better marginal cannot buy: the arrival times of the violations, which no independent-increments model can place. That division of labour, measured on one dataset with one consistent toolkit, is the contribution of this work.
+I set out to ask whether heavy-tailed Lévy models materially improve tail risk measurement under the Basel metrics. They do, by amounts that would change a capital number: roughly a third more Expected Shortfall at the FRTB's own confidence level, and half the regulatory red-zone time out of sample. The same battery of tests also showed me what a better marginal cannot buy: the arrival times of the violations, which no independent-increments model can place. That division of labour, measured on one dataset with one consistent toolkit, is what this project contributes.
 
 ---
