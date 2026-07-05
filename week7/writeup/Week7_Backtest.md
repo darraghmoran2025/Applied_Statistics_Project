@@ -14,10 +14,7 @@ The headline is a clean split. Rolling refits repair the *number* of violations 
 
 ## 2. Design
 
-- **Window**: 500 trading days (about two years), long enough for a stable four-parameter NIG fit, short enough to adapt across regimes.
-- **Refit**: every 21 trading days; parameters held between refits.
-- **Forecast**: one-day-ahead VaR at 95%, 97.5% and 99%, computed as the corresponding quantile of the fitted distribution (closed form for Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG).
-- **Violation**: realised return strictly below the VaR forecast.
+The window is 500 trading days, about two years: long enough for a stable four-parameter NIG fit, short enough to adapt across regimes. Models are refitted every 21 trading days and the parameters held in between. Each day's forecast is one-day-ahead VaR at 95%, 97.5% and 99%, read off the fitted distribution's quantile (closed form for the Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG). A violation is a realised return strictly below the forecast.
 
 One numerical note. On calm windows the rolling NIG regularly lands on its Gaussian-limit ridge (very large α with big standard errors), the same weakly identified regime the quarterly fits found in Week 6. scipy's generic NIG quantile fails to converge there, so the quantile is solved by hand: bracket using the NIG's own mean and standard deviation, then Brent's method on the CDF. On the ridge the quantile smoothly approaches the Gaussian one, which is the right behaviour.
 
@@ -50,11 +47,11 @@ Three likelihood-ratio tests per model and level, following Christoffersen (1998
 
 Three things stand out.
 
-**At 95% the Gaussian is fine and the Student-t is the worst model in the table.** That inversion is worth dwelling on. The full-sample Student-t carries ν = 2.648, a tail heavy enough to flirt with infinite kurtosis. A distribution with that much mass far out in the tail has to take it from somewhere, and it takes it from the shoulders: its 5% quantile sits *closer to zero* than the Gaussian's for the same data. So at the everyday 95% level the t under-covers (358 hits against 289 expected, rejected at p = 0.0001) while the thin-tailed Gaussian, which spends its probability exactly where the 5% quantile lives, passes comfortably (p = 0.27). Heavy tails are a statement about extremes, and they carry a cost at moderate quantiles.
+At 95% the Gaussian is fine and the Student-t is the worst model in the table. That inversion is worth dwelling on. The full-sample Student-t carries ν = 2.648, a tail heavy enough to flirt with infinite kurtosis. A distribution with that much mass far out in the tail has to take it from somewhere, and it takes it from the shoulders: its 5% quantile sits *closer to zero* than the Gaussian's for the same data. So at the everyday 95% level the t under-covers (358 hits against 289 expected, rejected at p = 0.0001) while the thin-tailed Gaussian, which spends its probability exactly where the 5% quantile lives, passes comfortably (p = 0.27). Heavy tails are a statement about extremes, and they carry a cost at moderate quantiles.
 
-**At 99% the ordering flips and the Gaussian collapses.** It produces 152 violations where 58 were expected, a factor of 2.6, with LR_uc = 106.9. This is the out-of-sample counterpart of the 79.5% ES gap from Week 2: the Gaussian tail is simply too short where it matters. The NIG does best (91 hits, a factor of 1.57), then Student-t (104) and Laplace (110). Note that even the NIG is rejected on pure coverage at 99%; a static tail fitted to the last two years is still too short when the regime breaks.
+At 99% the ordering flips and the Gaussian collapses. It produces 152 violations where 58 were expected, a factor of 2.6, with LR_uc = 106.9. This is the out-of-sample counterpart of the 79.5% ES gap from Week 2: the Gaussian tail is simply too short where it matters. The NIG does best (91 hits, a factor of 1.57), then Student-t (104) and Laplace (110). Note that even the NIG is rejected on pure coverage at 99%; a static tail fitted to the last two years is still too short when the regime breaks.
 
-**Every cell of the LR_ind column is a rejection.** More on that next.
+And every cell of the LR_ind column is a rejection. More on that next.
 
 ![Figure 1. 99% VaR forecasts and violations per model.](../figures/week7_var_series.png)
 

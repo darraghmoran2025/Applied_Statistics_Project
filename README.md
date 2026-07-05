@@ -237,8 +237,8 @@ Write-up: `Week7_Backtest.md`. Key findings:
   of 2.6 (LR_uc = 107). The NIG is closest at 91 (factor 1.57), yet even it is
   rejected on coverage.
 - Every model fails the independence test at every level (all p < 0.0001).
-  Violations arrive in bursts (late 2008, March 2020), not as a trickle:
-  the out-of-sample counterpart of the Week 5 volatility-clustering failure.
+  Violations arrive in bursts (late 2008, March 2020), the out-of-sample
+  counterpart of the Week 5 volatility-clustering failure.
 - Basel traffic light: the Gaussian spends 31% of days in the red zone with a
   worst 250-day count of 32 violations; the NIG spends 14% with a worst of 15.
 - FRTB ES check at 97.5%: realised losses on breach days are 33% deeper than
