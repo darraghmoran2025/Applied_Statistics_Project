@@ -54,7 +54,9 @@ week7/
   writeup/  - Week7_Backtest.md
   data/     - daily forecast/hit series, test tables (gitignored)
 
-week8/      - Final write-up  [upcoming]
+week8/
+  code/     - generate_final_report.py (renders the report to Word)
+  writeup/  - Final_Report.md (the standalone research paper)
 ```
 
 ## Weekly progress
@@ -68,7 +70,7 @@ week8/      - Final write-up  [upcoming]
 | 5 | Posterior predictive checks; diagnostics | Complete |
 | 6 | Weekday and open/close structure; quarterly parameter regressions; earnings windows | Complete |
 | 7 | Rolling VaR backtest (Christoffersen) | Complete |
-| 8 | Final write-up | Upcoming |
+| 8 | Final write-up | In progress |
 
 ## Week 1
 
@@ -249,6 +251,25 @@ Write-up: `Week7_Backtest.md`. Key findings:
 ```bash
 pip install numpy pandas scipy matplotlib
 python week7/code/week7_backtest.py
+```
+
+## Week 8
+
+The final write-up: a standalone research paper that reorganises the whole
+project by topic rather than by week. Structure: introduction and stylised
+facts; data; the five-model hierarchy and what each comparison isolates;
+estimation (MLE and Bayesian, including the custom NIG log-density); in-sample
+results (fits, risk measures, posteriors, posterior predictive checks);
+parameter instability (crisis sub-periods, yearly and quarterly fits, the
+calendar); the rolling out-of-sample backtest; conclusions with a one-page
+scorecard and limitations. Eleven figures are reused from the weekly folders.
+Write-up: `Final_Report.md`; Word render via `generate_final_report.py`
+(the docx itself is not tracked).
+
+### Rendering Week 8
+
+```bash
+python week8/code/generate_final_report.py
 ```
 
 ## Key references
