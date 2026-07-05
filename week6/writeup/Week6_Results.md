@@ -9,13 +9,13 @@ This week I looked at the same 6,287 daily S&P 500 log-returns from a different 
 3. Can I explain the fitted Lévy parameters with a regression, one parameter at a time, starting with the NIG δ?
 4. Do quarterly earnings seasons move index volatility?
 
-Short answers: yes, Monday / midweek / Friday is exactly the right cut; the market is only open for three fifths of its variance and almost none of its jumps; δ is mostly a VIX story and the skew parameters turn out to follow the VIX too once there is enough data; and earnings seasons do nothing at the index level, which turned out to be the most interesting null of the project so far.
+Short answers: yes, Monday / midweek / Friday is exactly the right cut; the market is only open for three fifths of its variance and almost none of its jumps; δ is mostly a VIX story and the skew parameters turn out to follow the VIX too once there is enough data. Earnings season was perhaps the most weakly informative out of all the test, and do nothing at the index level. However, this turned out to be the most interesting null of the project so far.
 
 ---
 
 ## 2. The shape of the week
 
-I fitted the Gaussian and the Student-t to each weekday separately. One thing to keep in mind: a Monday return runs from Friday's close to Monday's close, so the whole weekend is inside it.
+I fitted the Gaussian and the Student-t to each weekday separately. Note: a Monday return runs from Friday's close to Monday's close, so the whole weekend is inside it.
 
 **Table 1. Per-weekday MLEs, 2000-2024. Mean in basis points per day, σ annualised.**
 
@@ -27,7 +27,9 @@ I fitted the Gaussian and the Student-t to each weekday separately. One thing to
 | Thursday | 1,268 | +3.4 | 19.6% | 2.61 | 0.24 | 8.3 |
 | Friday | 1,262 | +0.3 | 17.8% | 3.10 | 0.35 | 5.3 |
 
-The means are all statistically zero (each one has a standard error of about 3.4 bp), which is what an efficient market should give. The interesting rows are the second moments. Monday is the most volatile day and has by far the heaviest tail: ν = 2.17, close enough to the ν = 2 boundary that its confidence interval brushes against infinite variance. Friday is the calmest and lightest day on every measure.
+The means are all statistically zero. The interesting rows are the second moments. 
+
+Monday is the most volatile day and has by far the heaviest tail: ν = 2.17, close enough to the ν = 2 boundary that its confidence interval brushes against infinite variance. Friday is the calmest and lightest day on every measure.
 
 The plan asked me to compare two definitions of the week, and the likelihood-ratio tests settle it:
 
@@ -39,7 +41,7 @@ The plan asked me to compare two definitions of the week, and the likelihood-rat
 | Five separate days vs one pooled week | 45.7 | 8 | < 0.0001 |
 | Five separate days vs Mon / midweek / Fri | 2.8 | 4 | 0.594 |
 
-Treating the week as one block is firmly rejected. But splitting it all the way into five days is no better than the three-group version. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
+Splitting it all the way into five days, is not very effective. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
 
 Grouped that way over the full sample, the pattern is a clean staircase. Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Excess kurtosis falls from 17.5 to 8.0 to 5.3. The tail parameter rises from ν = 2.17 to 2.73 to 3.10. Every measure says the same thing: the week opens risky and heavy-tailed, and calms down as it goes.
 
@@ -51,7 +53,9 @@ Grouped that way over the full sample, the pattern is a clean staircase. Volatil
 
 ## 3. The week inside each crisis
 
-Next I ran the same week-open (Monday) to week-close (Friday) lens through each of the four crisis windows, measuring volatility, variance and the fat-tail measures in each. One warning before the table: the crisis windows are short, so the per-group samples get small. COVID has only about 20 Mondays and 20 Fridays, so I report volatility, variance and kurtosis there but not a Student-t fit, which would need more data than that to mean anything.
+Next I ran the same week-open (Monday) to week-close (Friday) lens through each of the four crisis windows, measuring volatility, variance and the fat-tail measures in each. 
+
+COVID has only about 20 Mondays and 20 Fridays, so I report volatility, variance and kurtosis. However due to lack of data I cannot fit it properly onto a Student t-distribution.
 
 **Table 3. Week open vs midweek vs week close, full sample and per crisis. Variance is the daily variance in %². ν is omitted where n < 50.**
 
@@ -75,13 +79,13 @@ Next I ran the same week-open (Monday) to week-close (Friday) lens through each 
 
 The four crises do not treat the week the same way, and the differences line up with what Week 3 found about the crises themselves.
 
-The GFC is the extreme case. Monday volatility was 44.8% against Friday's 28.2%, so the variance of a GFC Monday was two and a half times the variance of a GFC Friday. The Monday tail parameter is ν = 2.01, sitting exactly on the infinite-variance boundary, while GFC Fridays fit at ν = 7.6, which is nearly Gaussian. The crisis was hitting hardest right as the week opened, after the weekend's bank failures and rescue announcements had piled up with no trading to absorb them.
+The GFC is the extreme case. Monday volatility was 44.8% against Friday's 28.2%, so the variance of a GFC Monday was two and a half times the variance of a GFC Friday. The crisis was hitting hardest right as the week opened, after the weekend's bank failures and rescue announcements had piled up with no trading to absorb them.
 
-COVID shows the same shape even more sharply in volatility terms: 65.9% on Mondays against 43.9% on Fridays, and the single worst day of the whole 25-year sample, the −12.8% of 16 March 2020, was a Monday. With only 20 observations per group I would not lean on the kurtosis numbers, but the volatility gap is too big to be an accident of sampling.
+COVID shows the same shape even more sharply in volatility terms: 65.9% on Mondays against 43.9% on Fridays, and the single worst day of the whole 25-year sample, the −12.8% of 16 March 2020, was a Monday. 
 
-The dot-com crash is completely flat: 23.1%, 23.7%, 23.1% across the three groups, with mild tails throughout. That fits its character from Week 3. It was a long grind lower, not a sequence of weekend shocks, so it had no reason to care what day it was.
+The dot-com crash is completely flat: 23.1%, 23.7%, 23.1% across the three groups, with mild tails throughout. That fits its character from Week 3. It was a longer protracted crisis rather than a sequence of weekend shocks, so it would not be as affected by day-to-day movements.
 
-The Fed rate-hike window is the surprise: the pattern reverses. Mondays were the calm days (16.7%) and Fridays the risky ones (21.1%). My reading is that this crisis ran on scheduled announcements rather than weekend surprises, and the big macro releases, CPI and the payrolls report, land on weekday mornings, with payrolls on Fridays. When the risk arrives by calendar appointment, the weekend stops mattering and the week's shape flips. The tail numbers back this up: those risky Fridays fit at ν = 15.5 with excess kurtosis of just 0.2, so the announcement volatility was big but nearly Gaussian. Scheduled news makes the market wide, not fat-tailed.
+The Fed rate-hike window is the surprise: the pattern reverses. Mondays were the calm days (16.7%) and Fridays the risky ones (21.1%). My reading is that this crisis ran on scheduled announcements rather than weekend surprises, and the big macro releases, CPI and the payrolls report, land on weekday mornings, with payrolls on Fridays. When the risk arrives by calendar appointment, the weekend stops mattering and the week's shape flips. The tail numbers back this up, those risky Fridays fit at ν = 15.5 with excess kurtosis of just 0.2, so the announcement volatility was big but nearly Gaussian. Scheduled news makes the market wide, not fat-tailed.
 
 So the full-sample Monday effect in Section 2 is really a crisis effect. It is driven by the GFC and COVID, absent in the dot-com years, and reversed in 2022-23.
 
