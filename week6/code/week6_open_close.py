@@ -69,6 +69,24 @@ def load_ohlc(path=os.path.join(_HERE, "..", "data", "sp500_ohlc.csv")):
     return df
 
 
+def stale_open_audit(ohlc, threshold=1e-8):
+    """Measure the fake-open problem that motivates the 2015 cutoff.
+
+    A day is flagged stale if Open(t) equals Close(t-1), i.e. the vendor
+    filled the open with the prior close (|ln(O_t / C_{t-1})| < threshold).
+    Prints the stale fraction by five-year block and returns the series.
+    """
+    r_on = np.log(ohlc["Open"] / ohlc["Close"].shift(1)).dropna()
+    stale = np.abs(r_on) < threshold
+    blocks = [("2000-2004", "2000", "2004"), ("2005-2009", "2005", "2009"),
+              ("2010-2014", "2010", "2014"), ("2015-2024", "2015", "2024")]
+    print("\nStale-open audit (Open(t) = Close(t-1)):")
+    for label, a, b in blocks:
+        s = stale.loc[a:b]
+        print(f"  {label}: {s.mean():6.2%} of {len(s)} days")
+    return stale
+
+
 def build_components(ohlc, split_start):
     """Overnight and intraday return components on the clean-opens sample."""
     c_prev = ohlc["Close"].shift(1)
@@ -223,6 +241,7 @@ def main():
     args = ap.parse_args()
 
     ohlc = load_ohlc()
+    stale_open_audit(ohlc)
     df = build_components(ohlc, args.split_start)
 
     print("\nReturn components (2015-2024 unless overridden):")

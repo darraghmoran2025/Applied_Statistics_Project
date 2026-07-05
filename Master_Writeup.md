@@ -948,7 +948,9 @@ The other meaning of open versus closed is within a single day. The close-to-clo
 
 r_close-to-close = r_overnight + r_intraday
 
-One data problem first. Yahoo's ^GSPC open prices are fake in the early sample: the open just equals the previous close on 96% of days in 2000-2004, 31% in 2005-2009 and 12% in 2010-2014, then almost never from 2015. So this section runs on 2015-2024 (n = 2,515, stale fraction 0.08%). Nothing else in the project is affected because everything else only needs closing prices.
+One data problem first. Yahoo's ^GSPC open prices are fake in the early sample. A real index almost never opens exactly where it closed, since futures move overnight, so when the open equals the previous close it means the vendor had no true open and just copied the prior close into the column. I flag a day as stale when |ln(O_t / C_{t-1})| < 10^-8. The script recomputes this audit every time it runs, and the fractions come out at 96.3% of days in 2000-2004, 31.4% in 2005-2009, 12.4% in 2010-2014, and 0.08% from 2015 on. Running the overnight and intraday split on the early data would therefore give an overnight return of exactly zero on nearly every day of 2000-2004. That zero is a vendor artifact, and it would sit as a huge spike at the origin in every distributional estimate this section makes.
+
+There is no repairing the bad opens; the true opening levels were simply never recorded in this data. So this section restricts itself to 2015-2024, where the opens are real. That leaves n = 2,515 trading days, plenty for estimation, and the leftover 0.08% is 2 days whose overnight return happens to be exactly zero, which does no harm. Nothing else in the project is touched: this is the only analysis that reads the open column, and everything else runs on closing prices, which are the official end-of-day index levels and reliable over the whole 25 years. The cost is scope. Everything below describes 2015-2024, and pushing the split further back would take a better data source for the early opens rather than a different method.
 
 **Table 4. Return components, 2015-2024.**
 
