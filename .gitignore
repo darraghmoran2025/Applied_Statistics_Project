@@ -14,3 +14,6 @@ week*/data/
 
 # Word renders of the writeups live outside the repo; only markdown is tracked
 *.docx
+
+# Week 8 withdrawn from the repo for now; files kept locally
+week8/
