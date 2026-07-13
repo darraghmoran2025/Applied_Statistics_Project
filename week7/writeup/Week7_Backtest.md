@@ -2,11 +2,11 @@
 
 ## 1. Overview
 
-Everything up to now has been in-sample: fit a distribution to the full history, read the risk numbers off the fitted tail. This week I made the models work for a living. I refitted each one on a rolling 500-day window and asked it, every day from January 2002 to December 2024, for tomorrow's Value-at-Risk. That gave me 5,787 genuine out-of-sample forecasts per model per confidence level, and a hit sequence of days where the realised return fell below the forecast. Christoffersen's (1998) framework then asks the two questions that matter about that sequence: are there the right *number* of violations, and do they arrive *independently*? A model can only be called correct if the answer to both is yes.
+I refitted each one on a rolling 500-day window for tomorrow's Value-at-Risk. That gave me 5,787 genuine out-of-sample forecasts per model per confidence level, and a hit sequence of days where the realised return fell below the forecast. Christoffersen's (1998) framework then asks the two questions that matter about that sequence: are there the right *number* of violations, and do they arrive *independently*? A model can only be called correct if the answer to both is yes.
 
-This also puts the last of the four references to work. Christoffersen (1998) has been sitting in my bibliography since Week 1 waiting for exactly this exercise.
+This also puts the last of the four references to work: Christoffersen (1998).
 
-The models are the four from the Bayesian arc: Gaussian, Laplace, Student-t and NIG, with the Laplace again standing in for the Variance-Gamma family as its symmetric special case. I refitted every 21 trading days, roughly the monthly update cycle a risk desk would run, and held the forecasts fixed between refits.
+The models are the four from the Bayesian arc: Gaussian, Laplace, Student-t and NIG, with the Laplace. I refitted every 21 trading days, roughly the monthly update cycle a risk desk would run, and held the forecasts fixed between refits.
 
 The headline is a clean split. Rolling refits repair the *number* of violations at the 95% level for the Gaussian and the NIG, and the NIG comes closest at 99%. But every model, at every level, fails the independence test outright. The violations do not arrive as a trickle; they arrive as bursts in late 2008 and March 2020. A rolling window drags the whole distribution towards yesterday's volatility, but a month too late. The missing ingredient is not a heavier tail. It is conditional volatility, and no static marginal, however well chosen, can supply it.
 
