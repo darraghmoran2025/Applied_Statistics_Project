@@ -8,15 +8,15 @@ This also puts the last of the four references to work: Christoffersen (1998).
 
 The models are the four from the Bayesian arc: Gaussian, Laplace, Student-t and NIG, with the Laplace. I refitted every 21 trading days, roughly the monthly update cycle a risk desk would run, and held the forecasts fixed between refits.
 
-The headline is a clean split. Rolling refits repair the *number* of violations at the 95% level for the Gaussian and the NIG, and the NIG comes closest at 99%. But every model, at every level, fails the independence test outright. The violations do not arrive as a trickle; they arrive as bursts in late 2008 and March 2020. A rolling window drags the whole distribution towards yesterday's volatility, but a month too late. The missing ingredient is not a heavier tail. It is conditional volatility, and no static marginal, however well chosen, can supply it.
+Rolling refits repair the *number* of violations at the 95% level for the Gaussian and the NIG, and the NIG comes closest at 99%. But every model, at every level, fails the independence test outright. The violations arrive as bursts in late 2008 and March 2020. A rolling window drags the whole distribution towards yesterday's volatility, but a month too late. 
 
 ---
 
 ## 2. Design
 
-I chose a window of 500 trading days, about two years: long enough for a stable four-parameter NIG fit, short enough to adapt across regimes. I refitted every 21 trading days and held the parameters in between. Each day's forecast is one-day-ahead VaR at 95%, 97.5% and 99%, read off the fitted distribution's quantile (closed form for the Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG). A violation is a realised return strictly below the forecast.
+I chose a window of 500 trading days, about two years: long enough for a stable four-parameter NIG fit, short enough to adapt across regimes. I refitted every 21 trading days and held the parameters in between. Each day's forecast is one-day-ahead VaR at 95%, 97.5% and 99%, read off the fitted distribution's quantile (closed form for the Gaussian, Laplace and Student-t; root-finding on the CDF for the NIG). 
 
-One numerical fight worth recording. On calm windows the rolling NIG regularly lands on its Gaussian-limit ridge (very large α with big standard errors), the same weakly identified regime my quarterly fits found in Week 6. scipy's generic NIG quantile refused to converge there, so I solved the quantile myself: bracket the root using the NIG's own mean and standard deviation, then run Brent's method on the CDF. On the ridge the quantile smoothly approaches the Gaussian one, which is the behaviour I wanted.
+On calm windows the rolling NIG regularly lands on its Gaussian-limit ridge, the same weakly identified regime my quarterly fits found in Week 6. scipy's generic NIG quantile refused to converge there, so I solved the quantile myself: bracket the root using the NIG's own mean and standard deviation, then run Brent's method on the CDF. On the ridge the quantile smoothly approaches the Gaussian one, which is the behaviour I wanted.
 
 I ran three likelihood-ratio tests per model and level, following Christoffersen (1998):
 
@@ -47,7 +47,7 @@ I ran three likelihood-ratio tests per model and level, following Christoffersen
 
 Three things stood out to me.
 
-At 95% the Gaussian is fine and the Student-t is the worst model in the table. That inversion is worth dwelling on. The full-sample Student-t carries ν = 2.648, a tail heavy enough to flirt with infinite kurtosis. A distribution with that much mass far out in the tail has to take it from somewhere, and it takes it from the shoulders: its 5% quantile sits *closer to zero* than the Gaussian's for the same data. So at the everyday 95% level the t under-covers (358 hits against 289 expected, rejected at p = 0.0001) while the thin-tailed Gaussian, which spends its probability exactly where the 5% quantile lives, passes comfortably (p = 0.27). Heavy tails are a statement about extremes, and they carry a cost at moderate quantiles.
+At 95% the Gaussian is fine and the Student-t is the worst model in the table. The full-sample Student-t carries ν = 2.648, a tail heavy enough to flirt with infinite kurtosis. A distribution with that much mass far out in the tail has to take it from somewhere, and it takes it from the shoulder. It's 5% quantile sits *closer to zero* than the Gaussian's for the same data. So at the everyday 95% level the t under-covers (358 hits against 289 expected, rejected at p = 0.0001) while the thin-tailed Gaussian, which spends its probability exactly where the 5% quantile lives, passes comfortably (p = 0.27). Heavy tails are a statement about extremes, and they carry a cost at moderate quantiles.
 
 At 99% the ordering flips and the Gaussian collapses. It produces 152 violations where 58 were expected, a factor of 2.6, with LR_uc = 106.9. This is the out-of-sample counterpart of the 79.5% ES gap from Week 2: the Gaussian tail is simply too short where it matters. The NIG does best (91 hits, a factor of 1.57), then Student-t (104) and Laplace (110). Even the NIG is rejected on pure coverage at 99%; a static tail fitted to the last two years is still too short when the regime breaks.
 
@@ -69,7 +69,7 @@ Figure 2 shows the same fact cumulatively. Violations accrue as staircases: flat
 
 *Figure 2. Cumulative violations at 95% (left) and 99% (right) against the nominal accrual (dashed). The GFC and COVID verticals are the independence failure made visible.*
 
-This is the out-of-sample confirmation of my Week 5 posterior predictive result. There, all four models failed the one dependence statistic in the battery (the lag-1 autocorrelation of squared returns, observed 0.32 against replicate bands centred on zero) while the NIG passed every marginal check. Here the same split reappears with real forecasts: the NIG gets the closest to the right number of violations, and still fails their timing, because a 500-day window updated monthly cannot chase volatility that doubles inside a week. Cont's (2001) volatility clustering is exactly the stylised fact these iid models were built without, and the backtest sends the bill.
+This is the out-of-sample confirmation of my Week 5 posterior predictive result. There, all four models failed the one dependence statistic in the battery (the lag-1 autocorrelation of squared returns, observed 0.32 against replicate bands centred on zero) while the NIG passed every marginal check. Cont's (2001) volatility clustering is exactly the stylised fact these iid models were built without, and the backtest sends the bill.
 
 ---
 
@@ -86,7 +86,7 @@ Basel's backtesting regime keys the capital multiplier off the count of 99% viol
 | Student-t | 65.3% | 16.7% | 17.9% | 22 |
 | NIG | 66.6% | 19.3% | 14.1% | 15 |
 
-A Gaussian desk spends almost a third of the 23 years in the red zone, and its worst 250-day window contains 32 violations, more than three times the red threshold and a level at which a regulator would simply withdraw model approval. The Lévy tails halve the red-zone time, and the NIG's worst window (15) is half the Gaussian's. But no model stays out of the red: every one of them breaches the threshold through the GFC and again around COVID, which is the traffic-light version of the independence failure.
+A Gaussian desk spends almost a third of the 23 years in the red zone, and its worst 250-day window contains 32 violations, more than three times the red threshold. The Lévy tails halve the red-zone time, and the NIG's worst window (15) is half the Gaussian's. But no model stays out of the red: every one of them breaches the threshold through the GFC and again around COVID, which is the traffic-light version of the independence failure.
 
 ![Figure 3. Rolling 250-day violation counts against the Basel zones.](../figures/week7_basel_traffic.png)
 
@@ -107,7 +107,7 @@ FRTB (BCBS, 2013) replaces 99% VaR with 97.5% ES as the capital metric, so my la
 | Student-t | 218 | −3.02% | −3.12% | 0.97 |
 | NIG | 177 | −3.18% | −2.96% | 1.07 |
 
-The Gaussian falls short twice over: too many breach days (223 against 145 expected) *and* losses 33% deeper than the ES it booked on those days. Under FRTB that is precisely the number a capital charge is built on. The Student-t's promised shortfall is actually adequate (ratio 0.97), the same phenomenon as its 95% failure viewed from the other end: the heavy ν buys deep-tail honesty at the price of shoulder coverage. The NIG is 7% short, much the best balance of breach count and depth, which matches its Week 5 status as the only model to pass the marginal FRTB check.
+The Gaussian falls short twice over: too many breach days (223 against 145 expected) *and* losses 33% deeper than the ES it booked on those days. Under FRTB that is precisely the number a capital charge is built on. The Student-t's promised shortfall is actually adequate (ratio 0.97), the same phenomenon as its 95% failure viewed from the other end: the heavy ν buys deep-tail honesty at the price of shoulder coverage. The NIG is 7% short, much the best balance of breach count and depth. This matches its Week 5 status as the only model to pass the marginal FRTB check.
 
 ---
 
