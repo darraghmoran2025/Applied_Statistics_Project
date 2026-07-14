@@ -9,7 +9,7 @@ This week I looked at the same 6,287 daily S&P 500 log-returns from a different 
 3. Can I explain the fitted Lévy parameters with a regression, one parameter at a time, starting with the NIG δ?
 4. Do quarterly earnings seasons move index volatility?
 
-Short answers: yes, Monday / midweek / Friday is exactly the right cut; the market is only open for three fifths of its variance and almost none of its jumps; δ is mostly a VIX story and the skew parameters turn out to follow the VIX too once there is enough data. Earnings season was perhaps the most weakly informative out of all the test, and do nothing at the index level. However, this turned out to be the most interesting null of the project so far.
+Short answers: yes, Monday / midweek / Friday is exactly the right cut; the market is only open for three fifths of its variance and almost none of its jumps; δ is mostly a VIX story and the skew parameters turn out to follow the VIX too once there is enough data. Earnings season was perhaps the most weakly informative out of all the tests, and does nothing at the index level. However, this turned out to be the most interesting null of the project so far.
 
 ---
 
@@ -41,7 +41,7 @@ The plan asked me to compare two definitions of the week, and the likelihood-rat
 | Five separate days vs one pooled week | 45.7 | 8 | < 0.0001 |
 | Five separate days vs Mon / midweek / Fri | 2.8 | 4 | 0.594 |
 
-Splitting it all the way into five days, is not very effective. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
+Splitting it all the way into five days is not very effective. So Monday / midweek / Friday is the right resolution: Tuesday, Wednesday and Thursday are statistically the same day, and the week's real structure is its open, its middle and its close.
 
 Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Excess kurtosis falls from 17.5 to 8.0 to 5.3. The tail parameter rises from ν = 2.17 to 2.73 to 3.10. Every measure says the same thing: the week opens risky and heavy-tailed, and calms down as it goes.
 
@@ -55,7 +55,7 @@ Volatility falls from 21.4% (Monday) to 19.3% (midweek) to 17.8% (Friday). Exces
 
 Next I ran the same week-open (Monday) to week-close (Friday) lens through each of the four crisis windows, measuring volatility, variance and the fat-tail measures in each. 
 
-COVID has only about 20 Mondays and 20 Fridays, so I report volatility, variance and kurtosis. However due to lack of data I cannot fit it properly onto a Student t-distribution.
+COVID has only about 20 Mondays and 20 Fridays, so I report volatility, variance and kurtosis. However, due to lack of data I cannot fit a Student-t to those two groups properly.
 
 **Table 3. Week open vs midweek vs week close, full sample and per crisis. Variance is the daily variance in %². ν is omitted where n < 50.**
 
