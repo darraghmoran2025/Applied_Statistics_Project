@@ -5,7 +5,8 @@
 This project compares five distributional models for S&P 500 daily log-returns:
 Gaussian, Laplace, Student-t, Variance-Gamma (VG), and Normal Inverse Gaussian (NIG).
 Estimation is carried out by Maximum Likelihood (MLE) and Bayesian MCMC (PyMC/NUTS).
-Risk measures (VaR, ES) are evaluated via rolling backtests using the Christoffersen test framework.
+Risk measures (VaR, ES) are evaluated via rolling backtests using the Christoffersen test framework,
+and the four crisis events in the sample are assessed against Taleb's Black Swan criteria.
 
 ## Repository structure
 
@@ -55,9 +56,16 @@ week7/
   data/     - daily forecast/hit series, test tables (gitignored)
 
 week8/
-  code/     - generate_final_report.py (renders the report to Word)
-  writeup/  - Final_Report.md (the standalone research paper)
+  code/     - week8_black_swan.py (surprise / oos / extremes / clustering modes),
+              generate_week8_doc.py
+  figures/  - crisis return periods, posterior return periods, pre-crisis vs
+              full-sample surprise, simulated extremes, violation clustering
+  writeup/  - Week8_BlackSwan.md
+  data/     - surprise, out-of-sample, extremes and clustering tables (gitignored)
 ```
+
+The Week 9 final report (the standalone research paper) is still being written
+and will be added to the repository when it is complete.
 
 ## Weekly progress
 
@@ -70,7 +78,8 @@ week8/
 | 5 | Posterior predictive checks; diagnostics | Complete |
 | 6 | Weekday and open/close structure; quarterly parameter regressions; earnings windows | Complete |
 | 7 | Rolling VaR backtest (Christoffersen) | Complete |
-| 8 | Final write-up | In progress |
+| 8 | Black Swan analysis of the four crisis events | Complete |
+| 9 | Final write-up | In progress |
 
 ## Week 1
 
@@ -255,25 +264,54 @@ python week7/code/week7_backtest.py
 
 ## Week 8
 
-The final write-up: a standalone research paper that reorganises the whole
-project by topic rather than by week. Structure: introduction and stylised
-facts; data; the five-model hierarchy and what each comparison isolates;
-estimation (MLE and Bayesian, including the custom NIG log-density); in-sample
-results (fits, risk measures, posteriors, posterior predictive checks);
-parameter instability (crisis sub-periods, yearly and quarterly fits, the
-calendar); the rolling out-of-sample backtest; conclusions with a one-page
-scorecard and limitations. Eleven figures are reused from the weekly folders.
-Write-up: `Final_Report.md`; Word render via `generate_final_report.py`
-(the docx itself is not tracked).
+Asks whether the four crisis events (dot-com, GFC, COVID-19, the 2022 Fed
+hikes) were Black Swans in Taleb's (2007) sense, treating "outside regular
+expectation" as a model-relative quantity. Four measurements: implied return
+periods of each crisis's worst day under the five full-sample fits (MLE and
+Bayesian); the same question under pre-crisis fits that use only information
+available at the time; a simulation check on whether 4,000 model-generated
+25-year histories can reproduce the observed extremes; and a permutation test
+on the timing of the Week 7 backtest violations.
+Write-up: `Week8_BlackSwan.md`. Key findings:
 
-### Rendering Week 8
+- The worst COVID-19 day (-12.77%, 16 March 2020) is a once-per-5.6x10^22-years
+  event under the Gaussian, once per 62,400 years under the Laplace, once per
+  119 years under the NIG and once per decade under the Student-t. Days at
+  least that bad occurred once in the 25-year sample. Under the Gaussian all
+  four crises are Black Swans; under the Student-t none of them are.
+- The exponential-tailed Laplace and VG, near-optimal by likelihood, misprice
+  the extremes by three to four orders of magnitude. The Black Swan question
+  is decided in the far tail, which the likelihood barely sees.
+- Out of sample the Student-t is the robust model: fitted on two calm
+  pre-crisis years it still prices the GFC and COVID worst days at 39 and 34
+  years. The NIG loses three orders of magnitude on calm windows (its
+  Gaussian-limit ridge), a capital-relevant fragility under rolling refits.
+  The 2022 tightening was a white swan under every model.
+- No iid model reproduces the observed worst month (-40% over 21 days), and
+  none puts 11-12 of its 99% VaR violations inside one 21-day window as
+  observed in March 2020 (permutation p < 1/20,000 for all four models).
+  A better marginal cures the magnitude swan; the timing swan remains.
+
+### Running Week 8
 
 ```bash
-python week8/code/generate_final_report.py
+pip install numpy pandas scipy matplotlib
+python week8/code/week8_black_swan.py                  # all four measurements
+python week8/code/week8_black_swan.py --mode surprise  # or oos / extremes / clustering
 ```
+
+## Week 9
+
+The final write-up: a standalone research paper reorganising the whole project
+by topic rather than by week, from the stylised facts through the model
+hierarchy, estimation, in-sample results, parameter instability, the rolling
+backtest and the Black Swan assessment to a closing scorecard. In progress;
+it will be added to the repository when complete.
 
 ## Key references
 
 - Madan, Carr & Chang (1998) - Variance Gamma process
 - Cont (2001) - Stylised facts of financial returns
 - Christoffersen (1998) - VaR backtesting framework
+- Basel Committee on Banking Supervision (2013) - FRTB
+- Taleb (2007) - The Black Swan
