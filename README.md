@@ -56,8 +56,7 @@ week7/
   data/     - daily forecast/hit series, test tables (gitignored)
 
 week8/
-  code/     - week8_black_swan.py (surprise / oos / extremes / clustering modes),
-              generate_week8_doc.py
+  code/     - week8_black_swan.py (surprise / oos / extremes / clustering modes)
   figures/  - crisis return periods, posterior return periods, pre-crisis vs
               full-sample surprise, simulated extremes, violation clustering
   writeup/  - Week8_BlackSwan.md

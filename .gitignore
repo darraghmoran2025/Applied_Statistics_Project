@@ -15,5 +15,9 @@ week*/data/
 # Word renders of the writeups live outside the repo; only markdown is tracked
 *.docx
 
+# The docx generator scripts stay out of the repo too (they depend on the
+# md2docx renderer at the project root, which is not part of the repo)
+week*/code/generate_week*_doc.py
+
 # Week 9 final report held back until it is ready; files kept locally
 week9/
