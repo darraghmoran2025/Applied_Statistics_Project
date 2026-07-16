@@ -2,13 +2,13 @@
 
 ## 1. Overview
 
-Taleb (2007) gives a Black Swan three attributes: it lies outside the realm of regular expectation, it carries an extreme impact, and human nature makes it explainable after the fact. The second and third attributes are history and psychology. The first one is statistics, and it hides an assumption that this whole project has been circling since Week 2: an event is only "outside regular expectation" relative to a model of what regular expectation is. A 12% down day is impossible under one distribution and merely a bad decade under another. So the question "were the dot-com crash, the GFC, COVID-19 and the 2022 Fed tightening Black Swans?" is not answerable in the abstract. It is answerable per model, and that is what I did this week.
+Taleb (2007) gives a Black Swan three attributes: it lies outside the realm of regular expectation, it carries an extreme impact, and human nature makes it explainable after the fact. The second and third attributes are history and psychology. The first one can be statisically measured. It measures an assumption that this whole project has been considering since Week 2. An event is only "outside regular expectation" relative to a model of what regular expectation is. A 12% down day is impossible under one distribution and merely a bad decade under another. So the question "were the dot-com crash, the GFC, COVID-19 and the 2022 Fed tightening Black Swans?" is not answerable in the abstract. It is answerable per mode
 
-This week also puts a new name in the bibliography: Taleb (2007), the fifth reference alongside the locked four.
+This week also puts a new name in the bibliography: Taleb (2007).
 
-I measured this four ways, one per section below. First with hindsight: the exceedance probability of each crisis's worst day under the five full-sample fits (Gaussian, Laplace, Student-t, VG, NIG), turned into an implied return period in years, plus the Bayesian version from the Week 4 posteriors. Then honestly, at the time: each model refitted on the 500 trading days before the crisis window opens and scored on the crisis itself. Then as a whole: 4,000 simulated twenty-five-year histories from each fitted model, to see how often a history contains what 2000 to 2024 actually contained. And finally on timing, a permutation test on the Week 7 backtest violations: granting each model its own number of hits, could the observed 21-day clusters arise if hits arrived independently?
+I measured this four ways. First with hindsight: the probability of each crisis's worst day under the five full-sample fits (Gaussian, Laplace, Student-t, VG, NIG). 
 
-The verdict comes in two halves. On magnitude, the Black Swan is an artifact of the Gaussian: the worst COVID-19 day is a once-per-10^22.7-years event under the Gaussian posterior (about four trillion ages of the universe), a once-per-125-years event under the NIG, and a once-per-decade event under the Student-t with its full-sample tail index ν = 2.648. On timing, the swan is real for every model in the class: no iid marginal, however heavy its tail, can place eleven or twelve 99% VaR violations inside one 21-day window, and all four models watched exactly that happen in late February 2020 (permutation p < 1/20,000).
+The Black Swan is an artifact of the Gaussian: the worst COVID-19 day is a once-per-10^22.7-years event under the Gaussian posterior (about four trillion ages of the universe), a once-per-125-years event under the NIG, and a once-per-decade event under the Student-t with its full-sample tail index ν = 2.648. On timing, the swan is real for every model in the class: no iid marginal, however heavy its tail, can place eleven or twelve 99% VaR violations inside one 21-day window, and all four models watched exactly that happen in late February 2020.
 
 ---
 
@@ -58,7 +58,7 @@ The four events are structurally different, which matters for everything below. 
 
 The empirical column is the referee here, and for my money this is the best single table the project has produced.
 
-The Gaussian declares every jump event impossible. The GFC's worst day is a 67-ages-of-the-universe event; COVID-19's is four trillion ages. Even the mild -4.42% of September 2022, a day the sample serves up 33 times, gets a return period (28 years) longer than the sample that contains it. Under the Gaussian, all four crises are textbook Black Swans, and that is a statement about the Gaussian, not about the crises.
+The Gaussian declares every jump event impossible. The GFC's worst day is a 67-ages-of-the-universe event; COVID-19's is four trillion ages. Even the mild -4.42% of September 2022, a day the sample serves up 33 times, gets a return period (28 years) longer than the sample that contains it. Under the Gaussian, all four crises are textbook Black Swans, and that is a statement about the Gaussian.
 
 The Student-t (ν = 2.648) absolves everything. Its implied recurrence matches the empirical column almost exactly at the two grind events (1.5 vs 1.9 years for dot-com, 0.7 vs 0.8 years for the Fed hikes) and stays on the right side of plausibility for the jumps: the GFC day once per 4.9 years, the COVID-19 day once per decade. A once-per-decade event inside a 25-year sample is not a swan of any colour.
 
