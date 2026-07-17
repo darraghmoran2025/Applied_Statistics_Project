@@ -37,7 +37,7 @@ I computed the probabilities from the closed-form CDFs where they exist (Gaussia
 | COVID-19 | Feb 2020 to Jun 2020 | 104 | 2020-03-16 | -12.77% | -19.80% | -40.00% | -3.96% |
 | Fed rate hikes | Jan 2022 to Dec 2023 | 501 | 2022-09-13 | -4.42% | -10.78% | -13.88% | +0.08% |
 
-The four events are structurally different, which matters for everything below. The dot-com crash and the Fed tightening are grinds: two years of losses with no single day worse than -6%. The GFC and COVID-19 are jump events, and COVID-19 is the extreme case: the worst day, the worst month (-40% in 21 days) and a window that nonetheless closes almost flat because the recovery was as violent as the fall.
+The four events are structurally different, which matters for everything below. The dot-com crash and the Fed tightening are grinds: two years of losses with no single day worse than -6%. The GFC and COVID-19 are jump events, and COVID-19 is the extreme case: the worst day, the worst month (-40% in 21 days).
 
 ---
 
@@ -56,9 +56,7 @@ The four events are structurally different, which matters for everything below. 
 
 *Figure 1. Implied return period (log scale) of each crisis's worst single day under the five full-sample fits. The dashed line is the sample length; the dotted line is the age of the universe. The Gaussian's GFC and COVID-19 bars clear the age of the universe by factors of 67 and four trillion.*
 
-The empirical column is the referee here, and for my money this is the best single table the project has produced.
-
-The Gaussian declares every jump event impossible. The GFC's worst day is a 67-ages-of-the-universe event; COVID-19's is four trillion ages. Even the mild -4.42% of September 2022, a day the sample serves up 33 times, gets a return period (28 years) longer than the sample that contains it. Under the Gaussian, all four crises are textbook Black Swans, and that is a statement about the Gaussian.
+The Gaussian declares every jump event impossible. The GFC's worst day is a 67-ages-of-the-universe event; COVID-19's is four trillion ages. Even the mild -4.42% of September 2022, a day the sample serves up 33 times, gets a return period (28 years) longer than the sample that contains it. Under the Gaussian, all four crises are textbook Black Swans.
 
 The Student-t (ν = 2.648) absolves everything. Its implied recurrence matches the empirical column almost exactly at the two grind events (1.5 vs 1.9 years for dot-com, 0.7 vs 0.8 years for the Fed hikes) and stays on the right side of plausibility for the jumps: the GFC day once per 4.9 years, the COVID-19 day once per decade. A once-per-decade event inside a 25-year sample is not a swan of any colour.
 
@@ -68,7 +66,7 @@ The rows that taught me the most are the Laplace and VG. By likelihood they are 
 
 ### The Bayesian version
 
-Point estimates might hide the verdict behind parameter uncertainty, so I pushed the Week 4 posterior draws through the same calculation for the worst day in the sample, 16 March 2020.
+I pushed the Week 4 posterior draws through the same calculation for the worst day in the sample, 16 March 2020.
 
 **Table 3. Posterior distribution of log10(return period in years) of the 16 March 2020 return, 2,000 draws per model.**
 
@@ -89,7 +87,7 @@ The parameter uncertainty is a rounding error next to the model gap. The Gaussia
 
 ## 5. Surprise at the time: pre-crisis fits
 
-Hindsight fits flatter every model, because the crisis days are in the estimation sample pulling the tails outward. The honest question is Taleb's actual one: how far outside regular expectation was the event, where "regular expectation" is a model fitted on the two years before it happened? I refitted all five models on the 500 trading days ending the day before each window opens. I had to leave the dot-com window out: the sample starts in January 2000, which leaves only 39 pre-crisis days (the same problem Week 3 hit with the dot-com lead-up, and I am keeping to the decision not to carry pre-2000 data into the analysis).
+The honest question is Taleb's actual one: how far outside regular expectation was the event, where "regular expectation" is a model fitted on the two years before it happened? I refitted all five models on the 500 trading days ending the day before each window opens. I had to leave the dot-com window out: the sample starts in January 2000, which leaves only 39 pre-crisis days (the same problem Week 3 hit with the dot-com lead-up, and I am keeping to the decision not to carry pre-2000 data into the analysis).
 
 **Table 4. Crisis days scored under the frozen pre-crisis fit: return period of the worst day, mean log predictive density per crisis day, and the number of crisis days the model priced below one-in-a-thousand.**
 
@@ -117,21 +115,23 @@ Hindsight fits flatter every model, because the crisis days are in the estimatio
 
 Four things stood out to me.
 
-The Gaussian's surprise explodes out of sample. Trained on the calm of 2005 to 2007, it prices the 15 October 2008 return at once per 10^33 years; trained on 2018 to 2019, it prices 16 March 2020 at once per 10^40. Its mean log-score on crisis days is negative in both episodes, which for daily returns (where a competent model earns a log density around +3) means it assigned essentially zero probability to what happened, day after day, for months. It also priced 53 of the GFC's 378 days below one-in-a-thousand: one trading day in seven was, by its own account, a once-in-four-years event.
+Gaussian is trained on the calm of 2005 to 2007, it prices the 15 October 2008 return at once per 10^33 years; trained on 2018 to 2019, it prices 16 March 2020 at once per 10^40. Its mean log-score on crisis days is negative in both episodes, which for daily returns (where a competent model earns a log density around +3) means it assigned essentially zero probability to what happened, day after day, for months. It also priced 53 of the GFC's 378 days below one-in-a-thousand: one trading day in seven was, by its own account, a once-in-four-years event.
 
 The Student-t barely notices the difference between hindsight and foresight. Its pre-crisis return periods are 39 years for the GFC day and 34 for COVID-19, against 4.9 and 10.6 with hindsight. A power-law tail index estimated on two calm years is still a power law, so the model keeps its scepticism about calm even when the recent data contain none. At the moment it happened, the worst COVID-19 day was, under the t, a once-in-a-generation event: severe, but named and priced.
 
 The NIG loses three orders of magnitude out of sample. Its pre-crisis return periods (1,820 and 2,100 years) are far worse than its hindsight ones (17.5 and 119). The mechanism is the Week 6 and Week 7 finding: on calm windows the NIG MLE drifts onto its Gaussian-limit ridge (α large, tails light), so a two-year calm window hands the crisis a much thinner tail than the full sample would. The t's tail survives calm training data; the NIG's does not. I had not expected this asymmetry, and for a risk desk that refits on rolling windows it matters as much as the full-sample likelihood ranking.
 
-And the Fed tightening was no swan at all. Every model, including the Gaussian, priced the whole of 2022 and 2023 within about a year's return period, and no model priced a single day below one-in-a-thousand. A bear market delivered as five hundred ordinary down days is exactly what every one of these distributions expects.
+And the Fed tightening was no swan at all. Every model, including the Gaussian, priced the whole of 2022 and 2023 within about a year's return period, and no model priced a single day below one-in-a-thousand. 
 
-The Week 3 lead-up regression completes the picture on Taleb's "no warning" criterion. The GFC brewed visibly: the z-score table showed elevated drawdown and volatility through 2007. COVID-19 erupted from below-average volatility and VIX, with no signal in any of the seven predictors. Combining the two dimensions: the GFC was rare but both priceable and visibly assembling itself (a grey swan); COVID-19 arrived unannounced and was the largest at-the-time surprise in the table, the closest thing in the sample to a genuine Black Swan, and even it sat within a once-in-a-generation tail under the right marginal.
+The Week 3 lead-up regression completes the picture on Taleb's "no warning" criterion. The GFC's z-score table showed elevated drawdown and volatility through 2007. COVID-19 erupted from below-average volatility and VIX, with no signal in any of the seven predictors. 
+
+Through combining the two dimensions, we can see the GFC was rare but both priceable and visibly assembling itself (a grey swan); COVID-19 arrived unannounced and was the largest at-the-time surprise in the table, the closest thing in the sample to a genuine Black Swan, and even it sat within a once-in-a-generation tail under the right marginal.
 
 ---
 
 ## 6. Could 2000 to 2024 have come from these models at all?
 
-Return periods interrogate one day at a time. A stricter test asks the models to reproduce the sample as a whole: I simulated 4,000 independent 25-year histories (6,287 days each) from each fitted model and recorded, per history, the worst day, the worst 21-day stretch, and the number of days below three and five empirical standard deviations. The observed history has a worst day of -12.77%, a worst 21-day stretch of -40.00%, 51 days below -3σ and 11 days below -5σ.
+Return periods interrogate one day at a time. I simulated 4,000 independent 25-year histories (6,287 days each) from each fitted model and recorded, per history, the worst day, the worst 21-day stretch, and the number of days below three and five empirical standard deviations. The observed history has a worst day of -12.77%, a worst 21-day stretch of -40.00%, 51 days below -3σ and 11 days below -5σ.
 
 **Table 5. Share of simulated 25-year histories at least as extreme as the observed one, with the median simulated value in brackets.**
 
@@ -149,9 +149,9 @@ Return periods interrogate one day at a time. A stricter test asks the models to
 
 Three of the five models simply cannot generate our history. In 4,000 attempts the Gaussian never produced a day worse than about -6% (median worst day -4.5%), the Laplace never reached -12.77%, and the VG got there 14 times in 4,000. None of the three ever produced 11 days below -5σ. The exponential-tail verdict from Section 4 is confirmed at the whole-sample level.
 
-The Student-t passes the daily tests almost too well: 91% of its histories contain a day worse than our worst, and its median worst day is -20.7%, considerably beyond anything the S&P 500 has done in this sample. This is the overshoot Week 7 saw from the other side (the t buying deep-tail mass at the cost of shoulder coverage), now visible as a tendency to invent catastrophes larger than history's. The NIG is the best calibrated on daily extremes: the observed worst day sits at the 19th percentile of its distribution and the -5σ count at the 63rd, neither surprising nor overshot.
+The Student-t passes the daily tests: 91% of its histories contain a day worse than our worst, and its median worst day is -20.7%, considerably beyond anything the S&P 500 has done in this sample. This is the overshoot Week 7 saw from the other side (the t buying deep-tail mass at the cost of shoulder coverage), now visible as a tendency to invent catastrophes larger than history's. The NIG is the best calibrated on daily extremes: the observed worst day sits at the 19th percentile of its distribution and the -5σ count at the 63rd, neither surprising nor overshot.
 
-The column that defeats everyone is the worst 21-day stretch. History assembled -40% in a month; the best any iid model manages is the t's 16.7%, and the NIG, calibrated so well on single days, produces a month that bad three times in ten thousand histories. The reason is structural. An iid model must build a catastrophic month out of independently drawn bad days, and independence makes the pieces refuse to line up. History builds it the other way: one shock arrives and the days stop being independent. Which is the bridge to the last measurement.
+The column that defeats everyone is the worst 21-day stretch. History assembled -40% in a month; the best any iid model manages is the t's 16.7%, and the NIG, calibrated so well on single days, produces a month that bad three times in ten thousand histories. 
 
 ---
 
@@ -174,7 +174,7 @@ Week 5 showed the iid models fail the squared-return autocorrelation check in-sa
 
 Every model, including the two whose tails Section 4 vindicated, watched eleven or twelve of its 99% violations land inside a single month, when independence would put the record for the entire 23-year backtest at five or six. Not one permutation in twenty thousand got there. And it is the same month for all four models: the COVID-19 crash of late February and March 2020.
 
-This is the cleanest statement of the project's central limit (in both senses). Upgrading the marginal from Gaussian to Student-t or NIG moves the magnitude of crisis days from "impossible" to "expected": that swan was an artifact of the model. Nothing in the iid class moves their arrangement in time. Conditional on their own hit counts, all four models found the timing of March 2020 a sub-1-in-20,000 event. The magnitude swan is curable by a better distribution; the timing swan is the volatility clustering of Cont (2001), and within this model class it is incurable by construction.
+This is the cleanest statement of the project's central limit. Upgrading the marginal from Gaussian to Student-t or NIG moves the magnitude of crisis days from "impossible" to "expected": that swan was an artifact of the model. Nothing in the iid class moves their arrangement in time. Conditional on their own hit counts, all four models found the timing of March 2020 a sub-1-in-20,000 event. The magnitude swan is curable by a better distribution; the timing swan is the volatility clustering of Cont (2001), and within this model class it is incurable by construction.
 
 ---
 
@@ -199,21 +199,9 @@ Third, what remains of Taleb's swan, after the best marginal has done its work, 
 
 ---
 
-## Reference added this week
 
 Taleb, N. N. (2007). *The Black Swan: The Impact of the Highly Improbable*. New York: Random House.
 
-This joins the four locked references (BCBS 2013; Christoffersen 1998; Cont 2001; Madan, Carr and Chang 1998) as the fifth and final entry in the project bibliography.
 
 ---
 
-## Reproducing
-
-```bash
-pip install numpy pandas scipy matplotlib
-python week8/code/week8_black_swan.py                    # all four measurements
-python week8/code/week8_black_swan.py --mode surprise    # or oos / extremes / clustering
-python week8/code/week8_black_swan.py --paths 2000       # faster simulation run
-```
-
-Modes 1 and 3 need only `week4/data/sp500_returns.csv` (the cached return series); mode 1's Bayesian part reads the Week 4 posterior CSVs; mode 4 reads the Week 7 hit sequences from `week7/data/week7_var_series.csv` (rerun `week7/code/week7_backtest.py` first if absent). Outputs: `week8_crisis_stats.csv`, `week8_surprise_table.csv`, `week8_posterior_rp.csv`, `week8_oos_table.csv`, `week8_extremes_table.csv`, `week8_clustering.csv` in `week8/data/`, and the five figures above in `week8/figures/`.
