@@ -1,32 +1,3 @@
-"""
-week7_backtest.py: rolling one-day-ahead VaR backtest with the
-Christoffersen (1998) conditional coverage framework.
-
-Each model is refitted on a rolling window of past returns and asked for
-the next day's Value-at-Risk. A violation ("hit") is a realised return
-below the VaR forecast. Three likelihood-ratio tests score the hit
-sequence at each confidence level:
-
-  LR_uc   Kupiec unconditional coverage: is the violation RATE right?
-  LR_ind  Christoffersen independence: do violations CLUSTER? (first-order
-          Markov alternative)
-  LR_cc   conditional coverage = LR_uc + LR_ind, chi-squared with 2 df.
-
-On top of the formal tests, the script reports the Basel traffic-light
-view (rolling 250-day count of 99% violations: green <= 4, yellow 5-9,
-red >= 10) and an FRTB-flavoured Expected Shortfall check at 97.5%: on
-violation days, how does the average realised loss compare with the
-average ES the model had promised?
-
-Models: Gaussian, Laplace, Student-t, NIG. As in Weeks 4-6, the Laplace
-stands in for the Variance-Gamma family as its symmetric special case
-(theta = 0, nu = 1); the NIG carries the full four-parameter tail.
-
-Run standalone:
-    python week7_backtest.py
-    python week7_backtest.py --window 250 --refit 21
-"""
-
 import os
 import sys
 import argparse
