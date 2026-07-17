@@ -8,9 +8,13 @@ venv/
 .DS_Store
 *.log
 
-# Generated data: cached returns and saved posterior draws
-# (regenerate deterministically from the week scripts)
-week*/data/
+# Generated data: saved posterior draws and derived tables
+# (regenerate deterministically from the week scripts). The two raw
+# returns series are tracked as the frozen inputs of the whole project,
+# since Yahoo revises its history silently.
+week*/data/*
+!week4/data/sp500_returns.csv
+!week8/data/sp500_returns_ext.csv
 
 # Word renders of the writeups live outside the repo; only markdown is tracked
 *.docx

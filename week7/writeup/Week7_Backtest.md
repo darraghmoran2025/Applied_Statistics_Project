@@ -115,7 +115,7 @@ The Gaussian falls short twice over: too many breach days (223 against 145 expec
 
 The backtest completes an argument I have been building since Week 2:
 
-1. The full-sample tail is heavy (ν = 2.648) and the Gaussian understates 99% ES by 79.5% in-sample (Week 2). Out of sample, that shows up as 2.6 times too many 99% violations and realised breach losses 33% beyond the booked ES.
+1. The full-sample tail is heavy (ν = 2.648) and the Student-t 99% ES runs 79.5% above the Gaussian's in-sample (Week 2). Out of sample, that shows up as 2.6 times too many 99% violations and realised breach losses 33% beyond the booked ES.
 2. Choosing a better marginal genuinely helps. The NIG cuts the excess 99% violations from a factor 2.6 to 1.57, spends half as much time in the Basel red zone, and prices its own breaches to within 7%.
 3. No marginal is enough. Every model fails Christoffersen's independence test at every level, because iid models, however heavy their tails, put the violations in the wrong places. The failure is not the size of the tail but its timing, and the timing is volatility clustering.
 

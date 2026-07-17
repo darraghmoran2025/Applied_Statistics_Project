@@ -2,11 +2,11 @@
 
 ## 1. Overview
 
-Taleb (2007) gives a Black Swan three attributes: it lies outside the realm of regular expectation, it carries an extreme impact, and human nature makes it explainable after the fact. The second and third attributes are history and psychology. The first one can be statistically measured. It measures an assumption that this whole project has been considering since Week 2. An event is only "outside regular expectation" relative to a model of what regular expectation is. A 12% down day is impossible under one distribution and merely a bad decade under another. So the question "were the dot-com crash, the GFC, COVID-19 and the 2022 Fed tightening Black Swans?" is not answerable in the abstract. It is answerable per mode
+Taleb (2007) gives a Black Swan three attributes: it lies outside the realm of regular expectation, it carries an extreme impact, and human nature makes it explainable after the fact. The second and third attributes are history and psychology. The first one can be statistically measured. It measures an assumption that this whole project has been considering since Week 2. An event is only "outside regular expectation" relative to a model of what regular expectation is. A 12% down day is impossible under one distribution and merely a bad decade under another. So the question "were the dot-com crash, the GFC, COVID-19 and the 2022 Fed tightening Black Swans?" is not answerable in the abstract. It is only answerable model by model.
 
 This week also puts a new name in the bibliography: Taleb (2007).
 
-I measured this four ways. First with hindsight: the probability of each crisis's worst day under the five full-sample fits (Gaussian, Laplace, Student-t, VG, NIG). 
+I measured this four ways: with hindsight (the probability of each crisis's worst day under the five full-sample fits: Gaussian, Laplace, Student-t, VG, NIG), at the time (the same probabilities under fits frozen before each crisis window opened), by simulation (whether 25-year histories like ours occur in each model's world at all), and on timing (whether any iid model can place the violations where they actually fell).
 
 The Black Swan is an artifact of the Gaussian: the worst COVID-19 day is a once-per-10^22.7-years event under the Gaussian posterior (about four trillion ages of the universe), a once-per-125-years event under the NIG, and a once-per-decade event under the Student-t with its full-sample tail index ν = 2.648. On timing, the swan is real for every model in the class: no iid marginal, however heavy its tail, can place eleven or twelve 99% VaR violations inside one 21-day window, and all four models watched exactly that happen in late February 2020.
 
@@ -18,7 +18,7 @@ I operationalised Taleb's first attribute as an exceedance probability. If a mod
 
 RP = 1 / (252 p) years.
 
-A return period of two years is a routine event; a return period of a thousand years is an event the model considers effectively outside its world; a return period beyond the age of the universe means the model declares the event impossible in any sense that matters. The 25-year dashed line (the length of the sample) is the natural reference: an event whose model-implied return period is far beyond 25 years should probably not be sitting in a 25-year sample.
+A return period of two years is a routine event; a return period of a thousand years is an event the model considers effectively outside its world; a return period beyond the age of the universe means the model declares the event impossible in any sense that matters. The 25-year dashed line (the length of the sample) is the natural reference: an event whose model-implied return period is far beyond 25 years should probably not be sitting in a 25-year sample. One caveat travels with the unit: 1/p days is a recurrence time only under independence, the assumption Weeks 5 and 7 reject, so a return period says how the model prices a single day, not when such days arrive. Section 7 prices the arrivals separately.
 
 Two versions of p matter, and the gap between them is Taleb's point about hindsight. The full-sample fit has already seen the crisis it is judging, so it gives the model every possible advantage. The pre-crisis fit uses only the two years of data available the day before the crisis window opened, which is what "regular expectation" actually meant at the time. Section 5 measures both.
 
