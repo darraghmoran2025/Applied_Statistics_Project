@@ -1,26 +1,3 @@
-"""
-week6_open_close.py: market-open vs market-closed volatility, and
-week-on-week volatility.
-
-Splits the close-to-close return into the part earned while the market
-is closed (overnight: prior close to today's open) and the part earned
-while it is open (intraday: open to close):
-
-    r_cc = ln(C_t / C_{t-1}) = r_overnight + r_intraday
-    r_overnight = ln(O_t / C_{t-1}),   r_intraday = ln(C_t / O_t)
-
-DATA CAVEAT: Yahoo's ^GSPC open prices are stale for most of the early
-sample (Open set equal to the prior close on 96% of 2000-2004 days, 31%
-of 2005-2009, 12% of 2010-2014, near zero from 2015). The overnight and
-intraday split therefore runs on 2015-2024 by default, where the opens
-are real. The weekly volatility section uses the full 2000-2024 sample,
-which needs closes only.
-
-Run standalone:
-    python week6_open_close.py
-    python week6_open_close.py --split_start 2010-01-01
-"""
-
 import os
 import sys
 import argparse
