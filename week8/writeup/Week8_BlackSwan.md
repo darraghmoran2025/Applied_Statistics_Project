@@ -87,12 +87,17 @@ The parameter uncertainty is a rounding error next to the model gap. The Gaussia
 
 ## 5. Surprise at the time: pre-crisis fits
 
-The honest question is Taleb's actual one: how far outside regular expectation was the event, where "regular expectation" is a model fitted on the two years before it happened? I refitted all five models on the 500 trading days ending the day before each window opens. I had to leave the dot-com window out: the sample starts in January 2000, which leaves only 39 pre-crisis days (the same problem Week 3 hit with the dot-com lead-up, and I am keeping to the decision not to carry pre-2000 data into the analysis).
+The honest question is Taleb's actual one: how far outside regular expectation was the event, where "regular expectation" is a model fitted on the two years before it happened? I refitted all five models on the 500 trading days ending the day before each window opens. The dot-com window needed the same concession Week 3 made for its lead-up table: the sample starts in January 2000, which leaves only 39 in-sample days before the crash window opens. As there, I brought in pre-2000 S&P 500 returns for the training window only (the 500 days ending 29 February 2000, reaching back to March 1998), so all four crises now sit in the table. The scored crisis days, and every other exhibit in this report, stay on the 2000 to 2024 sample.
 
 **Table 4. Crisis days scored under the frozen pre-crisis fit: return period of the worst day, mean log predictive density per crisis day, and the number of crisis days the model priced below one-in-a-thousand.**
 
 | Crisis | Model | RP of worst day (years) | Mean log-score | Days with p < 0.001 |
 |--------|-------|------------------------|----------------|---------------------|
+| Dot-com crash (671 days) | Gaussian | 6,280 | 2.76 | 5 |
+| | Laplace | 5.3 | 2.77 | 1 |
+| | Student-t | 7.2 | 2.78 | 1 |
+| | VG | 17.5 | 2.78 | 2 |
+| | NIG | 7.9 | 2.78 | 1 |
 | GFC (378 days) | Gaussian | 4.2 x 10^33 | -1.18 | 53 |
 | | Laplace | 443,000 | 1.44 | 29 |
 | | Student-t | 39.2 | 1.72 | 17 |
@@ -111,9 +116,11 @@ The honest question is Taleb's actual one: how far outside regular expectation w
 
 ![Figure 3. Full-sample vs pre-crisis return periods.](../figures/week8_oos_surprise.png)
 
-*Figure 3. Return period of each crisis's worst day under the full-sample fit (circles) against the pre-crisis fit (triangles). The Gaussian's hindsight-to-foresight gap spans 20 or more additional orders of magnitude; the Student-t's barely moves.*
+*Figure 3. Return period of each crisis's worst day under the full-sample fit (circles) against the pre-crisis fit (triangles). At the two jump events the Gaussian's hindsight-to-foresight gap spans 20 or more additional orders of magnitude; the Student-t's barely moves anywhere.*
 
-Four things stood out to me.
+Five things stood out to me.
+
+The dot-com crash was priceable in advance by everything except the Gaussian. The training window (March 1998 to February 2000) contains the LTCM autumn of 1998, and on it the four heavy-tailed models put the worst dot-com day at a return period of 5 to 18 years, priced at most two of the 671 crisis days below one-in-a-thousand, and earned mean log-scores around 2.78, which is what a competent model earns on ordinary days. That is the point: the crash was a grind of ordinary days, and even the exponential-tailed Laplace and VG handle a -6% day, because -6% is simply not deep enough in the tail for their thin extremes to be exposed. The Gaussian still stands apart. It calls the same day a once-per-6,280-years event, about 250 times the length of the sample that was two weeks from starting to contain it, and it managed this while scoring the average crisis day perfectly well. A grind has no extreme days for the log-score to punish, so the worst-day return period is the only place the thin tail shows.
 
 Gaussian is trained on the calm of 2005 to 2007, it prices the 15 October 2008 return at once per 10^33 years; trained on 2018 to 2019, it prices 16 March 2020 at once per 10^40. Its mean log-score on crisis days is negative in both episodes, which for daily returns (where a competent model earns a log density around +3) means it assigned essentially zero probability to what happened, day after day, for months. It also priced 53 of the GFC's 378 days below one-in-a-thousand: one trading day in seven was, by its own account, a once-in-four-years event.
 
@@ -123,7 +130,7 @@ The NIG loses three orders of magnitude out of sample. Its pre-crisis return per
 
 And the Fed tightening was no swan at all. Every model, including the Gaussian, priced the whole of 2022 and 2023 within about a year's return period, and no model priced a single day below one-in-a-thousand. 
 
-The Week 3 lead-up regression completes the picture on Taleb's "no warning" criterion. The GFC's z-score table showed elevated drawdown and volatility through 2007. COVID-19 erupted from below-average volatility and VIX, with no signal in any of the seven predictors. 
+The Week 3 lead-up regression completes the picture on Taleb's "no warning" criterion. The GFC's z-score table showed elevated drawdown and volatility through 2007. COVID-19 erupted from below-average volatility and VIX, with no signal in any of the seven predictors. The dot-com row of that table (added in Week 3 with the same pre-2000 warm-up used here) showed nothing stronger than +0.6 standard deviations on any predictor, but for an event the models priced at a 5-to-18-year return period, the absence of a warning costs little.
 
 Through combining the two dimensions, we can see the GFC was rare but both priceable and visibly assembling itself (a grey swan); COVID-19 arrived unannounced and was the largest at-the-time surprise in the table, the closest thing in the sample to a genuine Black Swan, and even it sat within a once-in-a-generation tail under the right marginal.
 
@@ -184,7 +191,7 @@ Sorting the four crises with both dimensions in hand:
 
 | Crisis | Under the Gaussian | Under the Student-t / NIG | Warning (Week 3) | Verdict |
 |--------|--------------------|--------------------------|------------------|---------|
-| Dot-com crash | Black (worst day once per 9,470 y) | Routine (1.5 to 2 y) | outside sample | Not a swan: a grind of ordinary days |
+| Dot-com crash | Black (worst day once per 9,470 y) | Routine (1.5 to 2 y; 5 to 8 y at the time) | mild (nothing above +0.6σ) | Not a swan: a grind of ordinary days |
 | GFC | Black (67 ages of the universe) | Rare but priced (5 to 40 y at the time) | visible build-up | Grey swan |
 | COVID-19 | Black (10^22 y; 10^40 at the time) | Once-in-a-generation at the time | none | Closest to a true Black Swan; magnitude priceable, timing not |
 | Fed rate hikes | Marginal (28 y) | Routine (< 1 y) | n/a | White swan under every model |

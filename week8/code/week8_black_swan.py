@@ -23,8 +23,11 @@ measurements, one per mode:
               window, then scored on the crisis days themselves (worst-day
               return period, mean log predictive density, and the count of
               crisis days the pre-crisis fit priced below one-in-a-
-              thousand). The dot-com window is skipped: the sample starts
-              in January 2000, so there is no pre-crisis history to fit on.
+              thousand). The dot-com training window needs history from
+              before January 2000, so pre-2000 ^GSPC returns are spliced in
+              for TRAINING ONLY (the same concession as the Week 3 lead-up
+              drawdown warm-up); every scored day and every other exhibit
+              stays on the 2000-2024 sample.
 
   extremes    Simulation check of extreme-value consistency: simulate many
               25-year histories (n = len(sample)) from each fitted model
@@ -86,6 +89,47 @@ def load_returns(path=os.path.join(_HERE, "..", "..", "week4", "data",
     s.name = "logret"
     print(f"Loaded {len(s)} returns from {path}")
     return s
+
+
+def load_extended_returns(r, lookback_start="1997-01-01",
+                          cache=os.path.join(_HERE, "..", "data",
+                                             "sp500_returns_ext.csv")):
+    """
+    The canonical 2000-2024 series with pre-2000 ^GSPC log-returns spliced
+    on the front. Used for ONE purpose only: giving the dot-com crash a
+    full pre-crisis training window in oos mode, the same concession the
+    Week 3 lead-up table made to warm up its 252-day drawdown. Only the
+    pre-2000 segment of the download is kept, so every post-2000 value in
+    the spliced series is byte-identical to the canonical sample and the
+    GFC / COVID-19 / Fed rows are untouched. Cached to week8/data so oos
+    mode stays reproducible offline. Returns None if neither the cache nor
+    a download is available.
+    """
+    if os.path.exists(cache):
+        ext = pd.read_csv(cache, index_col=0, parse_dates=True).iloc[:, 0]
+        print(f"Loaded {len(ext)} pre-2000 returns from {cache}")
+    else:
+        try:
+            import yfinance as yf
+            print(f"Downloading extended ^GSPC history from {lookback_start} "
+                  f"(dot-com pre-crisis training window only)…")
+            raw = yf.download("^GSPC", start=lookback_start,
+                              end=str(r.index[0].date()),
+                              auto_adjust=True, progress=False)["Close"]
+            if isinstance(raw, pd.DataFrame):
+                raw = raw.iloc[:, 0]
+            ext = np.log(raw / raw.shift(1)).dropna()
+            ext.index = pd.to_datetime(ext.index)
+            ext = ext.loc[:r.index[0] - pd.Timedelta(days=1)]
+            os.makedirs(os.path.dirname(cache), exist_ok=True)
+            ext.to_csv(cache)
+            print(f"Cached {len(ext)} pre-2000 returns to {cache}")
+        except Exception as e:
+            print(f"  [oos] extended history unavailable ({e}); "
+                  f"dot-com will be skipped")
+            return None
+    ext.name = "logret"
+    return pd.concat([ext, r])
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -298,16 +342,24 @@ def plot_posterior_rp(log10_rp, worst_x, save_dir):
 # MODE 2: OUT-OF-SAMPLE SURPRISE — pre-crisis fits only
 # ════════════════════════════════════════════════════════════════════════════
 
-def oos_table(r, window=500):
+def oos_table(r, window=500, r_train=None):
     """
     For each crisis with at least `window` prior observations: refit every
     model on the `window` days before the crisis window opens, then score
     the crisis days under that frozen pre-crisis fit.
+
+    `r_train`, when given, is the series the training windows are cut from
+    (the canonical sample with pre-2000 history spliced on the front, from
+    load_extended_returns). The scored crisis days always come from `r`,
+    and post-2000 the two series agree exactly, so only the dot-com row
+    can differ from what `r` alone would give.
     """
+    if r_train is None:
+        r_train = r
     rows = []
     fits_by_crisis = {}
     for label, (start, end) in SHOCK_PERIODS.items():
-        pre = r.loc[:pd.Timestamp(start) - pd.Timedelta(days=1)]
+        pre = r_train.loc[:pd.Timestamp(start) - pd.Timedelta(days=1)]
         if len(pre) < window:
             print(f"  [oos] {label}: only {len(pre)} pre-crisis days "
                   f"(< {window}), skipped")
@@ -590,7 +642,8 @@ def main():
 
     if args.mode in ("all", "oos"):
         print(f"\n=== MODE 2: out-of-sample surprise (window {args.window}) ===")
-        oos, _ = oos_table(r, window=args.window)
+        r_train = load_extended_returns(r)
+        oos, _ = oos_table(r, window=args.window, r_train=r_train)
         oos.to_csv(os.path.join(args.data_dir, "week8_oos_table.csv"),
                    index=False)
         print(oos.drop(columns=["p_worst"]).to_string(
