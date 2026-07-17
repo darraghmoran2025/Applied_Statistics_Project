@@ -1,25 +1,3 @@
-"""
-week6_earnings.py: volatility around quarterly earnings seasons.
-
-The index itself has no earnings dates, so this uses the aggregate
-reporting calendar as a proxy: the bulk of S&P 500 constituents report
-in the month starting roughly two weeks after each quarter ends. Each
-earnings season is defined as the window from the 15th of January,
-April, July and October to the 14th of the following month. This is a
-proxy, and the writeup says so; single-name event studies would need
-constituent-level dates.
-
-Two exhibits:
-  1. In-season vs out-of-season distributions: annualised volatility,
-     Student-t nu, Laplace scale, kurtosis, plus zero-mean NIG fits.
-  2. An event-study profile: mean daily |return| (annualised) over the
-     21 trading days before each season, the season itself, and the 21
-     days after, averaged across the 100 seasons.
-
-Run standalone:
-    python week6_earnings.py
-"""
-
 import os
 import sys
 import argparse
