@@ -1,36 +1,3 @@
-"""
-week6_param_regressions.py: quarterly Levy parameter fits and one
-regression per parameter.
-
-The Week 6 plan asks for a regression-based treatment of the Levy
-parameters: regress each individual parameter separately, with the
-regression as a predictor for the delta parameter first, then more
-predictors added. Yearly fits (Week 4) give only 25 points, so this
-script refits VG(sigma, theta, nu) and NIG(alpha, beta, delta) with
-mu = 0 one CALENDAR QUARTER at a time (100 quarters, roughly 63 daily
-returns each), then runs, for every parameter:
-
-  spec 1:  param_q ~ avg VIX_q                    (the baseline)
-  spec 2:  param_q ~ avg VIX_q + realised vol_q + drawdown_q + param_(q-1)
-
-and an AR(1), param_q ~ param_(q-1), which is the plan's "two parameters
-as a function of themselves" applied to all six (delta and alpha are the
-two headline ones). Standard errors are Newey-West (Bartlett, 4 lags).
-
-Identification caveat: with ~63 observations the scale parameters
-(delta, sigma) are well determined, but the tail parameters are noisy
-and NIG alpha runs into its Gaussian limit in calm quarters (alpha
-large and weakly identified). Alpha is therefore regressed in logs and
-quarters at the optimiser bound are dropped from its regression.
-
-The zero-mean fits mirror fit_vg0 / fit_nig0 in
-week4/code/week4_yearly_levy_mle.py; they are restated here so this
-script does not import the PyMC stack.
-
-Run standalone:
-    python week6_param_regressions.py
-"""
-
 import os
 import sys
 import argparse
