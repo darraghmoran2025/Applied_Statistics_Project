@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-Taleb (2007) gives a Black Swan three attributes: it lies outside the realm of regular expectation, it carries an extreme impact, and human nature makes it explainable after the fact. The second and third attributes are history and psychology. The first one can be statisically measured. It measures an assumption that this whole project has been considering since Week 2. An event is only "outside regular expectation" relative to a model of what regular expectation is. A 12% down day is impossible under one distribution and merely a bad decade under another. So the question "were the dot-com crash, the GFC, COVID-19 and the 2022 Fed tightening Black Swans?" is not answerable in the abstract. It is answerable per mode
+Taleb (2007) gives a Black Swan three attributes: it lies outside the realm of regular expectation, it carries an extreme impact, and human nature makes it explainable after the fact. The second and third attributes are history and psychology. The first one can be statistically measured. It measures an assumption that this whole project has been considering since Week 2. An event is only "outside regular expectation" relative to a model of what regular expectation is. A 12% down day is impossible under one distribution and merely a bad decade under another. So the question "were the dot-com crash, the GFC, COVID-19 and the 2022 Fed tightening Black Swans?" is not answerable in the abstract. It is answerable per mode
 
 This week also puts a new name in the bibliography: Taleb (2007).
 
