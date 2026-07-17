@@ -1,25 +1,3 @@
-"""
-week6_weekday.py: day-of-week structure in S&P 500 daily returns.
-
-Fits the models separately by weekday and tests the two week definitions
-from the Week 6 plan against each other:
-
-  A. "Monday (inclusive) -> Friday": one set of parameters for the whole
-     week. Monday returns span the weekend (Friday close to Monday close),
-     so the weekend gap is included rather than modelled separately.
-  B. "Monday -> Midweek -> Friday": three groups, {Mon}, {Tue, Wed, Thu},
-     {Fri}, each with its own parameters.
-  C. Five separate weekdays, the fully saturated version.
-
-Nested likelihood-ratio tests (Gaussian) decide whether the extra
-day-of-week parameters earn their keep. Per-day Student-t fits show
-whether tail heaviness, not just scale, varies through the week.
-
-Run standalone:
-    python week6_weekday.py
-    python week6_weekday.py --save_dir ../figures
-"""
-
 import os
 import sys
 import argparse
