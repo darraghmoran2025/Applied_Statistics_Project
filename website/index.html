@@ -145,10 +145,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>The classic Black-Scholes picture assumes market moves are gentle and well behaved, but decades of research all say the same thing: real markets simply don't move like that.</li>
-            <li>Crashes, panics and wild days happen far more often than the textbook model allows, so we needed candidate models that are built for heavy tails from the very start.</li>
-            <li>The reading also handed us the referee for the whole project — a proper statistical test for judging risk forecasts, saved for the final backtest.</li>
-            <li><strong>What led me to the following week:</strong> I didn't want to just take the literature's word for it. The obvious first step was to download the real market data and watch the Gaussian fail with my own eyes.</li>
+            <li>Black-Scholes assumes markets move in small, gentle steps. Decades of research keep finding the opposite, and that gap is where I started reading.</li>
+            <li>Big crashes and wild days turn up far more often than that model leaves room for, so I needed candidates that treat heavy tails as normal rather than as mistakes.</li>
+            <li>The reading also pointed me to the test I'd use to judge everything at the very end, a proper way to score risk forecasts that I parked until the backtest.</li>
+            <li><strong>What led me to the following week:</strong> I didn't want to just take the textbooks' word for it. The obvious next move was to pull the real market data and watch the Gaussian break for myself.</li>
           </ul>
         </div>
       </details>
@@ -233,10 +233,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>Once both models are fitted to the real data it isn't even close — the heavy-tailed model wins decisively, and the Gaussian badly understates how nasty the worst days can get.</li>
-            <li>Days the Gaussian treats as practically impossible show up again and again in the actual record. They aren't freak accidents; they're a regular feature of the market.</li>
-            <li>Crises also turn out to have different personalities: some are slow grinds of ordinary bad days, others are sudden jump storms where the tail thickens almost overnight.</li>
-            <li><strong>What led me to the following week:</strong> if the very first heavy-tailed model beat the Gaussian this easily, the natural question was whether the wider Lévy family — models built specifically for jumpy, skewed returns — could do even better.</li>
+            <li>Once I fitted both models to real returns, it wasn't close. The heavy-tailed one wins comfortably, and the Gaussian badly under-counts how ugly the worst days get.</li>
+            <li>Days the Gaussian treats as good as impossible turn up over and over in the actual record. They aren't freak accidents. They're just how the market behaves.</li>
+            <li>Crises don't all look alike either. Some are slow grinds of ordinary bad days, others land like a single jump where the tail thickens almost overnight.</li>
+            <li><strong>What led me to the following week:</strong> if the first heavy-tailed model beat the Gaussian this easily, I wanted to know whether the wider Lévy family, built for jumpy and skewed returns, could push it further.</li>
           </ul>
         </div>
       </details>
@@ -486,10 +486,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>With the full lineup fitted, the Normal Inverse Gaussian comes out on top — and it's the only model the goodness-of-fit test doesn't throw out.</li>
-            <li>The surprise is how far a very simple model gets you: most of the improvement over the Gaussian comes just from allowing fatter tails at all, not from clever extra parameters.</li>
-            <li>The models disagree most exactly where it matters — how much you'd set aside for a truly terrible day. Choosing a distribution is really choosing a capital number.</li>
-            <li><strong>What led me to the following week:</strong> maximum likelihood only hands you a single best guess for each parameter. Before trusting the heavy tail, I wanted to know how sure we could actually be about it — and that's a job for Bayesian inference.</li>
+            <li>With all five models fitted, the Normal Inverse Gaussian comes out on top, and it's the only one the goodness-of-fit test is willing to keep.</li>
+            <li>What surprised me was how far a really simple model gets you. Most of the gain over the Gaussian comes just from allowing fat tails at all, not from anything clever.</li>
+            <li>The models disagree most exactly where it costs you, over how much you'd hold back for a genuinely terrible day. Picking a distribution turns out to be picking a capital number.</li>
+            <li><strong>What led me to the following week:</strong> maximum likelihood only gives you one best guess per parameter. Before I trusted that heavy tail I wanted to know how sure I could really be about it, and that's a Bayesian question.</li>
           </ul>
         </div>
       </details>
@@ -568,10 +568,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>Under full Bayesian estimation the heavy tail refuses to go away: every version of the model the posterior considers plausible is still emphatically heavy-tailed.</li>
-            <li>In other words, the fat tail isn't a fluke of one lucky estimate — the data insist on it, with room to spare.</li>
-            <li>Getting there meant hand-building the NIG density inside the sampler, which was a genuine fight, but it means the uncertainty statements are exact rather than approximations.</li>
-            <li><strong>What led me to the following week:</strong> with full posteriors in hand, the honest next question is whether data simulated from these fitted models actually looks like the real market — so the next step was posterior predictive checking.</li>
+            <li>Under full Bayesian estimation the heavy tail just won't go away. Every version of the model the data considers plausible is still firmly heavy-tailed.</li>
+            <li>So the fat tail isn't one lucky estimate. The data genuinely insist on it, with room to spare.</li>
+            <li>Getting there meant building the NIG density by hand inside the sampler, which was a slog, but it means the uncertainty I report is exact rather than a rough approximation.</li>
+            <li><strong>What led me to the following week:</strong> with real posteriors in hand, the honest thing to ask was whether data simulated from these models actually looks like the market. That's a posterior predictive check.</li>
           </ul>
         </div>
       </details>
@@ -634,10 +634,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>When you ask each fitted model to generate fake market histories, the NIG's fakes are nearly indistinguishable from the real thing — it passes every check on the shape of returns.</li>
-            <li>The Gaussian's fakes fail almost everywhere it matters: it can mimic the calm middle of the market, and nothing else.</li>
-            <li>But every model shares one failure — none of them can reproduce the way turbulent days bunch together in streaks. Calm and chaos arrive in runs, and no fixed distribution can fake that.</li>
-            <li><strong>What led me to the following week:</strong> that shared failure hinted the story isn't only about the shape of the distribution — there's structure hiding in time itself. So I went looking for it in the calendar and inside the trading day.</li>
+            <li>When you make each fitted model generate fake histories, the NIG's are hard to tell apart from the real market. It clears every check on the shape of returns.</li>
+            <li>The Gaussian's fakes fall apart nearly everywhere that matters. It can copy the calm middle and not much else.</li>
+            <li>One failure is shared by all of them, though. None can reproduce the way turbulent days clump together, so calm and chaos arrive in streaks that no fixed distribution fakes.</li>
+            <li><strong>What led me to the following week:</strong> that shared miss hinted the story wasn't only about the distribution's shape, that there was structure hiding in time itself. So I went looking in the calendar and inside the trading day.</li>
           </ul>
         </div>
       </details>
@@ -772,10 +772,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>The market week genuinely has a shape: Mondays carry the weekend's pent-up news and are the wildest day, while Fridays are the calmest.</li>
-            <li>The scariest moves mostly happen while the market is closed — the overnight gap carries the jumps, and regular trading hours carry the routine noise.</li>
-            <li>So risk isn't spread evenly through time. It hides in the moments when nobody can trade, which is exactly when you can least do anything about it.</li>
-            <li><strong>What led me to the following week:</strong> everything so far had judged the models on the same data they were trained on. The only fair exam is prediction — forecast risk ahead of time, day after day, and count how often reality breaks through.</li>
+            <li>The market week really does have a shape. Mondays carry the weekend's backlog of news and are the roughest day, and Fridays are the calmest.</li>
+            <li>Most of the scary moves land while the market is shut. The overnight gap takes the jumps, and regular hours take the everyday noise.</li>
+            <li>So risk isn't spread evenly through time. It hides in the hours when you can't trade, which is exactly when you can do least about it.</li>
+            <li><strong>What led me to the following week:</strong> so far everything had been graded on the same data it was trained on. The only fair exam is prediction, so I forecast the risk ahead of time, day after day, and counted how often reality broke through.</li>
           </ul>
         </div>
       </details>
@@ -932,10 +932,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>Out of sample, over two decades of daily forecasts, the Gaussian fails exactly the way the theory predicted: reality blows through its risk limits far too often.</li>
-            <li>The heavy-tailed models get the frequency of bad days about right, and would have kept a bank comfortably inside the regulator's green zone.</li>
-            <li>But when the breaches come, they come in bursts. Every model — even the best one — fails the timing test, because market turbulence clusters.</li>
-            <li><strong>What led me to the following week:</strong> those breach clusters sit exactly on top of the famous crises. That begged the question the whole project had been building toward — were those crashes truly unforeseeable black swans, or just badly modelled ones?</li>
+            <li>Out of sample, across twenty-odd years of daily forecasts, the Gaussian fails exactly as advertised. Reality punches through its risk limits far too often.</li>
+            <li>The heavy-tailed models get the count of bad days about right and would have kept a bank comfortably inside the regulator's green zone.</li>
+            <li>The breaches arrive in bunches, though. Every model, even the best one, flunks the timing test, because market turbulence clusters.</li>
+            <li><strong>What led me to the following week:</strong> those clusters sit right on top of the famous crises, which raised the question the whole project had been circling. Were those crashes real black swans, or just badly modelled ones?</li>
           </ul>
         </div>
       </details>
@@ -1053,10 +1053,10 @@ details[open] > summary { background: #16150f !important; color: #f2f0eb !import
         <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
           <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
-            <li>Whether a crash counts as a "black swan" turns out to depend almost entirely on which model you were holding when it hit — under the Gaussian a crash looks impossible; under a heavy tail it's merely rare.</li>
-            <li>Most of the famous crises were priceable in advance. What stays genuinely unpredictable is not how big crashes are, but when they choose to arrive.</li>
-            <li>That pins down the honest boundary of this whole class of models: capturing the timing of turbulence needs models where risk itself changes over time.</li>
-            <li><strong>What led me to the final write-up:</strong> eight weeks of separate results had quietly become one argument — the black swan is mostly a model choice. The final report below pulls the whole thread together, from the first literature review to the last backtest.</li>
+            <li>Whether a crash counts as a "black swan" comes down almost entirely to which model you were holding when it hit. To the Gaussian it looks impossible, under a heavy tail it's just rare.</li>
+            <li>Most of the famous crises were priceable ahead of time. What stays genuinely unpredictable isn't how big crashes are, it's when they decide to show up.</li>
+            <li>That fixes the honest limit of this whole class of models. Catching the timing of turbulence needs models where the risk level itself moves over time.</li>
+            <li><strong>What led me to the final write-up:</strong> eight weeks of separate results had quietly turned into one argument, that the black swan is mostly a model choice. The report below ties the whole thread together, from the first literature review to the last backtest.</li>
           </ul>
         </div>
       </details>
