@@ -78,6 +78,11 @@ a:hover { color: oklch(0.6 0.19 35); }
   h1 { font-size: clamp(44px, 14vw, 72px) !important; }
   div[style*="font-size: 56px"] { font-size: 38px !important; }
 }
+
+summary::-webkit-details-marker { display: none; }
+details[open] > summary .kt-chevron { transform: rotate(180deg); }
+.kt-chevron { display: inline-block; transition: transform 0.15s ease; }
+details[open] > summary { background: #16150f !important; color: #f2f0eb !important; }
 </style>
 </helmet>
 
@@ -192,6 +197,17 @@ a:hover { color: oklch(0.6 0.19 35); }
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px">Christoffersen 1998</div>
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px">Taleb 2007</div>
       </div>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>Black-Scholes assumes markets move in small, gentle steps. Decades of research keep finding the opposite, and that gap is where I started reading.</li>
+            <li>Big crashes and wild days turn up far more often than that model leaves room for, so I needed candidates that treat heavy tails as normal rather than as mistakes.</li>
+            <li>The reading also pointed me to the test I'd use to judge everything at the very end, a proper way to score risk forecasts that I parked until the backtest.</li>
+            <li><strong>What led me to the following week:</strong> I didn't want to just take the textbooks' word for it. The obvious next move was to pull the real market data and watch the Gaussian break for myself.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -272,6 +288,17 @@ a:hover { color: oklch(0.6 0.19 35); }
           </div>
         </div>
       </sc-if>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>Once I fitted both models to real returns, it wasn't close. The heavy-tailed one wins comfortably, and the Gaussian badly under-counts how ugly the worst days get.</li>
+            <li>Days the Gaussian treats as good as impossible turn up over and over in the actual record. They aren't freak accidents. They're just how the market behaves.</li>
+            <li>Crises don't all look alike either. Some are slow grinds of ordinary bad days, others land like a single jump where the tail thickens almost overnight.</li>
+            <li><strong>What led me to the following week:</strong> if the first heavy-tailed model beat the Gaussian this easily, I wanted to know whether the wider Lévy family, built for jumpy and skewed returns, could push it further.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -514,6 +541,17 @@ a:hover { color: oklch(0.6 0.19 35); }
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; margin-top: 14px; padding: 12px 14px; border: 2px solid #16150f; background: #f2f0eb; line-height: 1.6">{{ c3pNote }}</div>
         <div style="font-family: 'Space Grotesk', monospace; font-size: 12px; color: #55524a; margin-top: 8px">bar length: R² against the annual VIX, n = 25 · the VIX tells you how wide next year's distribution is, not how heavy or lopsided its tails are · that distinction is what ES-based capital hangs on</div>
       </div>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>With all five models fitted, the Normal Inverse Gaussian comes out on top, and it's the only one the goodness-of-fit test is willing to keep.</li>
+            <li>What surprised me was how far a really simple model gets you. Most of the gain over the Gaussian comes just from allowing fat tails at all, not from anything clever.</li>
+            <li>The models disagree most exactly where it costs you, over how much you'd hold back for a genuinely terrible day. Picking a distribution turns out to be picking a capital number.</li>
+            <li><strong>What led me to the following week:</strong> maximum likelihood only gives you one best guess per parameter. Before I trusted that heavy tail I wanted to know how sure I could really be about it, and that's a Bayesian question.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -588,6 +626,17 @@ a:hover { color: oklch(0.6 0.19 35); }
           </div>
         </div>
       </div>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>Under full Bayesian estimation the heavy tail just won't go away. Every version of the model the data considers plausible is still firmly heavy-tailed.</li>
+            <li>So the fat tail isn't one lucky estimate. The data genuinely insist on it, with room to spare.</li>
+            <li>Getting there meant building the NIG density by hand inside the sampler, which was a slog, but it means the uncertainty I report is exact rather than a rough approximation.</li>
+            <li><strong>What led me to the following week:</strong> with real posteriors in hand, the honest thing to ask was whether data simulated from these models actually looks like the market. That's a posterior predictive check.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -648,6 +697,17 @@ a:hover { color: oklch(0.6 0.19 35); }
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; margin-top: 20px; padding: 14px 16px; border: 2px solid #16150f; background: #f2f0eb; line-height: 1.6">{{ w5Note }}</div>
         </div>
       </sc-if>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>When you make each fitted model generate fake histories, the NIG's are hard to tell apart from the real market. It clears every check on the shape of returns.</li>
+            <li>The Gaussian's fakes fall apart nearly everywhere that matters. It can copy the calm middle and not much else.</li>
+            <li>One failure is shared by all of them, though. None can reproduce the way turbulent days clump together, so calm and chaos arrive in streaks that no fixed distribution fakes.</li>
+            <li><strong>What led me to the following week:</strong> that shared miss hinted the story wasn't only about the distribution's shape, that there was structure hiding in time itself. So I went looking in the calendar and inside the trading day.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -778,6 +838,17 @@ a:hover { color: oklch(0.6 0.19 35); }
 
         </div>
       </sc-if>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>The market week really does have a shape. Mondays carry the weekend's backlog of news and are the roughest day, and Fridays are the calmest.</li>
+            <li>Most of the scary moves land while the market is shut. The overnight gap takes the jumps, and regular hours take the everyday noise.</li>
+            <li>So risk isn't spread evenly through time. It hides in the hours when you can't trade, which is exactly when you can do least about it.</li>
+            <li><strong>What led me to the following week:</strong> so far everything had been graded on the same data it was trained on. The only fair exam is prediction, so I forecast the risk ahead of time, day after day, and counted how often reality broke through.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -930,6 +1001,17 @@ a:hover { color: oklch(0.6 0.19 35); }
 
         </div>
       </sc-if>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>Out of sample, across twenty-odd years of daily forecasts, the Gaussian fails exactly as advertised. Reality punches through its risk limits far too often.</li>
+            <li>The heavy-tailed models get the count of bad days about right and would have kept a bank comfortably inside the regulator's green zone.</li>
+            <li>The breaches arrive in bunches, though. Every model, even the best one, flunks the timing test, because market turbulence clusters.</li>
+            <li><strong>What led me to the following week:</strong> those clusters sit right on top of the famous crises, which raised the question the whole project had been circling. Were those crashes real black swans, or just badly modelled ones?</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -1043,6 +1125,17 @@ a:hover { color: oklch(0.6 0.19 35); }
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; margin-top: 14px; padding: 12px 14px; border: 2px solid #16150f; background: #f2f0eb; line-height: 1.6">{{ c8sNote }}</div>
         <div style="font-family: 'Space Grotesk', monospace; font-size: 12px; color: #55524a; margin-top: 8px">filled square: fitted on the full 25 years · open square: fitted only on the 500 days before the crisis · log scale · hover a model</div>
       </div>
+      <details style="margin-top: 28px">
+        <summary style="font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 20px; border: 2px solid #16150f; background: #faf9f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none"><span>Key Takeaway</span><span class="kt-chevron">▾</span></summary>
+        <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 24px 28px">
+          <ul style="margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; max-width: 840px">
+            <li>Whether a crash counts as a "black swan" comes down almost entirely to which model you were holding when it hit. To the Gaussian it looks impossible, under a heavy tail it's just rare.</li>
+            <li>Most of the famous crises were priceable ahead of time. What stays genuinely unpredictable isn't how big crashes are, it's when they decide to show up.</li>
+            <li>That fixes the honest limit of this whole class of models. Catching the timing of turbulence needs models where the risk level itself moves over time.</li>
+            <li><strong>What led me to the final write-up:</strong> the black-swan question didn't hand me a new result so much as re-describe ones I'd already estimated, the same return periods and tail numbers retold as a matter of which model you hold. With that last lens in place, the report below pulls the eight weeks together, from the first literature review to the last backtest.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </div>
 </section>
@@ -1102,6 +1195,16 @@ a:hover { color: oklch(0.6 0.19 35); }
         <div style="font-family: 'Space Grotesk', monospace; font-size: 12px; color: #55524a; margin-top: 8px">{{ c9Sub }}</div>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="final-writeup" data-screen-label="Final write up" style="padding: 96px 48px">
+  <div style="border-top: 2px solid #16150f; padding-top: 64px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 28px">
+    <div style="font-family: 'Space Grotesk', monospace; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.6 0.19 35)">The complete story · one document</div>
+    <h2 style="font-size: 52px; font-weight: 800; margin: 0; letter-spacing: -0.02em; text-transform: uppercase">Read the final report</h2>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0; max-width: 680px">Every result on this page — the fits, the Bayesian posteriors, the validation, the backtest and the black-swan verdicts — assembled into the full written report of the project.</p>
+    <a href="assets/Final_Report.pdf" target="_blank" rel="noopener" style="display: inline-block; background: #16150f; color: #f2f0eb; font-family: 'Space Grotesk', monospace; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; padding: 18px 40px; border: 2px solid #16150f" style-hover="background: oklch(0.6 0.19 35); border-color: oklch(0.6 0.19 35); color: #f2f0eb">Review My Final Write Up ↗</a>
+    <div style="font-family: 'Space Grotesk', monospace; font-size: 12px; color: #55524a">opens the PDF in a new tab</div>
   </div>
 </section>
 
