@@ -8,6 +8,12 @@ Estimation is carried out by Maximum Likelihood (MLE) and Bayesian MCMC (PyMC/NU
 Risk measures (VaR, ES) are evaluated via rolling backtests using the Christoffersen test framework,
 and the four crisis events in the sample are assessed against Taleb's Black Swan criteria.
 
+**Live site:** [applied-statistics-project.vercel.app](https://applied-statistics-project.vercel.app/) -
+an interactive walkthrough of all nine weeks with a click-through explorer for every chart
+(density overlays, QQ plots, NUTS traces, the rolling VaR backtest, the Black Swan return periods
+and more), all driven natively from the repo's data rather than static images. Each week's
+section links back to the corresponding write-up below.
+
 ## Repository structure
 
 Each week is self-contained: code, figures, and write-up all live under the
@@ -61,10 +67,13 @@ week8/
               full-sample surprise, simulated extremes, violation clustering
   writeup/  - Week8_BlackSwan.md
   data/     - surprise, out-of-sample, extremes and clustering tables (gitignored)
-```
 
-The Week 9 final report (the standalone research paper) is still being written
-and will be added to the repository when it is complete.
+week9/
+  code/     - week9_es_bootstrap.py (bootstrap CIs for the Week 7 ES ratio),
+              week9_nig_convolution.py (tests NIG closure under convolution)
+  figures/  - week9_nig_convolution.png
+  writeup/  - Final_Report.md (the standalone research paper)
+```
 
 ## Weekly progress
 
@@ -78,7 +87,7 @@ and will be added to the repository when it is complete.
 | 6 | Weekday and open/close structure; quarterly parameter regressions; earnings windows | Complete |
 | 7 | Rolling VaR backtest (Christoffersen) | Complete |
 | 8 | Black Swan analysis of the four crisis events | Complete |
-| 9 | Final write-up | In progress |
+| 9 | Final write-up: standalone research paper, ES bootstrap, NIG convolution check | Complete |
 
 ## Week 1
 
@@ -304,12 +313,42 @@ python week8/code/week8_black_swan.py --mode surprise  # or oos / extremes / clu
 The final write-up: a standalone research paper reorganising the whole project
 by topic rather than by week, from the stylised facts through the model
 hierarchy, estimation, in-sample results, parameter instability, the rolling
-backtest and the Black Swan assessment to a closing scorecard. In progress;
-it will be added to the repository when complete.
+backtest and the Black Swan assessment to a closing scorecard. Two closing
+checks were added alongside it. Write-up: `Final_Report.md`. Key points:
+
+- The fitted Student-t degrees of freedom is 2.648, 94% credible interval
+  (2.46, 2.87), sitting entirely above the variance singularity at ν = 2:
+  the tails are heavy, but the variance is finite.
+- At the 99% level the Student-t Expected Shortfall is 79.5% larger than the
+  Gaussian's; capital set from the Gaussian number is short by 37% of what
+  the NIG, the only model to pass every goodness-of-fit and posterior
+  predictive check, would require.
+- The out-of-sample backtest confirms both halves of the story: the Gaussian
+  produces 2.6x the nominal count of 99% violations against the NIG's 1.6x,
+  yet every model fails the independence test, since no static distribution
+  can time the volatility clustering Cont (2001) documents.
+- A bootstrap on the Week 7 FRTB ES ratio (`week9_es_bootstrap.py`) puts
+  95% percentile intervals around the Student-t's 0.97 and the NIG's 1.07,
+  checking whether ~200 heavy-tailed breach days can actually tell the two
+  apart.
+- A convolution check (`week9_nig_convolution.py`) tests the one process-level
+  prediction the rest of the project never examines: an iid NIG process
+  should convolve to an exact NIG at the 5-day horizon. It fails, the
+  convolved law is too thin in the tails, because successive days are not
+  independent, volatility clustering again, in a third guise.
+
+### Running Week 9
+
+```bash
+pip install numpy pandas scipy matplotlib
+python week9/code/week9_es_bootstrap.py
+python week9/code/week9_nig_convolution.py
+```
 
 ## Key references
 
 - Madan, Carr & Chang (1998) - Variance Gamma process
+- Barndorff-Nielsen (1997) - Normal Inverse Gaussian distributions and stochastic volatility modelling
 - Cont (2001) - Stylised facts of financial returns
 - Christoffersen (1998) - VaR backtesting framework
 - Basel Committee on Banking Supervision (2013) - FRTB

@@ -22,10 +22,62 @@ window.BBS_DATA2 = {"conv":{"n":1257,"hist":{"lo":-0.208685,"w":0.00607529,"c":[
 </script>
 <style>
 html { scroll-behavior: smooth; }
-body { margin: 0; background: #f2f0eb; color: #16150f; font-family: 'Archivo', Helvetica, sans-serif; }
+body { margin: 0; background: #f2f0eb; color: #16150f; font-family: 'Archivo', Helvetica, sans-serif; overflow-x: hidden; }
 a { color: #16150f; }
 a:hover { color: oklch(0.6 0.19 35); }
 ::selection { background: oklch(0.6 0.19 35); color: #f2f0eb; }
+
+/* Mobile pass: collapse the desktop multi-column grids to one column, and rein in
+   the fixed paddings/font-sizes that were sized for a wide viewport. The .bbs-table-grid
+   escape hatch is for the one grid that is really a data table, which scrolls instead. */
+@media (max-width: 860px) {
+  div[style*="display: grid"]:not(.bbs-table-grid) { grid-template-columns: 1fr !important; }
+
+  div[style*="position: sticky; top: 90px"] {
+    position: static !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+  div[style*="position: sticky; top: 90px"] div[style*="font-size: 96px"] { font-size: 40px !important; }
+
+  section[style*="padding: 96px 48px 64px"],
+  section[style*="padding: 48px 48px 0"],
+  section[style*="padding: 96px 48px"],
+  section[style*="padding: 72px 48px 48px"],
+  section#week-1 { padding-left: 20px !important; padding-right: 20px !important; }
+  section[style*="padding: 64px 0"] { margin-left: 20px !important; margin-right: 20px !important; }
+  section#top { padding: 48px 20px 32px !important; }
+  section[data-screen-label="Headline stats"] { margin-left: 20px !important; margin-right: 20px !important; flex-wrap: wrap !important; }
+  section[data-screen-label="Headline stats"] > div { flex: 1 1 50% !important; border-right: none !important; border-bottom: 2px solid #16150f; padding: 20px !important; box-sizing: border-box; }
+  footer { padding: 40px 20px !important; }
+
+  h2[style*="font-size: 52px"] { font-size: 32px !important; }
+  h3[style*="font-size: 34px"] { font-size: 26px !important; }
+  h1 { margin-bottom: 24px !important; }
+
+  header { padding: 14px 16px !important; }
+  header nav { gap: 12px !important; flex-wrap: wrap !important; row-gap: 8px !important; justify-content: flex-end !important; }
+  header div[style*="width: 420px"] {
+    position: fixed !important;
+    top: 104px !important;
+    left: 16px !important;
+    right: 16px !important;
+    width: auto !important;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    transform: none !important;
+  }
+
+  .bbs-table-grid { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  div[style*="padding: 24px 40px"] { padding: 18px 16px !important; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: clamp(44px, 14vw, 72px) !important; }
+  div[style*="font-size: 56px"] { font-size: 38px !important; }
+}
 </style>
 </helmet>
 
@@ -131,6 +183,9 @@ a:hover { color: oklch(0.6 0.19 35); }
     <div style="max-width: 900px">
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">Why leave Black-Scholes at all</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 24px">A literature review and research proposal. Cont (2001) catalogues the stylised facts Gaussian returns can't produce: heavy tails, skew, volatility clustering. Madan, Carr &amp; Chang (1998) supply the Variance-Gamma alternative; Christoffersen (1998) supplies the test that will judge everything at the end.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week1/writeup/Week1_Literature_Review.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week1_Literature_Review.md ↗</a>
+      </div>
       <div style="display: flex; gap: 12px; flex-wrap: wrap">
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px">Madan, Carr &amp; Chang 1998</div>
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px">Cont 2001</div>
@@ -150,6 +205,9 @@ a:hover { color: oklch(0.6 0.19 35); }
     <div style="max-width: 900px">
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">The tail is heavier than you think</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 28px">Gaussian and Student-t fitted by MLE. The t wins by 1,803 AIC units and its fitted ν̂ = 2.648 (95% CI 2.43–2.87) implies infinite kurtosis. At the 99% level the Gaussian books an Expected Shortfall of −3.24% where the t books −5.81%, a 79.5% understatement of tail risk.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week2/writeup/Week2_Results.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week2_Results.md ↗</a>
+      </div>
 <div style="border: 2px solid #16150f; background: #faf9f6; padding: 24px; margin-bottom: 24px">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px">
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase">The two fitted densities over all 6,287 days · live</div>
@@ -469,6 +527,9 @@ a:hover { color: oklch(0.6 0.19 35); }
     <div style="max-width: 900px">
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">The heavy tail is not estimation noise</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 28px">Four marginals refitted with full posteriors under NUTS in PyMC, the NIG through a custom Bessel-function log-density. Every model converged cleanly and the posteriors reproduce the MLEs, the headline parameters are stable features of the data, not point-estimate luck.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week4/writeup/Week4_Bayesian.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week4_Bayesian.md ↗</a>
+      </div>
 <div style="border: 2px solid #16150f; background: #faf9f6; padding: 24px; margin-bottom: 24px">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px">
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase">The NUTS chains, draw by draw · live</div>
@@ -540,6 +601,9 @@ a:hover { color: oklch(0.6 0.19 35); }
     <div style="max-width: 900px">
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">The NIG passes every check but one</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 28px">1,000 replicate return histories per model, scored with posterior predictive p-values across the marginal distribution and one dependence statistic. The failure every model shares, volatility clustering, observed 0.32 against replicate bands on zero, is the limit of any static marginal, and the reason Week 7 exists.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week5/writeup/Week5_PPC.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week5_PPC.md ↗</a>
+      </div>
 <div style="border: 2px solid #16150f; background: #faf9f6; padding: 24px; margin-bottom: 24px">
         <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px">Observed statistic against 1,000 replicate histories · pick a statistic</div>
         <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px">
@@ -567,7 +631,8 @@ a:hover { color: oklch(0.6 0.19 35); }
       <sc-if value="{{ openW5 }}" hint-placeholder-val="{{ false }}">
         <div style="border: 2px solid #16150f; border-top: none; background: #faf9f6; padding: 32px">
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px">Posterior predictive checks, hover a row for the model's verdict</div>
-          <div style="display: grid; grid-template-columns: 110px repeat(8, minmax(0, 1fr)); border-top: 2px solid #16150f; border-left: 2px solid #16150f; font-family: 'Space Grotesk', monospace">
+          <div style="overflow-x: auto">
+          <div class="bbs-table-grid" style="display: grid; grid-template-columns: 110px repeat(8, minmax(0, 1fr)); min-width: 720px; border-top: 2px solid #16150f; border-left: 2px solid #16150f; font-family: 'Space Grotesk', monospace">
             <div style="border-right: 2px solid #16150f; border-bottom: 2px solid #16150f; padding: 10px 12px; background: #16150f"></div>
             <sc-for list="{{ w5Stats }}" as="st" hint-placeholder-count="8">
               <div style="border-right: 2px solid #16150f; border-bottom: 2px solid #16150f; padding: 8px 5px; background: #16150f; color: #f2f0eb; font-size: 10px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.35; display: flex; align-items: flex-end; overflow-wrap: break-word; min-width: 0">{{ st }}</div>
@@ -578,6 +643,7 @@ a:hover { color: oklch(0.6 0.19 35); }
                 <div onMouseEnter="{{ r.hover }}" style="border-right: 2px solid #16150f; border-bottom: 2px solid #16150f; padding: 12px 4px; font-size: 13px; font-weight: 700; text-align: center; background: {{ cell.bg }}; color: {{ cell.fg }}; cursor: default; min-width: 0">{{ cell.mark }}</div>
               </sc-for>
             </sc-for>
+          </div>
           </div>
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; margin-top: 20px; padding: 14px 16px; border: 2px solid #16150f; background: #f2f0eb; line-height: 1.6">{{ w5Note }}</div>
         </div>
@@ -595,6 +661,9 @@ a:hover { color: oklch(0.6 0.19 35); }
     <div style="max-width: 900px">
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">The week has a shape</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 28px">Calendar and cross-sectional structure. Monday, carrying the weekend gap, has the heaviest tail of the week. The closed market earns a fifth of the variance but takes the jumps. Quarterly NIG skew tracks the VIX (R² 0.64 in logs). And earnings seasons leave index volatility flat to the decimal: index tail risk is macro risk.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week6/writeup/Week6_Results.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week6_Results.md ↗</a>
+      </div>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px; align-items: start">
         <div style="border: 2px solid #16150f; background: #faf9f6; padding: 24px">
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px">The shape of the week · pick a statistic</div>
@@ -722,6 +791,9 @@ a:hover { color: oklch(0.6 0.19 35); }
     <div style="max-width: 900px">
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">5,787 days out of sample</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 28px">Each model refitted on a rolling 500-day window, forecasting next-day VaR, judged by Christoffersen's framework. Better marginals genuinely help: the NIG cuts excess 99% violations from ×2.6 to ×1.57. But every model fails the independence test at every level: the violations arrive as bursts, in late 2008 and March 2020.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week7/writeup/Week7_Backtest.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week7_Backtest.md ↗</a>
+      </div>
 <div style="border: 2px solid #16150f; background: #faf9f6; padding: 24px; margin-bottom: 24px">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px">
           <div style="display: flex; gap: 8px; flex-wrap: wrap">
@@ -872,6 +944,9 @@ a:hover { color: oklch(0.6 0.19 35); }
       <h3 style="font-size: 34px; font-weight: 800; margin: 0 0 20px; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: pretty">The swan is a model choice</h3>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 12px">Taleb's first attribute, "outside regular expectation", made measurable: the return period each fitted model implies for each crisis's worst day,</p>
       <div data-katex="\mathrm{RP} = \frac{1}{252\,\hat{p}} \;\text{years}, \qquad \hat{p} = F_{\hat\theta}\!\left(r_{\text{worst}}\right)" style="font-size: 17px; margin: 0 0 24px"></div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week8/writeup/Week8_BlackSwan.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Week8_BlackSwan.md ↗</a>
+      </div>
       <div style="border: 2px solid #16150f; background: #faf9f6; padding: 32px">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 12px">
           <div style="display: flex; gap: 8px; flex-wrap: wrap">
@@ -1005,6 +1080,9 @@ a:hover { color: oklch(0.6 0.19 35); }
         <div style="font-family: 'Space Grotesk', monospace; font-size: 14px; color: #55524a">the process-level test the title demands</div>
       </div>
       <p style="font-size: 17px; line-height: 1.65; margin: 0 0 24px; max-width: 900px">A Lévy process makes one promise the rest of the project never tests: if daily returns are iid NIG, five of them convolve to an exact NIG with δ and μ simply multiplied by five. No new parameters, nothing to tune. The orange curve below is that promise laid over the 1,257 observed 5-day sums; the dashed curve is an NIG fitted to the sums directly. The promise fails exactly where this project keeps finding the boundary: the convolved law is far too thin in the tails, because successive days are not independent. Volatility clustering, in a third guise.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px">
+        <a href="https://github.com/darraghmoran2025/Applied_Statistics_Project/blob/main/week9/writeup/Final_Report.md" style="font-family: 'Space Grotesk', monospace; font-size: 13px; border: 2px solid #16150f; padding: 6px 14px; text-decoration: none" style-hover="background: #16150f; color: #f2f0eb">Final_Report.md ↗</a>
+      </div>
       <div style="border: 2px solid #16150f; background: #faf9f6; padding: 24px">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px">
           <div style="font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase">Five days at a time · live</div>
